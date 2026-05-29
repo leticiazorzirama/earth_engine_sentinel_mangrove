@@ -1,0 +1,3 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var degrad = ee.FeatureCollection("projects/leticiazr/assets/babitonga_degradadas");
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
