@@ -2,3 +2,6 @@
 var degrad = ee.FeatureCollection("projects/leticiazr/assets/babitonga_degradadas"),
     preserv = ee.FeatureCollection("projects/leticiazr/assets/babitonga_preservadas");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
+Map.addLayer(degrad, name = 'babitonga_degradada');
+Map.centerObject(degrad);
+
