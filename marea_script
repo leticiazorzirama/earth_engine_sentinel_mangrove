@@ -70,8 +70,8 @@ var d2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 
 // Verificar colecao de imagens existentes para a area de interesse
 // Conferir os anos das imagens mais antigas e mais recentes
-var d2MinData = d1.aggregate_min('system:time_start');
-var d2MaxData = d1.aggregate_max('system:time_start');
+var d2MinData = d2.aggregate_min('system:time_start');
+var d2MaxData = d2.aggregate_max('system:time_start');
 print('Babi Degradada 2 - MSI L2A - Data mais antiga:', ee.Date(d2MinData));
 print('Babi Degradada 2 -  MSI L2A - Data mais recente:', ee.Date(d2MaxData));
 // Mais antigo:
@@ -91,8 +91,8 @@ var p1 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 
 // Verificar colecao de imagens existentes para a area de interesse
 // Conferir os anos das imagens mais antigas e mais recentes
-var p1MinData = d1.aggregate_min('system:time_start');
-var p1MaxData = d1.aggregate_max('system:time_start');
+var p1MinData = p1.aggregate_min('system:time_start');
+var p1MaxData = p1.aggregate_max('system:time_start');
 print('Babi Preservada 1 - MSI L2A - Data mais antiga:', ee.Date(p1MinData));
 print('Babi Preservada 1 -  MSI L2A - Data mais recente:', ee.Date(p1MaxData));
 // Mais antigo:
@@ -111,8 +111,8 @@ var p2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 
 // Verificar colecao de imagens existentes para a area de interesse
 // Conferir os anos das imagens mais antigas e mais recentes
-var p2MinData = d1.aggregate_min('system:time_start');
-var p2MaxData = d1.aggregate_max('system:time_start');
+var p2MinData = p2.aggregate_min('system:time_start');
+var p2MaxData = p2.aggregate_max('system:time_start');
 print('Babi Preservada 2 - MSI L2A - Data mais antiga:', ee.Date(p2MinData));
 print('Babi Preservada 2 -  MSI L2A - Data mais recente:', ee.Date(p2MaxData));
 // Mais antigo:
@@ -120,6 +120,74 @@ print('Babi Preservada 2 -  MSI L2A - Data mais recente:', ee.Date(p2MaxData));
 
 // Verificar principais metadados da colecao
 print('Babi Preservada 2 - MSI L2A - Metadados:', p2);
+// X imagens
+// X bandas
+// X propriedades
+
+//3
+var p3 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiPres3);
+
+var p3MinData = p3.aggregate_min('system:time_start');
+var p3MaxData = p3.aggregate_max('system:time_start');
+print('Babi Preservada 3 - MSI L2A - Data mais antiga:', ee.Date(p3MinData));
+print('Babi Preservada 3 -  MSI L2A - Data mais recente:', ee.Date(p3MaxData));
+// Mais antigo:
+// Mais recente:
+
+print('Babi Preservada 3 - MSI L2A - Metadados:', p3);
+// X imagens
+// X bandas
+// X propriedades
+
+//4
+var p4 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiPres4);
+
+var p4MinData = p4.aggregate_min('system:time_start');
+var p4MaxData = p4.aggregate_max('system:time_start');
+print('Babi Preservada 4 - MSI L2A - Data mais antiga:', ee.Date(p4MinData));
+print('Babi Preservada 4 -  MSI L2A - Data mais recente:', ee.Date(p4MaxData));
+// Mais antigo:
+// Mais recente:
+
+print('Babi Preservada 4 - MSI L2A - Metadados:', p4);
+// X imagens
+// X bandas
+// X propriedades
+
+//5
+var p5 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiPres5);
+
+var p5MinData = p5.aggregate_min('system:time_start');
+var p5MaxData = p5.aggregate_max('system:time_start');
+print('Babi Preservada 5 - MSI L2A - Data mais antiga:', ee.Date(p5MinData));
+print('Babi Preservada 5 -  MSI L2A - Data mais recente:', ee.Date(p5MaxData));
+// Mais antigo:
+// Mais recente:
+
+print('Babi Preservada 5 - MSI L2A - Metadados:', p5);
+// X imagens
+// X bandas
+// X propriedades
+
+//6
+var p6 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiPres6);
+
+var p6MinData = p6.aggregate_min('system:time_start');
+var p6MaxData = p6.aggregate_max('system:time_start');
+print('Babi Preservada 6 - MSI L2A - Data mais antiga:', ee.Date(p6MinData));
+print('Babi Preservada 6 -  MSI L2A - Data mais recente:', ee.Date(p6MaxData));
+// Mais antigo:
+// Mais recente:
+
+print('Babi Preservada 6 - MSI L2A - Metadados:', p6);
 // X imagens
 // X bandas
 // X propriedades
