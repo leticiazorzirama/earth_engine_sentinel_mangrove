@@ -103,3 +103,23 @@ print('Babi Preservada 1 - MSI L2A - Metadados:', p1);
 // X imagens
 // X bandas
 // X propriedades
+
+//2
+var p1 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiPres2);
+
+// Verificar colecao de imagens existentes para a area de interesse
+// Conferir os anos das imagens mais antigas e mais recentes
+var p2MinData = d1.aggregate_min('system:time_start');
+var p2MaxData = d1.aggregate_max('system:time_start');
+print('Babi Preservada 2 - MSI L2A - Data mais antiga:', ee.Date(p2MinData));
+print('Babi Preservada 2 -  MSI L2A - Data mais recente:', ee.Date(p2MaxData));
+// Mais antigo:
+// Mais recente:
+
+// Verificar principais metadados da colecao
+print('Babi Preservada 2 - MSI L2A - Metadados:', p2);
+// X imagens
+// X bandas
+// X propriedades
