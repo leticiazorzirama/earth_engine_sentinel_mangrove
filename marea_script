@@ -105,7 +105,7 @@ print('Babi Preservada 1 - MSI L2A - Metadados:', p1);
 // X propriedades
 
 //2
-var p1 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+var p2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
   .filterBounds(babiPres2);
 
