@@ -2,6 +2,8 @@
 var degrad = ee.FeatureCollection("projects/leticiazr/assets/babitonga_degradadas"),
     preserv = ee.FeatureCollection("projects/leticiazr/assets/babitonga_preservadas");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
+
+
 Map.centerObject(degrad);
 Map.addLayer(degrad, {color: 'red', fillColor: 'ff000033'}, 'Babitonga_degradada');
 
