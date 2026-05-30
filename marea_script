@@ -9,6 +9,7 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
     babiPres6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 // ETAPA: CARREGAR, IMPORTAR E VISUALIZAR ASSETS
+// TODO: cor por área
 
 // Áreas degradadas 
 //1
@@ -27,23 +28,23 @@ Map.addLayer(babiPres1, {color: '#EAF3DE', fillColor: '#EAF3DE'}, 'Babi Preserva
 
 //2
 Map.centerObject(babiPres2);
-Map.addLayer(babiPres2, {color: '#C0DD97', fillColor: '#C0DD97'}, 'Babi Preservada - área 2');
+Map.addLayer(babiPres2, {color: '#C0DD97', fillColor: '#C0DD97'}, 'Babi Preservada - área 2', false);
 
 //3
 Map.centerObject(babiPres3);
-Map.addLayer(babiPres3, {color: '#97C459', fillColor: '#97C459'}, 'Babi Preservada - área 3');
+Map.addLayer(babiPres3, {color: '#97C459', fillColor: '#97C459'}, 'Babi Preservada - área 3', false);
 
 //4
 Map.centerObject(babiPres4);
-Map.addLayer(babiPres4, {color: '#639922', fillColor: '#639922'}, 'Babi Preservada - área 4');
+Map.addLayer(babiPres4, {color: '#639922', fillColor: '#639922'}, 'Babi Preservada - área 4', false);
 
 //5
 Map.centerObject(babiPres5);
-Map.addLayer(babiPres5, {color: '#3B6D11', fillColor: '#3B6D11'}, 'Babi Preservada - área 5');
+Map.addLayer(babiPres5, {color: '#3B6D11', fillColor: '#3B6D11'}, 'Babi Preservada - área 5', false);
 
 //6
 Map.centerObject(babiPres6);
-Map.addLayer(babiPres6, {color: '#27500A', fillColor: '#27500A'}, 'Babi Preservada - área 6');
+Map.addLayer(babiPres6, {color: '#27500A', fillColor: '#27500A'}, 'Babi Preservada - área 6', false);
 
 // ETAPA: AQUISITAR IMAGENS
 
