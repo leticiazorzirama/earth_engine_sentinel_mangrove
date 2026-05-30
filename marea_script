@@ -64,7 +64,7 @@ print('Babi Degradada 1 - MSI L2A - Metadados:', d1);
 // X propriedades
 
 //2
-var d1 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+var d2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
   .filterBounds(babiDegr2);
 
