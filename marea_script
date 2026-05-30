@@ -13,21 +13,17 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
 
 // Áreas degradadas 
 //1
-Map.centerObject(babiDegr1);
 Map.addLayer(babiDegr1, {color: '#F5C4B3', fillColor: '#F5C4B3'}, 'Babi Degradada - área 1', false);
 
 //2
-Map.centerObject(babiDegr2);
 Map.addLayer(babiDegr2, {color: '#F0997B', fillColor: '#F0997B'}, 'Babi Degradada - área 2', false);
 
 // Áreas preservadas
 
 //1
-Map.centerObject(babiPres1);
 Map.addLayer(babiPres1, {color: '#EAF3DE', fillColor: '#EAF3DE'}, 'Babi Preservada - área 1', false);
 
 //2
-Map.centerObject(babiPres2);
 Map.addLayer(babiPres2, {color: '#C0DD97', fillColor: '#C0DD97'}, 'Babi Preservada - área 2', false);
 
 //3
@@ -35,7 +31,6 @@ Map.centerObject(babiPres3);
 Map.addLayer(babiPres3, {color: '#97C459', fillColor: '#97C459'}, 'Babi Preservada - área 3', false);
 
 //4
-Map.centerObject(babiPres4);
 Map.addLayer(babiPres4, {color: '#639922', fillColor: '#639922'}, 'Babi Preservada - área 4', false);
 
 //5
@@ -43,8 +38,30 @@ Map.centerObject(babiPres5);
 Map.addLayer(babiPres5, {color: '#3B6D11', fillColor: '#3B6D11'}, 'Babi Preservada - área 5', false);
 
 //6
-Map.centerObject(babiPres6);
 Map.addLayer(babiPres6, {color: '#27500A', fillColor: '#27500A'}, 'Babi Preservada - área 6', false);
 
 // ETAPA: AQUISITAR IMAGENS
+// Dataset: Harmonized Sentinel-2 MSI: MultiSpectral Instrument, Level-2A (SR)
+// Importar o dataset para cada area de interesse 
+// Filtrar por cobertura de nuvens de ate 5%
 
+// Áreas degradadas 
+//1
+var d1 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiDegr1);
+
+// Verificar colecao de imagens existentes para a area de interesse
+// Conferir os anos das imagens mais antigas e mais recentes
+var d1MinData = d1.aggregate_min('system:time_start');
+var d1MinData = d1.aggregate_max('system:time_start');
+print('Babi Degradada 1 - MSI L2A - Data mais antiga:', ee.Date(d1MinData));
+print('Babi Degradada 1 -  MSI L2A - Data mais recente:', ee.Date(d1MinData));
+// Mais antigo:
+// Mais recente:
+
+// Verificar principais metadados da colecao
+print('Babi Degradada 1 - MSI L2A - Metadados:', s2);
+// X imagens
+// X bandas
+// X propriedades
