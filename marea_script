@@ -1,16 +1,49 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
-var degrad = ee.FeatureCollection("projects/leticiazr/assets/babitonga_degradadas"),
-    preserv = ee.FeatureCollection("projects/leticiazr/assets/babitonga_preservadas");
+var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1"),
+    babiDegr2 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada2"),
+    babiPres1 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada1"),
+    babiPres2 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada2"),
+    babiPres3 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada3"),
+    babiPres4 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada4"),
+    babiPres5 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada5"),
+    babiPres6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 // ETAPA: CARREGAR, IMPORTAR E VISUALIZAR ASSETS
 
 // Áreas degradadas 
-Map.centerObject(degrad);
-Map.addLayer(degrad, {color: 'red', fillColor: 'ff000033'}, 'Babitonga_degradada');
+//1
+Map.centerObject(babiDegr1);
+Map.addLayer(babiDegr1, {color: 'red', fillColor: ''}, 'Babitonga_degradada1');
+
+//2
+Map.centerObject(babiDegr2);
+Map.addLayer(babiDegr2, {color: 'red', fillColor: ''}, 'Babitonga_degradada2');
 
 // Áreas preservadas
+
+//1
 Map.centerObject(preserv);
-Map.addLayer(preserv, {color: 'green', fillColor: '#6bb300'}, 'Babitonga_preservada');
+Map.addLayer(preserv, {color: 'green', fillColor: '#6bb300'}, 'Babitonga_preservada1');
+
+//2
+Map.centerObject(preserv);
+Map.addLayer(preserv, {color: 'green', fillColor: '#6bb300'}, 'Babitonga_preservada2');
+
+//3
+Map.centerObject(preserv);
+Map.addLayer(preserv, {color: 'green', fillColor: '#6bb300'}, 'Babitonga_preservada3');
+
+//4
+Map.centerObject(preserv);
+Map.addLayer(preserv, {color: 'green', fillColor: '#6bb300'}, 'Babitonga_preservada4');
+
+//5
+Map.centerObject(preserv);
+Map.addLayer(preserv, {color: 'green', fillColor: '#6bb300'}, 'Babitonga_preservada5');
+
+//6
+Map.centerObject(preserv);
+Map.addLayer(preserv, {color: 'green', fillColor: '#6bb300'}, 'Babitonga_preservada6');
 
 // ETAPA: AQUISITAR IMAGENS
 
