@@ -190,3 +190,5 @@ print('Babi Preservada 6 - MSI L2A - Metadados:', p6);
 // X bandas
 // X propriedades
 
+Map.centerObject(p6, 10);
+
