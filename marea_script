@@ -8,8 +8,9 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
     babiPres5 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada5"),
     babiPres6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
+// ==================================================
 // ETAPA: CARREGAR, IMPORTAR E VISUALIZAR ASSETS
-// TODO: cor por área
+// ==================================================
 
 // Áreas degradadas 
 //1
@@ -37,28 +38,32 @@ Map.addLayer(babiPres5, {color: '#3B6D11', fillColor: '#3B6D11'}, 'Babi Preserva
 //6
 Map.addLayer(babiPres6, {color: '#27500A', fillColor: '#27500A'}, 'Babi Preservada - área 6', false);
 
+// ==================================================
 // ETAPA: AQUISITAR IMAGENS
+// ==================================================
+
 // Dataset: Harmonized Sentinel-2 MSI: MultiSpectral Instrument, Level-2A (SR)
 // Importar o dataset para cada area de interesse 
 // Filtrar por cobertura de nuvens de ate 5%
 
 // Áreas degradadas 
 //1
+//d1
 var d1 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
   .filterBounds(babiDegr1);
 
 // Verificar colecao de imagens existentes para a area de interesse
 // Conferir os anos das imagens mais antigas e mais recentes
-var d1MinData = d1.aggregate_min('system:time_start');
-var d1MaxData = d1.aggregate_max('system:time_start');
-print('Babi Degradada 1 - MSI L2A - Data mais antiga:', ee.Date(d1MinData));
-print('Babi Degradada 1 -  MSI L2A - Data mais recente:', ee.Date(d1MaxData));
+// var d1MinData = d1.aggregate_min('system:time_start');
+// var d1MaxData = d1.aggregate_max('system:time_start');
+// print('Babi Degradada 1 - MSI L2A - Data mais antiga:', ee.Date(d1MinData));
+// print('Babi Degradada 1 -  MSI L2A - Data mais recente:', ee.Date(d1MaxData));
 // Mais antigo:
 // Mais recente:
 
 // Verificar principais metadados da colecao
-print('Babi Degradada 1 - MSI L2A - Metadados:', d1);
+// print('Babi Degradada 1 - MSI L2A - Metadados:', d1);
 // X imagens
 // X bandas
 // X propriedades
@@ -66,39 +71,41 @@ print('Babi Degradada 1 - MSI L2A - Metadados:', d1);
 // Repetir para a outra área degradada
 
 //2
+//d2
 var d2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
   .filterBounds(babiDegr2);
 
-var d2MinData = d2.aggregate_min('system:time_start');
-var d2MaxData = d2.aggregate_max('system:time_start');
-print('Babi Degradada 2 - MSI L2A - Data mais antiga:', ee.Date(d2MinData));
-print('Babi Degradada 2 -  MSI L2A - Data mais recente:', ee.Date(d2MaxData));
+// var d2MinData = d2.aggregate_min('system:time_start');
+// var d2MaxData = d2.aggregate_max('system:time_start');
+// print('Babi Degradada 2 - MSI L2A - Data mais antiga:', ee.Date(d2MinData));
+// print('Babi Degradada 2 -  MSI L2A - Data mais recente:', ee.Date(d2MaxData));
 // Mais antigo:
 // Mais recente:
 
-print('Babi Degradada 2 - MSI L2A - Metadados:', d2);
+// print('Babi Degradada 2 - MSI L2A - Metadados:', d2);
 // X imagens
 // X bandas
 // X propriedades
 
 // Áreas preservadas 
 //1
+//p1
 var p1 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
   .filterBounds(babiPres1);
 
 // Verificar colecao de imagens existentes para a area de interesse
 // Conferir os anos das imagens mais antigas e mais recentes
-var p1MinData = p1.aggregate_min('system:time_start');
-var p1MaxData = p1.aggregate_max('system:time_start');
-print('Babi Preservada 1 - MSI L2A - Data mais antiga:', ee.Date(p1MinData));
-print('Babi Preservada 1 -  MSI L2A - Data mais recente:', ee.Date(p1MaxData));
+// var p1MinData = p1.aggregate_min('system:time_start');
+// var p1MaxData = p1.aggregate_max('system:time_start');
+// print('Babi Preservada 1 - MSI L2A - Data mais antiga:', ee.Date(p1MinData));
+// print('Babi Preservada 1 -  MSI L2A - Data mais recente:', ee.Date(p1MaxData));
 // Mais antigo:
 // Mais recente:
 
 // Verificar principais metadados da colecao
-print('Babi Preservada 1 - MSI L2A - Metadados:', p1);
+// print('Babi Preservada 1 - MSI L2A - Metadados:', p1);
 // X imagens
 // X bandas
 // X propriedades
@@ -106,89 +113,147 @@ print('Babi Preservada 1 - MSI L2A - Metadados:', p1);
 // Repetir para as demais áreas preservadas
 
 //2
+//p2
 var p2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
   .filterBounds(babiPres2);
 
-var p2MinData = p2.aggregate_min('system:time_start');
-var p2MaxData = p2.aggregate_max('system:time_start');
-print('Babi Preservada 2 - MSI L2A - Data mais antiga:', ee.Date(p2MinData));
-print('Babi Preservada 2 -  MSI L2A - Data mais recente:', ee.Date(p2MaxData));
+// var p2MinData = p2.aggregate_min('system:time_start');
+// var p2MaxData = p2.aggregate_max('system:time_start');
+// print('Babi Preservada 2 - MSI L2A - Data mais antiga:', ee.Date(p2MinData));
+// print('Babi Preservada 2 -  MSI L2A - Data mais recente:', ee.Date(p2MaxData));
 // Mais antigo:
 // Mais recente:
 
-print('Babi Preservada 2 - MSI L2A - Metadados:', p2);
+// print('Babi Preservada 2 - MSI L2A - Metadados:', p2);
 // X imagens
 // X bandas
 // X propriedades
 
 //3
+//p3
 var p3 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
   .filterBounds(babiPres3);
 
-var p3MinData = p3.aggregate_min('system:time_start');
-var p3MaxData = p3.aggregate_max('system:time_start');
-print('Babi Preservada 3 - MSI L2A - Data mais antiga:', ee.Date(p3MinData));
-print('Babi Preservada 3 -  MSI L2A - Data mais recente:', ee.Date(p3MaxData));
+// var p3MinData = p3.aggregate_min('system:time_start');
+// var p3MaxData = p3.aggregate_max('system:time_start');
+// print('Babi Preservada 3 - MSI L2A - Data mais antiga:', ee.Date(p3MinData));
+// print('Babi Preservada 3 -  MSI L2A - Data mais recente:', ee.Date(p3MaxData));
 // Mais antigo:
 // Mais recente:
 
-print('Babi Preservada 3 - MSI L2A - Metadados:', p3);
+// print('Babi Preservada 3 - MSI L2A - Metadados:', p3);
 // X imagens
 // X bandas
 // X propriedades
 
 //4
+//p4
 var p4 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
   .filterBounds(babiPres4);
 
-var p4MinData = p4.aggregate_min('system:time_start');
-var p4MaxData = p4.aggregate_max('system:time_start');
-print('Babi Preservada 4 - MSI L2A - Data mais antiga:', ee.Date(p4MinData));
-print('Babi Preservada 4 -  MSI L2A - Data mais recente:', ee.Date(p4MaxData));
+// var p4MinData = p4.aggregate_min('system:time_start');
+// var p4MaxData = p4.aggregate_max('system:time_start');
+// print('Babi Preservada 4 - MSI L2A - Data mais antiga:', ee.Date(p4MinData));
+// print('Babi Preservada 4 -  MSI L2A - Data mais recente:', ee.Date(p4MaxData));
 // Mais antigo:
 // Mais recente:
 
-print('Babi Preservada 4 - MSI L2A - Metadados:', p4);
+// print('Babi Preservada 4 - MSI L2A - Metadados:', p4);
 // X imagens
 // X bandas
 // X propriedades
 
 //5
+//p5
 var p5 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
   .filterBounds(babiPres5);
 
-var p5MinData = p5.aggregate_min('system:time_start');
-var p5MaxData = p5.aggregate_max('system:time_start');
-print('Babi Preservada 5 - MSI L2A - Data mais antiga:', ee.Date(p5MinData));
-print('Babi Preservada 5 -  MSI L2A - Data mais recente:', ee.Date(p5MaxData));
+// var p5MinData = p5.aggregate_min('system:time_start');
+// var p5MaxData = p5.aggregate_max('system:time_start');
+// print('Babi Preservada 5 - MSI L2A - Data mais antiga:', ee.Date(p5MinData));
+// print('Babi Preservada 5 -  MSI L2A - Data mais recente:', ee.Date(p5MaxData));
 // Mais antigo:
 // Mais recente:
 
-print('Babi Preservada 5 - MSI L2A - Metadados:', p5);
+// print('Babi Preservada 5 - MSI L2A - Metadados:', p5);
 // X imagens
 // X bandas
 // X propriedades
 
 //6
+//p6
 var p6 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
   .filterBounds(babiPres6);
 
-var p6MinData = p6.aggregate_min('system:time_start');
-var p6MaxData = p6.aggregate_max('system:time_start');
-print('Babi Preservada 6 - MSI L2A - Data mais antiga:', ee.Date(p6MinData));
-print('Babi Preservada 6 -  MSI L2A - Data mais recente:', ee.Date(p6MaxData));
+// var p6MinData = p6.aggregate_min('system:time_start');
+// var p6MaxData = p6.aggregate_max('system:time_start');
+// print('Babi Preservada 6 - MSI L2A - Data mais antiga:', ee.Date(p6MinData));
+// print('Babi Preservada 6 -  MSI L2A - Data mais recente:', ee.Date(p6MaxData));
 // Mais antigo:
 // Mais recente:
 
-print('Babi Preservada 6 - MSI L2A - Metadados:', p6);
+// print('Babi Preservada 6 - MSI L2A - Metadados:', p6);
 // X imagens
 // X bandas
 // X propriedades
 
-Map.centerObject(p6, 10);
+// Map.centerObject(p6, 10);
 
+// ==================================================
+// ETAPA: TABELA DE DATAS DISPONIVEIS POR POLIGONO
+// ==================================================
+
+// Funcao reutilizavel: gera uma FeatureCollection (1 linha por imagem)
+// com data, indice e cobertura de nuvens, pronta para exportar como CSV
+function gerarTabelaDatas(colecao, nomeArea) {
+  return colecao.map(function(img) {
+    return ee.Feature(null, {
+      'area': nomeArea,
+      'indice': img.get('system:index'),
+      'data': img.date().format('YYYY-MM-dd'),
+      'ano': img.date().get('year'),
+      'mes': img.date().get('month'),
+      'time_start': img.get('system:time_start'),
+      'nuvem_pct': img.get('CLOUD_COVERAGE_ASSESSMENT')
+    });
+  });
+}
+
+// Dicionario com todas as areas: degradadas + preservadas
+var areas = {
+  'babiDegr1': d1,
+  'babiDegr2': d2,
+  'babiPres1': p1,
+  'babiPres2': p2,
+  'babiPres3': p3,
+  'babiPres4': p4,
+  'babiPres5': p5,
+  'babiPres6': p6
+};
+
+// Objeto para guardar as tabelas geradas (util se quiser reusar em memoria)
+var tabelasDatas = {};
+
+Object.keys(areas).forEach(function(nomeArea) {
+  var colecao = areas[nomeArea];
+  
+  // Gerar tabela de datas para a area
+  var tabela = gerarTabelaDatas(colecao, nomeArea);
+  tabelasDatas[nomeArea] = tabela;
+  
+  print(nomeArea + ' - Tabela de datas disponiveis:', tabela);
+  
+  // Exportar para inspecionar fora do console (Sheets/Excel)
+  Export.table.toDrive({
+    collection: tabela,
+    description: nomeArea + '_tabela_datas',
+    folder: 'GEE_Exports',
+    fileNamePrefix: nomeArea + '_tabela_datas',
+    fileFormat: 'CSV'
+  });
+});
