@@ -379,4 +379,4 @@ blocos.forEach(function(bloco, i) {
   });
 });
 
-// Teste de conexao com o github na branch master
+// Caso aprovado, realizar a extracao para as outras areas
