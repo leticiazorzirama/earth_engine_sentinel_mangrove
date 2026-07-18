@@ -208,10 +208,25 @@ var p6 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 // ETAPA: TABELA DE DATAS DISPONIVEIS POR POLIGONO
 // ==================================================
 
-// Funcao reutilizavel: gera uma FeatureCollection (1 linha por imagem)
-// com data, indice e cobertura de nuvens, pronta para exportar como CSV
+// definirEstacao: 
+// recebe uma imagem e classifica seu mes de aquisicao em uma das duas
+// estacoes definidas para a regiao da Baia Babitonga: 
+// 'seco' (meses 4,5,6,7,8) ou 'chuvoso' (meses 9,10,11,12,1,2,3)
+// baseada em Koehntopp et al. (2021, Revista CEPSUL)
+// Retorna a mesma imagem com a propriedade 'estacao' adicionada
+function definirEstacao(img) {
+  var mes = ee.Number(img.date().get('month'));
+  var ehSeco = mes.gte(4).and(mes.lte(8));
+  var estacao = ee.Algorithms.If(ehSeco, 'seco', 'chuvoso');
+  return img.set('estacao', estacao);
+}
+
+// gerarTabelasDatas: gera uma FeatureCollection (1 linha por imagem)
+// com data, indice, cobertura de nuvens e estacao pronta para exportar como CSV
 function gerarTabelaDatas(colecao, nomeArea) {
-  return colecao.map(function(img) {
+  var colecaoComEstacao = colecao.map(definirEstacao);
+
+  return colecaoComEstacao.map(function(img) {
     return ee.Feature(null, {
       'area': nomeArea,
       'indice': img.get('system:index'),
@@ -219,7 +234,8 @@ function gerarTabelaDatas(colecao, nomeArea) {
       'ano': img.date().get('year'),
       'mes': img.date().get('month'),
       'time_start': img.get('system:time_start'),
-      'nuvem_pct': img.get('CLOUD_COVERAGE_ASSESSMENT')
+      'nuvem_pct': img.get('CLOUD_COVERAGE_ASSESSMENT'),
+      'estacao': img.get('estacao')
     });
   });
 }
@@ -251,9 +267,9 @@ Object.keys(areas).forEach(function(nomeArea) {
   // Exportar para inspecionar fora do console (Sheets/Excel)
   Export.table.toDrive({
     collection: tabela,
-    description: nomeArea + '_tabela_datas',
+    description: nomeArea,
     folder: 'GEE_Exports',
-    fileNamePrefix: nomeArea + '_tabela_datas',
+    fileNamePrefix: nomeArea,
     fileFormat: 'CSV'
   });
 });
