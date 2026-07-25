@@ -265,7 +265,7 @@ Object.keys(areas).forEach(function(nomeArea) {
   
   print(nomeArea + ' - Tabela de datas disponiveis:', tabela);
   
-  // Exportar para inspecionar fora do console (Sheets/Excel)
+  // Exportar cada tabela
   Export.table.toDrive({
     collection: tabela,
     description: nomeArea,
@@ -379,5 +379,3 @@ Object.keys(areas).forEach(function(nomeArea) {
 //     maxPixels: 1e13
 //   });
 // });
-
-// // Caso aprovado, realizar a extracao para as outras areas
