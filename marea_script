@@ -8,9 +8,9 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
     babiPres5 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada5"),
     babiPres6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
-// ==================================================
+// ==============================================
 // ETAPA: CARREGAR, IMPORTAR E VISUALIZAR ASSETS
-// ==================================================
+// ==============================================
 
 // Áreas degradadas 
 //1
@@ -38,9 +38,9 @@ Map.addLayer(babiPres5, {color: '#3B6D11', fillColor: '#3B6D11'}, 'Babi Preserva
 //6
 Map.addLayer(babiPres6, {color: '#27500A', fillColor: '#27500A'}, 'Babi Preservada - área 6', false);
 
-// ==================================================
+// =========================
 // ETAPA: AQUISITAR IMAGENS
-// ==================================================
+// =========================
 
 // Dataset: Harmonized Sentinel-2 MSI: MultiSpectral Instrument, Level-2A (SR)
 // Importar o dataset para cada area de interesse 
@@ -204,9 +204,9 @@ print('Babi Preservada 6 - MSI L2A - Metadados:', p6);
 
 // Map.centerObject(p6, 10);
 
-// ==================================================
+// =================================================
 // ETAPA: TABELA DE DATAS DISPONIVEIS POR POLIGONO
-// ==================================================
+// =================================================
 
 // definirEstacao: 
 // recebe uma imagem e classifica seu mes de aquisicao em uma das duas
@@ -275,9 +275,9 @@ Object.keys(areas).forEach(function(nomeArea) {
   });
 });
 
-// // ==================================================
+// // ===============================================================
 // // ETAPA: PRE-PROCESSAMENTO (reaproveitado do script de manguezal)
-// // ==================================================
+// // ===============================================================
 
 // var d1cloudProb = ee.ImageCollection('COPERNICUS/S2_CLOUD_PROBABILITY')
 //   .filterBounds(babiDegr1)
@@ -308,13 +308,13 @@ Object.keys(areas).forEach(function(nomeArea) {
 // // Ordenar cronologicamente - fundamental para a deteccao de blocos
 // var d1Ordenado = d1MaskEstacao.sort('system:time_start');
 
-// // ==================================================
+// // ==================================================================
 // // ETAPA: DETECTAR BLOCOS DE ESTACAO CONSECUTIVOS
 // // A deteccao de sequencias (runs) e mais simples client-side, entao
 // // trazemos apenas indice/data/estacao para o cliente (getInfo),
 // // processamos os blocos em JS, e devolvemos ao servidor apenas
 // // os ids das imagens de cada bloco para filtrar a colecao original.
-// // ==================================================
+// // ==================================================================
 
 // var d1ListaInfo = d1Ordenado.map(function(img) {
 //   return ee.Feature(null, {
@@ -347,11 +347,11 @@ Object.keys(areas).forEach(function(nomeArea) {
 
 // print('Babi Degradada 1 - Blocos detectados:', blocos);
 
-// // ==================================================
+// // =================================================================
 // // ETAPA: COMPOR/EXPORTAR CADA BLOCO
 // // Bloco com 1 imagem -> exporta a imagem bruta (ja pre-processada)
 // // Bloco com 2+ imagens -> composita por mediana antes de exportar
-// // ==================================================
+// // =================================================================
 
 // blocos.forEach(function(bloco, i) {
 //   var numImg = bloco.indices.length;
