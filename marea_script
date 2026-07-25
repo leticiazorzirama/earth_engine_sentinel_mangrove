@@ -256,126 +256,144 @@ var areas = {
 // Objeto para guardar as tabelas geradas (util se quiser reusar em memoria)
 var tabelasDatas = {};
 
-Object.keys(areas).forEach(function(nomeArea) {
-  var colecao = areas[nomeArea];
+// Object.keys(areas).forEach(function(nomeArea) {
+//   var colecao = areas[nomeArea];
   
-  // Gerar tabela de datas para a area
-  var tabela = gerarTabelaDatas(colecao, nomeArea);
-  tabelasDatas[nomeArea] = tabela;
+//   // Gerar tabela de datas para a area
+//   var tabela = gerarTabelaDatas(colecao, nomeArea);
+//   tabelasDatas[nomeArea] = tabela;
   
-  print(nomeArea + ' - Tabela de datas disponiveis:', tabela);
+//   print(nomeArea + ' - Tabela de datas disponiveis:', tabela);
   
-  // Exportar cada tabela
-  Export.table.toDrive({
-    collection: tabela,
-    description: nomeArea,
-    folder: 'GEE_Exports',
-    fileNamePrefix: nomeArea,
-    fileFormat: 'CSV'
+//   // Exportar cada tabela
+//   Export.table.toDrive({
+//     collection: tabela,
+//     description: nomeArea,
+//     folder: 'GEE_Exports',
+//     fileNamePrefix: nomeArea,
+//     fileFormat: 'CSV'
+//   });
+// });
+
+// ===============================================================
+// ETAPA: PRE-PROCESSAMENTO + DETECCAO DE BLOCOS + EXPORTACAO
+// Controle manual por area: alterar AREA_ATUAL e rodar o script
+// novamente para processar a proxima area.
+// ===============================================================
+
+// Dicionario: nome da area -> colecao de imagens (ja filtrada por bounds/nuvens)
+var areas = {
+  'babiDegr1': d1,
+  'babiDegr2': d2,
+  'babiPres1': p1,
+  'babiPres2': p2,
+  'babiPres3': p3,
+  'babiPres4': p4,
+  'babiPres5': p5,
+  'babiPres6': p6
+};
+
+// Dicionario: nome da area -> geometria do poligono (para clip e region)
+var poligonos = {
+  'babiDegr1': babiDegr1,
+  'babiDegr2': babiDegr2,
+  'babiPres1': babiPres1,
+  'babiPres2': babiPres2,
+  'babiPres3': babiPres3,
+  'babiPres4': babiPres4,
+  'babiPres5': babiPres5,
+  'babiPres6': babiPres6
+};
+
+// ===============================================================
+// VARIAVEL DE CONTROLE - alterar manualmente a cada execucao
+// Valores possiveis: 'babiDegr1', 'babiDegr2', 'babiPres1', 'babiPres2',
+// 'babiPres3', 'babiPres4', 'babiPres5', 'babiPres6'
+// ===============================================================
+var AREA_ATUAL = 'babiDegr1';
+
+// ---- PRE-PROCESSAMENTO ----
+var colecao = areas[AREA_ATUAL];
+var poligono = poligonos[AREA_ATUAL];
+
+var cloudProb = ee.ImageCollection('COPERNICUS/S2_CLOUD_PROBABILITY')
+  .filterBounds(poligono)
+  .filterDate('2015-01-01', '2026-12-31');
+
+var comb = ee.ImageCollection(ee.Join.saveFirst('s2cloudProb').apply({
+  primary: colecao,
+  secondary: cloudProb,
+  condition: ee.Filter.equals({leftField: 'system:index', rightField: 'system:index'})
+}));
+
+function maskNuvens(img) {
+  var nuvemProb = ee.Image(img.get('s2cloudProb')).select('probability');
+  var temNuvem = nuvemProb.gt(50);
+  var bandas = ['B1','B2','B3','B4','B5','B6','B7','B8','B8A','B9','B11','B12'];
+  return img.select(bandas)
+    .updateMask(temNuvem.not())
+    .divide(10000)
+    .copyProperties(img, img.propertyNames());
+}
+
+var mask = comb.map(maskNuvens);
+var maskEstacao = mask.map(definirEstacao);
+var ordenado = maskEstacao.sort('system:time_start');
+
+// ---- DETECTAR BLOCOS DE ESTACAO CONSECUTIVOS ----
+var listaInfo = ordenado.map(function(img) {
+  return ee.Feature(null, {
+    'indice': img.get('system:index'),
+    'time_start': img.get('system:time_start'),
+    'estacao': img.get('estacao')
   });
+}).getInfo().features;
+
+var blocos = [];
+var blocoAtual = null;
+
+listaInfo.forEach(function(f) {
+  var props = f.properties;
+  if (blocoAtual === null || blocoAtual.estacao !== props.estacao) {
+    blocoAtual = {
+      estacao: props.estacao,
+      indices: [],
+      dataInicio: null,
+      dataFim: null
+    };
+    blocos.push(blocoAtual);
+  }
+  blocoAtual.indices.push(props.indice);
+  var dataImg = ee.Date(props.time_start).format('YYYY-MM-dd').getInfo();
+  if (blocoAtual.dataInicio === null) blocoAtual.dataInicio = dataImg;
+  blocoAtual.dataFim = dataImg;
 });
 
-// // ===============================================================
-// // ETAPA: PRE-PROCESSAMENTO (reaproveitado do script de manguezal)
-// // ===============================================================
+print(AREA_ATUAL + ' - Blocos detectados:', blocos);
 
-// var d1cloudProb = ee.ImageCollection('COPERNICUS/S2_CLOUD_PROBABILITY')
-//   .filterBounds(babiDegr1)
-//   .filterDate('2015-01-01', '2026-12-31');
+// ---- COMPOR/EXPORTAR CADA BLOCO ----
+blocos.forEach(function(bloco, i) {
+  var numImg = bloco.indices.length;
+  var subColecao = ordenado.filter(ee.Filter.inList('system:index', bloco.indices));
 
-// var d1Comb = ee.ImageCollection(ee.Join.saveFirst('s2cloudProb').apply({
-//   primary: d1,
-//   secondary: d1cloudProb,
-//   condition: ee.Filter.equals({leftField: 'system:index', rightField: 'system:index'})
-// }));
+  var imagemFinal = (numImg === 1)
+    ? subColecao.first()
+    : subColecao.median();
 
-// function maskNuvens(img) {
-//   var nuvemProb = ee.Image(img.get('s2cloudProb')).select('probability');
-//   var temNuvem = nuvemProb.gt(50);
-//   var bandas = ['B1','B2','B3','B4','B5','B6','B7','B8','B8A','B9','B11','B12'];
+  imagemFinal = imagemFinal.clip(poligono);
 
-//   return img.select(bandas)
-//     .updateMask(temNuvem.not())
-//     .divide(10000)
-//     .copyProperties(img, img.propertyNames());
-// }
+  var nomeBloco = AREA_ATUAL + '_bloco' + (i + 1) + '_' + bloco.estacao
+    + '_' + bloco.dataInicio + '_a_' + bloco.dataFim;
 
-// var d1Mask = d1Comb.map(maskNuvens);
+  print(nomeBloco + ' - n imagens: ' + numImg);
 
-// // Adicionar a coluna 'estacao' (mesma logica ja definida)
-// var d1MaskEstacao = d1Mask.map(definirEstacao);
-
-// // Ordenar cronologicamente - fundamental para a deteccao de blocos
-// var d1Ordenado = d1MaskEstacao.sort('system:time_start');
-
-// // ==================================================================
-// // ETAPA: DETECTAR BLOCOS DE ESTACAO CONSECUTIVOS
-// // A deteccao de sequencias (runs) e mais simples client-side, entao
-// // trazemos apenas indice/data/estacao para o cliente (getInfo),
-// // processamos os blocos em JS, e devolvemos ao servidor apenas
-// // os ids das imagens de cada bloco para filtrar a colecao original.
-// // ==================================================================
-
-// var d1ListaInfo = d1Ordenado.map(function(img) {
-//   return ee.Feature(null, {
-//     'indice': img.get('system:index'),
-//     'time_start': img.get('system:time_start'),
-//     'estacao': img.get('estacao')
-//   });
-// }).getInfo().features;
-
-// // Construir os blocos comparando a estacao de cada imagem com a anterior
-// var blocos = [];
-// var blocoAtual = null;
-
-// d1ListaInfo.forEach(function(f) {
-//   var props = f.properties;
-//   if (blocoAtual === null || blocoAtual.estacao !== props.estacao) {
-//     blocoAtual = {
-//       estacao: props.estacao,
-//       indices: [],
-//       dataInicio: null,
-//       dataFim: null
-//     };
-//     blocos.push(blocoAtual);
-//   }
-//   blocoAtual.indices.push(props.indice);
-//   var dataImg = ee.Date(props.time_start).format('YYYY-MM-dd').getInfo();
-//   if (blocoAtual.dataInicio === null) blocoAtual.dataInicio = dataImg;
-//   blocoAtual.dataFim = dataImg;
-// });
-
-// print('Babi Degradada 1 - Blocos detectados:', blocos);
-
-// // =================================================================
-// // ETAPA: COMPOR/EXPORTAR CADA BLOCO
-// // Bloco com 1 imagem -> exporta a imagem bruta (ja pre-processada)
-// // Bloco com 2+ imagens -> composita por mediana antes de exportar
-// // =================================================================
-
-// blocos.forEach(function(bloco, i) {
-//   var numImg = bloco.indices.length;
-
-//   var subColecao = d1Ordenado.filter(ee.Filter.inList('system:index', bloco.indices));
-
-//   var imagemFinal = (numImg === 1)
-//     ? subColecao.first()
-//     : subColecao.median();
-
-//   imagemFinal = imagemFinal.clip(babiDegr1);
-
-//   var nomeBloco = 'babiDegr1_bloco' + (i + 1) + '_' + bloco.estacao
-//     + '_' + bloco.dataInicio + '_a_' + bloco.dataFim;
-
-//   print(nomeBloco + ' - n imagens: ' + numImg);
-
-//   Export.image.toDrive({
-//     image: imagemFinal,
-//     description: nomeBloco,
-//     folder: 'GEE_Exports',
-//     fileNamePrefix: nomeBloco,
-//     region: babiDegr1,
-//     scale: 10,
-//     maxPixels: 1e13
-//   });
-// });
+  Export.image.toDrive({
+    image: imagemFinal,
+    description: nomeBloco,
+    folder: 'GEE_Exports',
+    fileNamePrefix: nomeBloco,
+    region: poligono,
+    scale: 10,
+    maxPixels: 1e13
+  });
+});
