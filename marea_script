@@ -305,12 +305,12 @@ var poligonos = {
   'babiPres6': babiPres6
 };
 
-// ===============================================================
+// ======================================================================
 // VARIAVEL DE CONTROLE - alterar manualmente a cada execucao
 // Valores possiveis: 'babiDegr1', 'babiDegr2', 'babiPres1', 'babiPres2',
 // 'babiPres3', 'babiPres4', 'babiPres5', 'babiPres6'
-// ===============================================================
-var AREA_ATUAL = 'babiDegr1';
+// ======================================================================
+var AREA_ATUAL = 'babiPres6';
 
 // ---- PRE-PROCESSAMENTO ----
 var colecao = areas[AREA_ATUAL];
