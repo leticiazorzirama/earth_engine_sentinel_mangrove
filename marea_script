@@ -63,7 +63,7 @@ var d1 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 // Mais recente:
 
 // Verificar principais metadados da colecao
-// print('Babi Degradada 1 - MSI L2A - Metadados:', d1);
+print('Babi Degradada 1 - MSI L2A - Metadados:', d1);
 // X imagens
 // X bandas
 // X propriedades
@@ -83,7 +83,7 @@ var d2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 // Mais antigo:
 // Mais recente:
 
-// print('Babi Degradada 2 - MSI L2A - Metadados:', d2);
+print('Babi Degradada 2 - MSI L2A - Metadados:', d2);
 // X imagens
 // X bandas
 // X propriedades
@@ -105,7 +105,7 @@ var p1 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 // Mais recente:
 
 // Verificar principais metadados da colecao
-// print('Babi Preservada 1 - MSI L2A - Metadados:', p1);
+print('Babi Preservada 1 - MSI L2A - Metadados:', p1);
 // X imagens
 // X bandas
 // X propriedades
@@ -125,7 +125,7 @@ var p2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 // Mais antigo:
 // Mais recente:
 
-// print('Babi Preservada 2 - MSI L2A - Metadados:', p2);
+print('Babi Preservada 2 - MSI L2A - Metadados:', p2);
 // X imagens
 // X bandas
 // X propriedades
@@ -143,7 +143,7 @@ var p3 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 // Mais antigo:
 // Mais recente:
 
-// print('Babi Preservada 3 - MSI L2A - Metadados:', p3);
+print('Babi Preservada 3 - MSI L2A - Metadados:', p3);
 // X imagens
 // X bandas
 // X propriedades
@@ -161,7 +161,7 @@ var p4 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 // Mais antigo:
 // Mais recente:
 
-// print('Babi Preservada 4 - MSI L2A - Metadados:', p4);
+print('Babi Preservada 4 - MSI L2A - Metadados:', p4);
 // X imagens
 // X bandas
 // X propriedades
@@ -179,7 +179,7 @@ var p5 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 // Mais antigo:
 // Mais recente:
 
-// print('Babi Preservada 5 - MSI L2A - Metadados:', p5);
+print('Babi Preservada 5 - MSI L2A - Metadados:', p5);
 // X imagens
 // X bandas
 // X propriedades
@@ -197,7 +197,7 @@ var p6 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 // Mais antigo:
 // Mais recente:
 
-// print('Babi Preservada 6 - MSI L2A - Metadados:', p6);
+print('Babi Preservada 6 - MSI L2A - Metadados:', p6);
 // X imagens
 // X bandas
 // X propriedades
@@ -211,8 +211,8 @@ var p6 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
 // definirEstacao: 
 // recebe uma imagem e classifica seu mes de aquisicao em uma das duas
 // estacoes definidas para a regiao da Baia Babitonga: 
-// 'seco' (meses 4,5,6,7,8) ou 'chuvoso' (meses 9,10,11,12,1,2,3)
-// baseada em Koehntopp et al. (2021, Revista CEPSUL)
+// 'seco' (meses 4, 5, 6, 7, 8) ou 'chuvoso' (meses 9, 10, 11, 12, 1, 2, 3)
+// baseada em Koehntopp et al. (2021)
 // Retorna a mesma imagem com a propriedade 'estacao' adicionada
 function definirEstacao(img) {
   var mes = ee.Number(img.date().get('month'));
@@ -221,21 +221,22 @@ function definirEstacao(img) {
   return img.set('estacao', estacao);
 }
 
+
 // gerarTabelasDatas: gera uma FeatureCollection (1 linha por imagem)
-// com data, indice, cobertura de nuvens e estacao pronta para exportar como CSV
+// com area, indice, data, ano, mes, time_start, cobertura de nuvens e estacao pronta para exportar como CSV
 function gerarTabelaDatas(colecao, nomeArea) {
   var colecaoComEstacao = colecao.map(definirEstacao);
 
   return colecaoComEstacao.map(function(img) {
     return ee.Feature(null, {
-      'area': nomeArea,
-      'indice': img.get('system:index'),
-      'data': img.date().format('YYYY-MM-dd'),
+      'area': nomeArea, // area de interesse (cada poligono)
+      'indice': img.get('system:index'), // id unico de cada imagem
+      'data': img.date().format('YYYY-MM-dd'), 
       'ano': img.date().get('year'),
       'mes': img.date().get('month'),
-      'time_start': img.get('system:time_start'),
-      'nuvem_pct': img.get('CLOUD_COVERAGE_ASSESSMENT'),
-      'estacao': img.get('estacao')
+      'time_start': img.get('system:time_start'), // milissegundos desde 01/01/1970
+      'nuvem_pct': img.get('CLOUD_COVERAGE_ASSESSMENT'), // porcentagem de nuvens
+      'estacao': img.get('estacao') // estacao seca ou chuvosa
     });
   });
 }
@@ -253,130 +254,130 @@ var areas = {
 };
 
 // Objeto para guardar as tabelas geradas (util se quiser reusar em memoria)
-// var tabelasDatas = {};
+var tabelasDatas = {};
 
-// Object.keys(areas).forEach(function(nomeArea) {
-//   var colecao = areas[nomeArea];
+Object.keys(areas).forEach(function(nomeArea) {
+  var colecao = areas[nomeArea];
   
-//   // Gerar tabela de datas para a area
-//   var tabela = gerarTabelaDatas(colecao, nomeArea);
-//   tabelasDatas[nomeArea] = tabela;
+  // Gerar tabela de datas para a area
+  var tabela = gerarTabelaDatas(colecao, nomeArea);
+  tabelasDatas[nomeArea] = tabela;
   
-//   print(nomeArea + ' - Tabela de datas disponiveis:', tabela);
+  print(nomeArea + ' - Tabela de datas disponiveis:', tabela);
   
-//   // Exportar para inspecionar fora do console (Sheets/Excel)
-//   Export.table.toDrive({
-//     collection: tabela,
-//     description: nomeArea,
+  // Exportar para inspecionar fora do console (Sheets/Excel)
+  Export.table.toDrive({
+    collection: tabela,
+    description: nomeArea,
+    folder: 'GEE_Exports',
+    fileNamePrefix: nomeArea,
+    fileFormat: 'CSV'
+  });
+});
+
+// // ==================================================
+// // ETAPA: PRE-PROCESSAMENTO (reaproveitado do script de manguezal)
+// // ==================================================
+
+// var d1cloudProb = ee.ImageCollection('COPERNICUS/S2_CLOUD_PROBABILITY')
+//   .filterBounds(babiDegr1)
+//   .filterDate('2015-01-01', '2026-12-31');
+
+// var d1Comb = ee.ImageCollection(ee.Join.saveFirst('s2cloudProb').apply({
+//   primary: d1,
+//   secondary: d1cloudProb,
+//   condition: ee.Filter.equals({leftField: 'system:index', rightField: 'system:index'})
+// }));
+
+// function maskNuvens(img) {
+//   var nuvemProb = ee.Image(img.get('s2cloudProb')).select('probability');
+//   var temNuvem = nuvemProb.gt(50);
+//   var bandas = ['B1','B2','B3','B4','B5','B6','B7','B8','B8A','B9','B11','B12'];
+
+//   return img.select(bandas)
+//     .updateMask(temNuvem.not())
+//     .divide(10000)
+//     .copyProperties(img, img.propertyNames());
+// }
+
+// var d1Mask = d1Comb.map(maskNuvens);
+
+// // Adicionar a coluna 'estacao' (mesma logica ja definida)
+// var d1MaskEstacao = d1Mask.map(definirEstacao);
+
+// // Ordenar cronologicamente - fundamental para a deteccao de blocos
+// var d1Ordenado = d1MaskEstacao.sort('system:time_start');
+
+// // ==================================================
+// // ETAPA: DETECTAR BLOCOS DE ESTACAO CONSECUTIVOS
+// // A deteccao de sequencias (runs) e mais simples client-side, entao
+// // trazemos apenas indice/data/estacao para o cliente (getInfo),
+// // processamos os blocos em JS, e devolvemos ao servidor apenas
+// // os ids das imagens de cada bloco para filtrar a colecao original.
+// // ==================================================
+
+// var d1ListaInfo = d1Ordenado.map(function(img) {
+//   return ee.Feature(null, {
+//     'indice': img.get('system:index'),
+//     'time_start': img.get('system:time_start'),
+//     'estacao': img.get('estacao')
+//   });
+// }).getInfo().features;
+
+// // Construir os blocos comparando a estacao de cada imagem com a anterior
+// var blocos = [];
+// var blocoAtual = null;
+
+// d1ListaInfo.forEach(function(f) {
+//   var props = f.properties;
+//   if (blocoAtual === null || blocoAtual.estacao !== props.estacao) {
+//     blocoAtual = {
+//       estacao: props.estacao,
+//       indices: [],
+//       dataInicio: null,
+//       dataFim: null
+//     };
+//     blocos.push(blocoAtual);
+//   }
+//   blocoAtual.indices.push(props.indice);
+//   var dataImg = ee.Date(props.time_start).format('YYYY-MM-dd').getInfo();
+//   if (blocoAtual.dataInicio === null) blocoAtual.dataInicio = dataImg;
+//   blocoAtual.dataFim = dataImg;
+// });
+
+// print('Babi Degradada 1 - Blocos detectados:', blocos);
+
+// // ==================================================
+// // ETAPA: COMPOR/EXPORTAR CADA BLOCO
+// // Bloco com 1 imagem -> exporta a imagem bruta (ja pre-processada)
+// // Bloco com 2+ imagens -> composita por mediana antes de exportar
+// // ==================================================
+
+// blocos.forEach(function(bloco, i) {
+//   var numImg = bloco.indices.length;
+
+//   var subColecao = d1Ordenado.filter(ee.Filter.inList('system:index', bloco.indices));
+
+//   var imagemFinal = (numImg === 1)
+//     ? subColecao.first()
+//     : subColecao.median();
+
+//   imagemFinal = imagemFinal.clip(babiDegr1);
+
+//   var nomeBloco = 'babiDegr1_bloco' + (i + 1) + '_' + bloco.estacao
+//     + '_' + bloco.dataInicio + '_a_' + bloco.dataFim;
+
+//   print(nomeBloco + ' - n imagens: ' + numImg);
+
+//   Export.image.toDrive({
+//     image: imagemFinal,
+//     description: nomeBloco,
 //     folder: 'GEE_Exports',
-//     fileNamePrefix: nomeArea,
-//     fileFormat: 'CSV'
+//     fileNamePrefix: nomeBloco,
+//     region: babiDegr1,
+//     scale: 10,
+//     maxPixels: 1e13
 //   });
 // });
 
-// ==================================================
-// ETAPA: PRE-PROCESSAMENTO (reaproveitado do script de manguezal)
-// ==================================================
-
-var d1cloudProb = ee.ImageCollection('COPERNICUS/S2_CLOUD_PROBABILITY')
-  .filterBounds(babiDegr1)
-  .filterDate('2015-01-01', '2026-12-31');
-
-var d1Comb = ee.ImageCollection(ee.Join.saveFirst('s2cloudProb').apply({
-  primary: d1,
-  secondary: d1cloudProb,
-  condition: ee.Filter.equals({leftField: 'system:index', rightField: 'system:index'})
-}));
-
-function maskNuvens(img) {
-  var nuvemProb = ee.Image(img.get('s2cloudProb')).select('probability');
-  var temNuvem = nuvemProb.gt(50);
-  var bandas = ['B1','B2','B3','B4','B5','B6','B7','B8','B8A','B9','B11','B12'];
-
-  return img.select(bandas)
-    .updateMask(temNuvem.not())
-    .divide(10000)
-    .copyProperties(img, img.propertyNames());
-}
-
-var d1Mask = d1Comb.map(maskNuvens);
-
-// Adicionar a coluna 'estacao' (mesma logica ja definida)
-var d1MaskEstacao = d1Mask.map(definirEstacao);
-
-// Ordenar cronologicamente - fundamental para a deteccao de blocos
-var d1Ordenado = d1MaskEstacao.sort('system:time_start');
-
-// ==================================================
-// ETAPA: DETECTAR BLOCOS DE ESTACAO CONSECUTIVOS
-// A deteccao de sequencias (runs) e mais simples client-side, entao
-// trazemos apenas indice/data/estacao para o cliente (getInfo),
-// processamos os blocos em JS, e devolvemos ao servidor apenas
-// os ids das imagens de cada bloco para filtrar a colecao original.
-// ==================================================
-
-var d1ListaInfo = d1Ordenado.map(function(img) {
-  return ee.Feature(null, {
-    'indice': img.get('system:index'),
-    'time_start': img.get('system:time_start'),
-    'estacao': img.get('estacao')
-  });
-}).getInfo().features;
-
-// Construir os blocos comparando a estacao de cada imagem com a anterior
-var blocos = [];
-var blocoAtual = null;
-
-d1ListaInfo.forEach(function(f) {
-  var props = f.properties;
-  if (blocoAtual === null || blocoAtual.estacao !== props.estacao) {
-    blocoAtual = {
-      estacao: props.estacao,
-      indices: [],
-      dataInicio: null,
-      dataFim: null
-    };
-    blocos.push(blocoAtual);
-  }
-  blocoAtual.indices.push(props.indice);
-  var dataImg = ee.Date(props.time_start).format('YYYY-MM-dd').getInfo();
-  if (blocoAtual.dataInicio === null) blocoAtual.dataInicio = dataImg;
-  blocoAtual.dataFim = dataImg;
-});
-
-print('Babi Degradada 1 - Blocos detectados:', blocos);
-
-// ==================================================
-// ETAPA: COMPOR/EXPORTAR CADA BLOCO
-// Bloco com 1 imagem -> exporta a imagem bruta (ja pre-processada)
-// Bloco com 2+ imagens -> composita por mediana antes de exportar
-// ==================================================
-
-blocos.forEach(function(bloco, i) {
-  var numImg = bloco.indices.length;
-
-  var subColecao = d1Ordenado.filter(ee.Filter.inList('system:index', bloco.indices));
-
-  var imagemFinal = (numImg === 1)
-    ? subColecao.first()
-    : subColecao.median();
-
-  imagemFinal = imagemFinal.clip(babiDegr1);
-
-  var nomeBloco = 'babiDegr1_bloco' + (i + 1) + '_' + bloco.estacao
-    + '_' + bloco.dataInicio + '_a_' + bloco.dataFim;
-
-  print(nomeBloco + ' - n imagens: ' + numImg);
-
-  Export.image.toDrive({
-    image: imagemFinal,
-    description: nomeBloco,
-    folder: 'GEE_Exports',
-    fileNamePrefix: nomeBloco,
-    region: babiDegr1,
-    scale: 10,
-    maxPixels: 1e13
-  });
-});
-
-// Caso aprovado, realizar a extracao para as outras areas
+// // Caso aprovado, realizar a extracao para as outras areas
