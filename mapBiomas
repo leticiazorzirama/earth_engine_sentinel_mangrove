@@ -1,0 +1,3 @@
+var collection = ee.Image("projects/mapbiomas-public/assets/brazil/lulc_10m/collection3/mapbiomas_10m_collection3_integration_v1");
+print(collection);
+
