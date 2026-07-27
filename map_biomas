@@ -19,7 +19,7 @@ var collection = ee.ImageCollection(assetPath)
 	.filter(ee.Filter.eq('collection_id', 10.0))
 	.filter(ee.Filter.eq('version', 'v1'))
 	.filter(ee.Filter.eq('year', year))
-	.filterBounds(geometry);
+	.filterBounds(babiDegr1);
 	
 print(collection);
 
