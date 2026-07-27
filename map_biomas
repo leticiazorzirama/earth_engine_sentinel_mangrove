@@ -1,3 +1,16 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1"),
+    table2 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada2"),
+    table3 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada1"),
+    table4 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada2"),
+    table5 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada3"),
+    table6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada4"),
+    table7 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada5"),
+    table8 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+
+
+
 var collection = ee.Image("projects/mapbiomas-public/assets/brazil/lulc_10m/collection3/mapbiomas_10m_collection3_integration_v1");
 print(collection);
 
