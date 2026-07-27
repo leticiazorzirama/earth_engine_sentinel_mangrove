@@ -23,3 +23,6 @@ var collection = ee.ImageCollection(assetPath)
 	
 print(collection);
 
+var d1 = collection
+  .filterBounds(babiDegr1);
+  
