@@ -9,6 +9,17 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
     babiPres6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 
-var collection = ee.Image("projects/mapbiomas-public/assets/brazil/lulc_10m/collection3/mapbiomas_10m_collection3_integration_v1");
+// Define the asset path for MapBiomas Collection 10
+var assetPath = 'projects/mapbiomas-public/assets/brazil/lulc/v1';
+
+// Define the year for visualization
+var year = 2024;
+
+// Load the classified image for the year 2024 from Collection 10
+var collection = ee.ImageCollection(assetPath)
+	.filter(ee.Filter.eq('collection_id', 10.0))
+	.filter(ee.Filter.eq('version', 'v1'))
+	.filter(ee.Filter.eq('year', year));
+	
 print(collection);
 
