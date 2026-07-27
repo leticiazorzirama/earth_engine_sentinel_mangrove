@@ -1,6 +1,6 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
 var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1"),
-    table2 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada2"),
+    babiDegr2 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada2"),
     table3 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada1"),
     table4 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada2"),
     table5 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada3"),
