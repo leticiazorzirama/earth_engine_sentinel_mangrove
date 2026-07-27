@@ -18,8 +18,7 @@ var year = 2024;
 var collection = ee.ImageCollection(assetPath)
 	.filter(ee.Filter.eq('collection_id', 10.0))
 	.filter(ee.Filter.eq('version', 'v1'))
-	.filter(ee.Filter.eq('year', year))
-	.filterBounds(babiDegr1);
+	.filter(ee.Filter.eq('year', year));
 	
 print(collection);
 
@@ -107,8 +106,11 @@ var visParams = {
 	]
 };
 
-// Add the layer to the map
-Map.addLayer(collection, visParams, 'Babi Degradada - área 1 - MapBiomas 2024');
+//
+var d1 = collection.mosaic().clip(babiDegr1);
 
-// Center the map on the image with a zoom level of 5 (covers Brazil)
-Map.centerObject(collection, 5);
+// 
+Map.addLayer(d1, visParams, 'Babi Degradada - área 1 - MapBiomas 2024');
+
+// 
+Map.centerObject(babiDegr1, 14);
