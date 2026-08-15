@@ -10,7 +10,7 @@ var classID                    = 5;
 var userEEProject              = 'USER_PROJECT_ID';
 var userPath                   = 'USER_PATH';
 
-// Your 8 AOIs, merged into a single geometry for clipping the final output
+// Your 8 AOIs, merged into a single geometry used to clip the final output
 var aois = {
   babiDegr1: babiDegr1, babiDegr2: babiDegr2,
   babiPres1: babiPres1, babiPres2: babiPres2,
@@ -20,38 +20,41 @@ var aois = {
 var aoiGeometries = Object.keys(aois).map(function(k) {
   return ee.FeatureCollection(aois[k]).geometry();
 });
-var ROI = ee.FeatureCollection(aoiGeometries).geometry(); // replaces the old placeholder ROI
+var AOI_ROI = ee.FeatureCollection(aoiGeometries).geometry();
 
 var scale      = 30;
 var versionRaw = 1;
 var listclass  = ee.List([]);
+var regions    = [ESSP, SPSC, AP, PIBA_1, PIBA_2, PAMA, MAR];
 
-// Only SPSC is used for training/classification — confirmed as the region containing all 8 AOIs
-var region = SPSC;
+var listClassYears = regions.map(function(region){
+  var mosaic_image = ee.Image('projects/'+userEEProject+'/assets/'+userPath+'/mosaic_'+year).clip(region);
 
-var mosaic_image = ee.Image('projects/'+userEEProject+'/assets/'+userPath+'/mosaic_'+year).clip(region);
+  var lastYear = ee.Image('projects/'+userEEProject+'/COLECAO'+ previousMapBioCol +'/zona-costeira/'+year_Reference_for_Samples+'-'+13).eq(classID).toByte();
+  lastYear = ee.ImageCollection([lastYear.rename('classification')]).max();
+  lastYear = lastYear.unmask(0).updateMask(mosaic_image.select(0).mask());
 
-var lastYear = ee.Image('projects/'+userEEProject+'/COLECAO'+ previousMapBioCol +'/zona-costeira/'+year_Reference_for_Samples+'-'+13).eq(classID).toByte();
-lastYear = ee.ImageCollection([lastYear.rename('classification')]).max();
-lastYear = lastYear.unmask(0).updateMask(mosaic_image.select(0).mask());
+  var samples = mosaic_image.addBands(lastYear).stratifiedSample({
+    numPoints:5000,
+    classBand:'classification',
+    classValues:[0,1],
+    classPoints:[50000,5000],
+    region:region,
+    scale:30
+  });
 
-// Training samples still drawn from the full SPSC region — preserves class diversity
-var samples = mosaic_image.addBands(lastYear).stratifiedSample({
-  numPoints:5000,
-  classBand:'classification',
-  classValues:[0,1],
-  classPoints:[50000,5000],
-  region:region,
-  scale:30
+  var classifier     = ee.Classifier.smileRandomForest(100).train(samples,'classification');
+  var classification = mosaic_image.classify(classifier);
+  return listclass.add(classification);
 });
 
-var classifier     = ee.Classifier.smileRandomForest(100).train(samples,'classification');
-var classification = mosaic_image.classify(classifier);
+listClassYears = ee.List(listClassYears).flatten();
+var classificationNewYear = ee.ImageCollection(listClassYears).mosaic();
+var finalProduct = classificationNewYear.updateMask(classificationNewYear.neq(0));
 
-// Classification still runs over all of SPSC, then gets clipped to just your 8 AOIs
-var finalProduct = classification.updateMask(classification.neq(0)).clip(ROI);
+// Clip the merged, all-region classification down to just your 8 AOIs
+finalProduct = finalProduct.clip(AOI_ROI);
 
-Map.addLayer(mosaic_image, imageVisParam_mosaic, 'Mosaic '+year);
 Map.addLayer(finalProduct, {min:0,max:1, palette:'#0014ff'}, 'Final class '+year, false);
 
 finalProduct = finalProduct.remap([0,1],[0,classID]).rename(['classification']);
@@ -62,5 +65,5 @@ Export.image.toAsset({
   assetId: 'projects/'+userEEProject+'/'+year+'-'+versionRaw+'-Babitonga-raw',
   scale: scale,
   maxPixels: 1e13,
-  region: ROI
+  region: AOI_ROI
 });
