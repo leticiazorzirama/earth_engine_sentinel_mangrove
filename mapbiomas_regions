@@ -1062,4 +1062,10 @@ var SPSC =
           [-48.3673095703125, -0.13760791900779706],
           [-48.5211181640625, 0.13705002113522438]]]);
 
-export {ESSP, SPSC, AP, PIBA_1, PIBA_2, PAMA, MAR}
+exports.ESSP = ESSP;
+exports.SPSC = SPSC;
+exports.AP = AP;
+exports.PIBA_1 = PIBA_1;
+exports.PIBA_2 = PIBA_2;
+exports.PAMA = PAMA;
+exports.MAR = MAR;
