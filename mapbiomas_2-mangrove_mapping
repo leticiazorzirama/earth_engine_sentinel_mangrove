@@ -1080,7 +1080,6 @@ var classID                    = 5;
 var userEEProject              = 'USER_PROJECT_ID';
 var userPath                   = 'USER_PATH';
 
-// Your 8 AOIs, merged into a single geometry used to clip the final output
 var aois = {
   babiDegr1: babiDegr1, babiDegr2: babiDegr2,
   babiPres1: babiPres1, babiPres2: babiPres2,
@@ -1122,7 +1121,6 @@ listClassYears = ee.List(listClassYears).flatten();
 var classificationNewYear = ee.ImageCollection(listClassYears).mosaic();
 var finalProduct = classificationNewYear.updateMask(classificationNewYear.neq(0));
 
-// Clip the merged, all-region classification down to just your 8 AOIs
 finalProduct = finalProduct.clip(AOI_ROI);
 
 Map.addLayer(finalProduct, {min:0,max:1, palette:'#0014ff'}, 'Final class '+year, false);
