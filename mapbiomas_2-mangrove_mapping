@@ -1060,10 +1060,16 @@ var SPSC =
           [-48.306884765625, -0.42050222554249556],
           [-48.28216552734375, -0.20352559203214515],
           [-48.3673095703125, -0.13760791900779706],
-          [-48.5211181640625, 0.13705002113522438]]]);
+          [-48.5211181640625, 0.13705002113522438]]]),
+    babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1"),
+    babiDegr2 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada2"),
+    babiPres1 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada1"),
+    babiPres2 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada2"),
+    babiPres3 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada3"),
+    babiPres4 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada4"),
+    babiPres5 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada5"),
+    babiPres6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
-
-
 var imageVisParam_mosaic = {"opacity":1,"bands":["swir1","nir","red"],"min":4,"max":107,"gamma":1};
 
 var year                       = 2024;
