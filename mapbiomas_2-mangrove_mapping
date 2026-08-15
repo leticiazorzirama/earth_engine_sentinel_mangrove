@@ -1117,15 +1117,15 @@ var listClassYears = regions.map(function(region){
   return listclass.add(classification);
 });
 
-listClassYears = ee.List(listClassYears).flatten();
+var listClassYears = ee.List(listClassYears).flatten();
 var classificationNewYear = ee.ImageCollection(listClassYears).mosaic();
 var finalProduct = classificationNewYear.updateMask(classificationNewYear.neq(0));
 
-finalProduct = finalProduct.clip(AOI_ROI);
+var finalProduct = finalProduct.clip(AOI_ROI);
 
 Map.addLayer(finalProduct, {min:0,max:1, palette:'#0014ff'}, 'Final class '+year, false);
 
-finalProduct = finalProduct.remap([0,1],[0,classID]).rename(['classification']);
+var finalProduct = finalProduct.remap([0,1],[0,classID]).rename(['classification']);
 
 Export.image.toAsset({
   image: finalProduct.select('classification').set({'classification':1,'class':classID,'year':year,'version':versionRaw,'region':'BABITONGA_AOIs'}).toByte(),
