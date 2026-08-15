@@ -1070,38 +1070,72 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
           [-48.3673095703125, -0.13760791900779706],
           [-48.5211181640625, 0.13705002113522438]]]);
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
+var assetPath = 'projects/mapbiomas-public/assets/brazil/lulc/v1';
+var year = 2024;
+var collection = ee.ImageCollection(assetPath)
+  .filter(ee.Filter.eq('collection_id', 10.0))
+  .filter(ee.Filter.eq('version', 'v1'))
+  .filter(ee.Filter.eq('year', year));
 
-var aois = {
-  babiDegr1: babiDegr1,
-  babiDegr2: babiDegr2,
-  babiPres1: babiPres1,
-  babiPres2: babiPres2,
-  babiPres3: babiPres3,
-  babiPres4: babiPres4,
-  babiPres5: babiPres5,
-  babiPres6: babiPres6
+var visParams = {
+  min: 0,
+  max: 75,
+  palette: [
+    'ffffff','32a65e','32a65e','1f8d49','7dc975','04381d','026975','000000','000000',
+    '7a6c00','ad975a','519799','d6bc74','d89f5c','FFFFB2','edde8e','000000','000000',
+    'f5b3c8','C27BA0','db7093','ffefc3','db4d4f','ffa07a','d4271e','db4d4f','0000FF',
+    '000000','000000','ffaa5f','9c0027','091077','fc8114','2532e4','93dfe6','9065d0',
+    'd082de','000000','000000','f5b3c8','c71585','f54ca9','cca0d4','dbd26b','807a40',
+    'e04cfa','d68fe2','9932cc','e6ccff','02d659','ad5100','000000','000000','000000',
+    '000000','000000','000000','CC66FF','FF6666','006400','8d9e8b','f5d5d5','ff69b4',
+    'ebf8b5','000000','000000','91ff36','7dc975','e97a7a','0fffe3','000000','000000',
+    '000000','000000','000000','c12100'
+  ]
 };
 
-var prlaGeom = ee.Feature(PRLA).geometry();
+var regions = {
+  ESSP: ESSP, SPSC: SPSC, AP: AP, PIBA_1: PIBA_1,
+  PIBA_2: PIBA_2, PAMA: PAMA, MAR: MAR
+};
 
-Object.keys(aois).forEach(function(name) {
-  var aoi = ee.Feature(aois[name]).geometry
-    ? ee.Feature(aois[name]).geometry()
-    : ee.Geometry(aois[name]);
+var aois = {
+  babiDegr1: babiDegr1, babiDegr2: babiDegr2,
+  babiPres1: babiPres1, babiPres2: babiPres2,
+  babiPres3: babiPres3, babiPres4: babiPres4,
+  babiPres5: babiPres5, babiPres6: babiPres6
+};
 
-  var aoiArea    = aoi.area(1);
-  var insideArea = aoi.intersection(prlaGeom, 1).area(1);
-  var fraction   = insideArea.divide(aoiArea);
+var mosaicImg = collection.mosaic();
 
-  fraction.evaluate(function(pct) {
-    var status = pct >= 0.999 ? 'FULLY INSIDE PRLA'
-               : pct > 0      ? 'PARTIALLY INSIDE PRLA (' + (pct*100).toFixed(1) + '%)'
-               : 'OUTSIDE PRLA';
-    print(name + ': ' + status);
+Object.keys(aois).forEach(function(aoiName) {
+  var aoiGeom = ee.FeatureCollection(aois[aoiName]).geometry();
+  var aoiArea = aoiGeom.area(1);
+
+  // MapBiomas classification clipped to this AOI
+  var clipped = mosaicImg.clip(aoiGeom);
+  Map.addLayer(clipped, visParams, 'MapBiomas ' + year + ' - ' + aoiName);
+
+  // Region overlap check
+  Object.keys(regions).forEach(function(regName) {
+    var regGeom = ee.FeatureCollection(regions[regName]).geometry();
+    var insideArea = aoiGeom.intersection(regGeom, 1).area(1);
+    var fraction = insideArea.divide(aoiArea);
+
+    fraction.evaluate(function(pct) {
+      if (pct > 0) {
+        var status = pct >= 0.999 ? 'Totalmente incluída' : 'Parcialmente incluída (' + (pct*100).toFixed(1) + '%)';
+        print(aoiName + ' -> ' + regName + ': ' + status);
+      }
+    });
   });
 
-  Map.addLayer(aoi, {color: pct === undefined ? 'red' : 'yellow'}, name);
+  Map.addLayer(aoiGeom, {color: 'yellow'}, aoiName + ' - limites');
 });
 
-Map.addLayer(prlaGeom, {color: 'blue'}, 'PRLA boundary', false);
-Map.centerObject(prlaGeom, 7);
+Object.keys(regions).forEach(function(regName) {
+  Map.addLayer(ee.FeatureCollection(regions[regName]).geometry(), {color: 'blue'}, regName, false);
+});
+
+Map.centerObject(ee.FeatureCollection(Object.keys(aois).map(function(k) {
+  return ee.Feature(ee.FeatureCollection(aois[k]).geometry());
+})), 10);
