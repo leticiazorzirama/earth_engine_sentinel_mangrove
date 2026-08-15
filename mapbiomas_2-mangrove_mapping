@@ -1,0 +1,66 @@
+
+
+var imageVisParam_mosaic = {"opacity":1,"bands":["swir1","nir","red"],"min":4,"max":107,"gamma":1};
+
+var year                       = 2024;
+var year_Reference_for_Samples = year - 1;
+var currentMapBioCol           = 10;
+var previousMapBioCol          = currentMapBioCol - 1;
+var classID                    = 5;
+var userEEProject              = 'USER_PROJECT_ID';
+var userPath                   = 'USER_PATH';
+
+// Your 8 AOIs, merged into a single geometry for clipping the final output
+var aois = {
+  babiDegr1: babiDegr1, babiDegr2: babiDegr2,
+  babiPres1: babiPres1, babiPres2: babiPres2,
+  babiPres3: babiPres3, babiPres4: babiPres4,
+  babiPres5: babiPres5, babiPres6: babiPres6
+};
+var aoiGeometries = Object.keys(aois).map(function(k) {
+  return ee.FeatureCollection(aois[k]).geometry();
+});
+var ROI = ee.FeatureCollection(aoiGeometries).geometry(); // replaces the old placeholder ROI
+
+var scale      = 30;
+var versionRaw = 1;
+var listclass  = ee.List([]);
+
+// Only SPSC is used for training/classification — confirmed as the region containing all 8 AOIs
+var region = SPSC;
+
+var mosaic_image = ee.Image('projects/'+userEEProject+'/assets/'+userPath+'/mosaic_'+year).clip(region);
+
+var lastYear = ee.Image('projects/'+userEEProject+'/COLECAO'+ previousMapBioCol +'/zona-costeira/'+year_Reference_for_Samples+'-'+13).eq(classID).toByte();
+lastYear = ee.ImageCollection([lastYear.rename('classification')]).max();
+lastYear = lastYear.unmask(0).updateMask(mosaic_image.select(0).mask());
+
+// Training samples still drawn from the full SPSC region — preserves class diversity
+var samples = mosaic_image.addBands(lastYear).stratifiedSample({
+  numPoints:5000,
+  classBand:'classification',
+  classValues:[0,1],
+  classPoints:[50000,5000],
+  region:region,
+  scale:30
+});
+
+var classifier     = ee.Classifier.smileRandomForest(100).train(samples,'classification');
+var classification = mosaic_image.classify(classifier);
+
+// Classification still runs over all of SPSC, then gets clipped to just your 8 AOIs
+var finalProduct = classification.updateMask(classification.neq(0)).clip(ROI);
+
+Map.addLayer(mosaic_image, imageVisParam_mosaic, 'Mosaic '+year);
+Map.addLayer(finalProduct, {min:0,max:1, palette:'#0014ff'}, 'Final class '+year, false);
+
+finalProduct = finalProduct.remap([0,1],[0,classID]).rename(['classification']);
+
+Export.image.toAsset({
+  image: finalProduct.select('classification').set({'classification':1,'class':classID,'year':year,'version':versionRaw,'region':'BABITONGA_AOIs'}).toByte(),
+  description: 'Mangrove_v'+versionRaw+'_'+year+'_Babitonga',
+  assetId: 'projects/'+userEEProject+'/'+year+'-'+versionRaw+'-Babitonga-raw',
+  scale: scale,
+  maxPixels: 1e13,
+  region: ROI
+});
