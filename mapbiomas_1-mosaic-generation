@@ -1133,7 +1133,7 @@ var createIndexs = function(image) {
     '((banda2 - banda4)/ (banda4 + banda2))', {
       'banda2' : image.select('green'),
       'banda4' : image.select('nir')
-  }.rename('NDWI'));
+  }).rename('NDWI');
   MNDWI = image.expression(
     '((( banda2 - banda5) / (banda2 + banda5)))', {
       'banda2': image.select('green'),
@@ -1167,8 +1167,8 @@ var endDate   = (year+1)+'-01-01';
 
 var mosaicMerge = getImageCollection(ROI,startDate,endDate).map(createIndexs).map(bqaFunction);
 var mosaic      = mosaicMerge.median();
-var mosaicNew   = mosaic.select(['blue','green','red','nir','swir1','swir2','BQA']).multiply(255);
-mosaicNew       = mosaicNew.addBands(mosaic.select(['NDVI','MNDWI','MMRI','NDSI','NDWI']).add(1).multiply(127));
+var mosaicNew   = mosaic.select(['blue','green','red','nir','swir1','swir2']).multiply(255);
+var mosaicNew   = mosaicNew.addBands(mosaic.select(['NDVI','MNDWI','MMRI','NDSI','NDWI']).add(1).multiply(127));
 
 Map.addLayer(mosaicNew,{},'Mosaic '+year, false)
 
