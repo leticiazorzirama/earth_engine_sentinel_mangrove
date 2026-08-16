@@ -1094,7 +1094,7 @@ var AOI_ROI = ee.FeatureCollection(aoiGeometries).geometry();
 var scale      = 30;
 var versionRaw = 1;
 var listclass  = ee.List([]);
-var region    = [SPSC];
+var regions   = [SPSC];
 
 var listClassYears = regions.map(function(region){
   var mosaic_image = ee.Image('projects/'+userEEProject+'/assets/'+userPath+'/mosaic_'+year).clip(region);
