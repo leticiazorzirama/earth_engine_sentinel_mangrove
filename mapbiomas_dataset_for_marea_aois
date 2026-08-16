@@ -11,7 +11,7 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
 // Define the asset path for MapBiomas Collection 10
 var assetPath = 'projects/mapbiomas-public/assets/brazil/lulc/v1';
 // Define the year for visualization
-var year = 2024;
+var year = 2018;
 // Load the classified image for the year 2024 from Collection 10
 var collection = ee.ImageCollection(assetPath)
     .filter(ee.Filter.eq('collection_id', 10.0))
