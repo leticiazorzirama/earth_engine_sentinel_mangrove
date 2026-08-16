@@ -1149,6 +1149,7 @@ var createIndexs = function(image) {
 
 
 /// Main CODE
+/// Just for SPSC region to speed up
 var userEEProject='USER_PROJECT_ID'
 
 var year      = 2024;
