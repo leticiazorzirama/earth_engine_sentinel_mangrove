@@ -1111,11 +1111,9 @@ Object.keys(aois).forEach(function(aoiName) {
   var aoiGeom = ee.FeatureCollection(aois[aoiName]).geometry();
   var aoiArea = aoiGeom.area(1);
 
-  // MapBiomas classification clipped to this AOI
   var clipped = mosaicImg.clip(aoiGeom);
   Map.addLayer(clipped, visParams, 'MapBiomas ' + year + ' - ' + aoiName);
 
-  // Region overlap check
   Object.keys(regions).forEach(function(regName) {
     var regGeom = ee.FeatureCollection(regions[regName]).geometry();
     var insideArea = aoiGeom.intersection(regGeom, 1).area(1);
