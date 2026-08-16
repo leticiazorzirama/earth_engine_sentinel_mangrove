@@ -1150,22 +1150,12 @@ var createIndexs = function(image) {
 
 /// Main CODE
 var userEEProject='USER_PROJECT_ID'
-var ROI = ee.Geometry.Polygon(
-  [
-      [
-          [-75.46319738935682, 6.627809464162168],
-          [-75.46319738935682, -34.62753178950752],
-          [-32.92413488935683, -34.62753178950752],
-          [-32.92413488935683, 6.627809464162168]
-      ]
-  ], null, false
-);
 
 var year      = 2024;
 var startDate = year+'-01-01';
 var endDate   = (year+1)+'-01-01';
 
-var mosaicMerge = getImageCollection(ROI,startDate,endDate).map(createIndexs).map(bqaFunction);
+var mosaicMerge = getImageCollection(SPSC,startDate,endDate).map(createIndexs).map(bqaFunction);
 var mosaic      = mosaicMerge.median();
 var mosaicNew   = mosaic.select(['blue','green','red','nir','swir1','swir2']).multiply(255);
 var mosaicNew   = mosaicNew.addBands(mosaic.select(['NDVI','MNDWI','MMRI','NDSI','NDWI']).add(1).multiply(127));
@@ -1176,7 +1166,7 @@ Export.image.toAsset({
   image:mosaicNew.toByte().set({'year':year,'mosaic':1}),
   description: 'Mosaic_'+year,
   assetId:'projects/'+userEEProject+'/assets/USER_PATH/mosaic_'+year,
-  region:ROI,
+  region:SPSC,
   scale:30,
   maxPixels:1e13
 })
