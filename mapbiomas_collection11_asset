@@ -1,1 +1,1 @@
-ee.data.copyAsset('projects/mapbiomas-public/assets/brazil/lulc/collection11/mapbiomas_brazil_collection11_coverage_v3', 'projects/my-project/assets/mapbiomas_collection11')
+ee.data.copyAsset('projects/mapbiomas-public/assets/brazil/lulc/collection11/mapbiomas_brazil_collection11_coverage_v3', 'projects/leticiazr/assets')
