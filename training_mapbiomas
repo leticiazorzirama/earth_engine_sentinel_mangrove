@@ -33,9 +33,12 @@ print(typeof serverString);
 // geometry = vector
 // geometries = points, polygons
 // feature = geometry and a dictionary
+// feature collection = a set of features
 
 var geometry = ee.Geometry.Point([-30, 32.89]);
 var dictionary = ee.Dictionary({name:'point'});
 var feature = ee.Feature(geometry, dictionary);
 print(feature);
+
+
 
