@@ -1,0 +1,24 @@
+// functions
+var bmi = function(weight, height){
+  var bmi = weight / (height * height)
+  return bmi
+};
+
+print(bmi(61, 1.69));
+
+// foor loop
+var weights = [65, 68, 67, 57, 69]
+var heights = [1.77, 1.65, 1.60, 2.00, 1.87]
+
+for (var index = 0; index < weights.length; index = index + 1){
+  var weight = weights[index]
+  var height = heights[index]
+  print(bmi(weight, height))
+};
+
+// client-side vs. server-side (in general, any "ee" is server-side)
+var clientString = 'Client string';
+print(typeof clientString);
+
+var serverString = ee.String('Server string');
+print(typeof serverString);
