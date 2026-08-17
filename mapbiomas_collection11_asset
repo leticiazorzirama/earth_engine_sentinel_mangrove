@@ -33,11 +33,11 @@ Map.addLayer(integration, {
 
 /**
  * Identify specific transition: Mangrove (3) to Soy (39).
- * Resulting code: (3 * 100) + 39 = 339.
+ * Resulting code: (5 * 100) + 24 = 524.
  * .selfMask() is used to make pixels that don't match the criteria transparent.
  */
-var forest_to_soy = transitions.eq(339).selfMask();
-Map.addLayer(forest_to_soy, {palette: '#ad0000'}, 'forest_'+start_year+' to soy_'+ end_year);
+var mangrove_to_urban = transitions.eq(524).selfMask();
+Map.addLayer(mangrove_to_urban, {palette: '#ad0000'}, 'mangrove_'+start_year+' to urban_'+ end_year);
 
 /**
  * Identify multiple transitions to a single class (Regeneration):
@@ -45,5 +45,5 @@ Map.addLayer(forest_to_soy, {palette: '#ad0000'}, 'forest_'+start_year+' to soy_
  * 2103: Agriculture/Mosaic (21) to Forest (03)
  * .remap() groups these different origins into a single value (1) for visualization.
  */
-var pasture_or_mosaic_to_forest = transitions.remap([1503, 2103], [1, 1]);
-Map.addLayer(pasture_or_mosaic_to_forest, {palette: '#27ff00'}, 'pasture_or_mosaic_'+start_year+' to forest_'+ end_year);
+// var pasture_or_mosaic_to_forest = transitions.remap([1503, 2103], [1, 1]);
+// Map.addLayer(pasture_or_mosaic_to_forest, {palette: '#27ff00'}, 'pasture_or_mosaic_'+start_year+' to forest_'+ end_year);
