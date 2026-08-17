@@ -1,3 +1,5 @@
+// Class 1
+
 // functions
 var bmi = function(weight, height){
   var bmi = weight / (height * height)
