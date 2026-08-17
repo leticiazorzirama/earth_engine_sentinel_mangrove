@@ -35,10 +35,32 @@ print(typeof serverString);
 // feature = geometry and a dictionary
 // feature collection = a set of features
 
+// practicing featuring
 var geometry = ee.Geometry.Point([-30, 32.89]);
 var dictionary = ee.Dictionary({name:'point'});
 var feature = ee.Feature(geometry, dictionary);
+
+// filtering = restrict collections
+// practicing filtering 1
+var feature = ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017');
+Map.addLayer(feature);
 print(feature);
+var point = ee.Geometry.Point([-30, 32.89]);
+var filter = feature.filterBounds(point);
+print(filter);
 
+// practicing filtering 2
+var image = ee.ImageCollection("LANDSAT/LC08/C02/T1_TOA");
+print(image);
+var filter = image.filterDate('2023-12-30', '2023-12-31');
+print(filter);
 
+// reducing = transform an image collection into a single image
+var max = image.max();
+print(max);
+
+// selecting bands
+var band = ee.Image('LANDSAT/LC08/C02/T1_TOA/LC08_229057_20241108').select(['B1']);
+print(band);
+Map.addLayer(band);
 
