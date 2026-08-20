@@ -58,3 +58,4 @@ Object.keys(aois).forEach(function(aoiName) {
 
   Map.addLayer(aoiGeom, {color: 'black'}, aoiName + ' - limites', false);
 });
+
