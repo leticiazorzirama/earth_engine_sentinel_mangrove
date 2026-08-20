@@ -1070,13 +1070,25 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
           [-48.3673095703125, -0.13760791900779706],
           [-48.5211181640625, 0.13705002113522438]]]);
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
+/**
+ * MapBiomas Collection 10 - LULC Visualization for 2024
+ **/
+
+// Define the asset path for MapBiomas Collection 10
 var assetPath = 'projects/mapbiomas-public/assets/brazil/lulc/v1';
-var year = 2025;
+
+// Define the year for visualization
+var year = 2024;
+
+// Filter the collection for the year 2024 from Collection 10
 var collection = ee.ImageCollection(assetPath)
-  .filter(ee.Filter.eq('collection_id', 11.0))
+  .filter(ee.Filter.eq('collection_id', 10.0))
   .filter(ee.Filter.eq('version', 'v1'))
   .filter(ee.Filter.eq('year', year));
 
+print('Coleção 10 MapBiomas ano de 2024:', collection);
+
+// Define visualization parameters
 var visParams = {
   min: 0,
   max: 75,
@@ -1093,11 +1105,13 @@ var visParams = {
   ]
 };
 
+// Dictionary for Mapbiomas regions
 var regions = {
   ESSP: ESSP, SPSC: SPSC, AP: AP, PIBA_1: PIBA_1,
   PIBA_2: PIBA_2, PAMA: PAMA, MAR: MAR
 };
 
+// Dictionary for regions of interest (ROI)
 var aois = {
   babiDegr1: babiDegr1, babiDegr2: babiDegr2,
   babiPres1: babiPres1, babiPres2: babiPres2,
@@ -1105,14 +1119,18 @@ var aois = {
   babiPres5: babiPres5, babiPres6: babiPres6
 };
 
+// Composites all the images in a collection,
 var mosaicImg = collection.mosaic();
 
+print('Mosaico', mosaicImg);
+
+// Function to iterate over each ROI, clip the mosaic, display the image to the layer and inform if the ROI intersects with any MapBiomas region
 Object.keys(aois).forEach(function(aoiName) {
   var aoiGeom = ee.FeatureCollection(aois[aoiName]).geometry();
   var aoiArea = aoiGeom.area(1);
 
   var clipped = mosaicImg.clip(aoiGeom);
-  Map.addLayer(clipped, visParams, 'MapBiomas ' + year + ' - ' + aoiName);
+  Map.addLayer(clipped, visParams, 'MapBiomas ' + year + ' - ' + aoiName, false);
 
   Object.keys(regions).forEach(function(regName) {
     var regGeom = ee.FeatureCollection(regions[regName]).geometry();
@@ -1127,7 +1145,7 @@ Object.keys(aois).forEach(function(aoiName) {
     });
   });
 
-  Map.addLayer(aoiGeom, {color: 'yellow'}, aoiName + ' - limites');
+  Map.addLayer(aoiGeom, {color: 'black'}, aoiName + ' - limites', false);
 });
 
 Object.keys(regions).forEach(function(regName) {
