@@ -5,4 +5,10 @@
 // Define the asset path for MapBiomas Collection 11
 var assetPath = 'projects/mapbiomas-public/assets/brazil/lulc/collection11/mapbiomas_brazil_collection11_coverage_v3';
 
-print(assetPath);
+// Define the year for visualization
+var year = 2025;
+
+// Filter the collection for the year 2025 from Collection 11
+var collection = ee.ImageCollection(assetPath)
+  .filter(ee.Filter.eq('collection_id', 11.0))
+  .filter(ee.Filter.eq('year', year));
