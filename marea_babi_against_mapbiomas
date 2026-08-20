@@ -1071,9 +1071,9 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
           [-48.5211181640625, 0.13705002113522438]]]);
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 var assetPath = 'projects/mapbiomas-public/assets/brazil/lulc/v1';
-var year = 2024;
+var year = 2025;
 var collection = ee.ImageCollection(assetPath)
-  .filter(ee.Filter.eq('collection_id', 10.0))
+  .filter(ee.Filter.eq('collection_id', 11.0))
   .filter(ee.Filter.eq('version', 'v1'))
   .filter(ee.Filter.eq('year', year));
 
