@@ -55,7 +55,6 @@ Object.keys(aois).forEach(function(aoiName) {
 
   var clipped = image.clip(aoiGeom);
   Map.addLayer(clipped, visParams, 'MapBiomas ' + year + ' - ' + aoiName, false);
-  });
 
   Map.addLayer(aoiGeom, {color: 'black'}, aoiName + ' - limites', false);
 });
