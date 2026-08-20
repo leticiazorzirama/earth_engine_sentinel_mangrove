@@ -12,3 +12,5 @@ var year = 2025;
 var collection = ee.ImageCollection(assetPath)
   .filter(ee.Filter.eq('collection_id', 11.0))
   .filter(ee.Filter.eq('year', year));
+  
+print();
