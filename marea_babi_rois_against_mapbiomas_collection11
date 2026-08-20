@@ -9,8 +9,6 @@ var assetPath = 'projects/mapbiomas-public/assets/brazil/lulc/collection11/mapbi
 var year = 2025;
 
 // Filter the collection for the year 2025 from Collection 11
-var collection = ee.ImageCollection(assetPath)
-  .filter(ee.Filter.eq('collection_id', 11.0))
-  .filter(ee.Filter.eq('year', year));
+var image = ee.Image(assetPath).select('classification_' + year);
   
-print();
+print('Coleção 11 MapBiomas - ano de 2025:', image);
