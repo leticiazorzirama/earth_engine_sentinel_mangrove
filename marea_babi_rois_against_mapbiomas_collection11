@@ -23,7 +23,7 @@ var image = ee.Image(assetPath).select('classification_' + year);
   
 print('Coleção 11 MapBiomas - ano de 2025:', image);
 
-// 
+// Define visualization parameters
 var visParams = {
   min: 0,
   max: 75,
@@ -38,5 +38,13 @@ var visParams = {
     'ebf8b5','000000','000000','91ff36','7dc975','e97a7a','0fffe3','000000','000000',
     '000000','000000','000000','c12100'
   ]
+};
+
+// Dictionary for regions of interest (ROI)
+var aois = {
+  babiDegr1: babiDegr1, babiDegr2: babiDegr2,
+  babiPres1: babiPres1, babiPres2: babiPres2,
+  babiPres3: babiPres3, babiPres4: babiPres4,
+  babiPres5: babiPres5, babiPres6: babiPres6
 };
 
