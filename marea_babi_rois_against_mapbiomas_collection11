@@ -1,0 +1,8 @@
+/**
+ * MapBiomas Collection 11 - LULC Visualization for 2025
+ **/
+
+// Define the asset path for MapBiomas Collection 11
+var assetPath = 'projects/mapbiomas-public/assets/brazil/lulc/collection11/mapbiomas_brazil_collection11_coverage_v3';
+
+print(assetPath);
