@@ -48,3 +48,14 @@ var aois = {
   babiPres5: babiPres5, babiPres6: babiPres6
 };
 
+// Function to iterate over each ROI, clip the mosaic, display the image to the layer and inform if the ROI intersects with any MapBiomas region
+Object.keys(aois).forEach(function(aoiName) {
+  var aoiGeom = ee.FeatureCollection(aois[aoiName]).geometry();
+  var aoiArea = aoiGeom.area(1);
+
+  var clipped = image.clip(aoiGeom);
+  Map.addLayer(clipped, visParams, 'MapBiomas ' + year + ' - ' + aoiName, false);
+  });
+
+  Map.addLayer(aoiGeom, {color: 'black'}, aoiName + ' - limites', false);
+});
