@@ -12,3 +12,4 @@ var year = 2025;
 var image = ee.Image(assetPath).select('classification_' + year);
   
 print('Coleção 11 MapBiomas - ano de 2025:', image);
+
