@@ -1119,7 +1119,7 @@ var aois = {
   babiPres5: babiPres5, babiPres6: babiPres6
 };
 
-// Composites all the images in a collection,
+// Composites all the images into a mosaic
 var mosaicImg = collection.mosaic();
 
 print('Mosaico', mosaicImg);
