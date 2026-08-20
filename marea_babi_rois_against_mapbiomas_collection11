@@ -1,12 +1,12 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
 var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1"),
     babiDegr2 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada2"),
-    babiDegr3 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada1"),
-    babiDegr4 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada2"),
-    babiDegr5 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada3"),
-    babiDegr6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada4"),
-    babiPres1 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada5"),
-    table8 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
+    babiPres1 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada1"),
+    babiPres2 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada2"),
+    babiPres3 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada3"),
+    babiPres4 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada4"),
+    babiPres5 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada5"),
+    babiPres6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 /**
  * MapBiomas Collection 11 - LULC Visualization for 2025
