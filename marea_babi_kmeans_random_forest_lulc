@@ -203,7 +203,7 @@ var barPlot = ui.Chart.feature.groups({
     title: 'Área por cluster K-means',
 
     hAxis: {
-        title: 'Cluster'
+        title: 'Agrupamento'
     },
 
     vAxis: {
