@@ -483,6 +483,7 @@ listaInfo.forEach(function(f) {
 });
 
 print(AREA_ATUAL + ' - Blocos detectados:', blocos);
+print(AREA ATUAL, ordenadoComIndices);
 print('Exemplo da coleção:', ordenadoComIndices.first());
 
 // // ---- COMPOR/EXPORTAR CADA BLOCO ----
