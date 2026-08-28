@@ -332,8 +332,7 @@ var ordenado = maskEstacao.sort('system:time_start');
 
 // ---- CALCULAR INDICES ESPECTRAIS ----
 
-// Calculate NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI for each image
-// Defining NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI functions
+// Definir funcoes NDVI, NDWI, EVI, NDSI, MNDWI e MMRI
 /**
  * @name
  *      computeNDVI
