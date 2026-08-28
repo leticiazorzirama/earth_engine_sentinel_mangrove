@@ -145,15 +145,15 @@ var collectionWithIndexes = collectionWithoutClouds
     .map(computeMNDWI)
     .map(computeMMRI);
 
-// ? Export images with added bands to assets
+// Export mosaics with added bands to GEE asset
+// Export the mosaic image to an Earth Engine asset.
 Export.image.toAsset({
-  image: imagemFinal,
-  description: nomeBloco,
-  folder: 'GEE_Exports',
-  fileNamePrefix: nomeBloco,
-  region: poligono,
-  scale: 10,
-  maxPixels: 1e13
-});
+    image: ,                               // The image to export (in this case, the mosaic variable).
+    description: '',               // A user-defined description for the export task.
+    assetId: '',                   // The destination path in the Earth Engine Assets where the image will be saved.
+    pyramidingPolicy: {'.default': 'mean'},      // Defines how data is resampled at lower resolutions. 'mean' computes the average.
+    region: ,                                 // The region of interest (ROI) to export. Must be a geometry or feature collection.
+    scale: 10,                                   // The spatial resolution of the output image, in meters per pixel.
+    maxPixels: 1e13                              // Maximum number of pixels allowed in the export. Ensure this is large enough for the image size.
 });
     
