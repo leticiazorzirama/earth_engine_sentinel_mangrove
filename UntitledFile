@@ -10,9 +10,30 @@ var visParams = {
 };
 
 Map.addLayer(image, visParams, 'Natural color');
+Map.centerObject(image)
 
 // NDVI
+var visNdvi = {
+    bands: ['ndvi'],          // NDVI median band.
+    min: 0,                          // Minimum NDVI value for visualization.
+    max: 1,                          // Maximum NDVI value for visualization.
+    palette: 'ff0000,ffff00,00aa00', // Gradient from red (low NDVI) to green (high NDVI).
+    format: 'png'
+};
 
+Map.addLayer(image, visNdvi, 'NDVI');
+Map.centerObject(image)
 
+//MMRI
+var visMmri = {
+    bands: ['ndvi'],          // MMRI median band.
+    min: 0,                          // Minimum MMRI value for visualization.
+    max: 1,                          // Maximum MMRI value for visualization.
+    palette: 'ff0000,ffff00,00aa00', // Gradient from red (low MMRI) to green (high MMRI).
+    format: 'png'
+};
+
+Map.addLayer(image, visMmri, 'MMRI');
+Map.centerObject(image)
 
 
