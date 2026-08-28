@@ -8,9 +8,9 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
     babiPres5 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada5"),
     babiPres6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
-// // ==============================================
-// // ETAPA: CARREGAR, IMPORTAR E VISUALIZAR ASSETS
-// // ==============================================
+// // ================================================
+// // ETAPA: CARREGAR, IMPORTAR E VISUALIZAR POLÍGONOS
+// // ================================================
 
 // // Áreas degradadas 
 // //1
