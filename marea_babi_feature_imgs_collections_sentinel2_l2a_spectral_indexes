@@ -310,7 +310,7 @@ var poligonos = {
 // Valores possiveis: 'babiDegr1', 'babiDegr2', 'babiPres1', 'babiPres2',
 // 'babiPres3', 'babiPres4', 'babiPres5', 'babiPres6'
 // ======================================================================
-var AREA_ATUAL = 'babiPres6';
+var AREA_ATUAL = 'babiDegr1';
 
 // ---- PRE-PROCESSAMENTO ----
 var colecao = areas[AREA_ATUAL];
