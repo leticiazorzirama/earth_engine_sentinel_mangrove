@@ -351,7 +351,7 @@ var ordenado = maskEstacao.sort('system:time_start');
  *      Calcula o Índice de Vegetação por Diferença Normalizada (NDVI).
  *      O NDVI é um indicador da saúde e do vigor vegetativo.
  * @param 
- *      {ee.Image} image - A imagem de entrada contendo as bandas SR_B5 (NIR) e SR_B4 (Vermelho).
+ *      {ee.Image} image - A imagem de entrada contendo as bandas B8 (NIR) e B4 (Vermelho).
  * @returns 
  *      {ee.Image} - A imagem de entrada com uma banda 'ndvi' adicional.
  */
@@ -368,7 +368,7 @@ var computeNDVI = function(img) {
  *      Calcula o Índice de Água por Diferença Normalizada (NDWI).
  *      O NDWI é utilizado para realçar corpos d'água.
  * @param 
- *      {ee.Image} image - A imagem de entrada contendo as bandas SR_B5 (NIR) e SR_B6 (SWIR1).
+ *      {ee.Image} image - A imagem de entrada contendo as bandas B8 (NIR) e B11 (SWIR1).
  * @returns 
  *      {ee.Image} - A imagem de entrada com uma banda 'ndwi' adicional.
  */
@@ -385,7 +385,7 @@ var computeNDWI = function(img) {
  *      Calcula o Índice de Vegetação Aprimorado (EVI).
  *      O EVI é utilizado para quantificar a vegetação, reduzindo ruídos atmosféricos e do solo.
  * @param 
- *      {ee.Image} image - A imagem de entrada contendo as bandas SR_B5 (NIR), SR_B4 (Vermelho) e SR_B2 (Azul).
+ *      {ee.Image} image - A imagem de entrada contendo as bandas B8 (NIR), B4 (Vermelho) e B2 (Azul).
  * @returns 
  *      {ee.Image} - A imagem de entrada com uma banda 'evi' adicional.
  */
@@ -398,22 +398,22 @@ var computeEVI = function(img) {
   return img.addBands(evi);
 };
 
-/**
-* @name
-*      computeNDSI
-* @description
-*      Calcula o Índice de Solo por Diferença Normalizada (NDSI).
-*      O NDSI é utilizado para avaliar o conteúdo de umidade do solo.
-* @param  
-*      {ee.Image} image - A imagem de entrada contendo as bandas SR_B5 (NIR) e SR_B6 (SWIR1).
-* @returns 
-*      {ee.Image} - A imagem de entrada com uma banda 'ndsi' adicional.
-*/
-var computeNDSI = function(img) {
-  var exp = '(b("B11") - b("B8")) / (b("B11") + b("B8"))';
-  var ndsi = img.expression(exp).rename("ndsi");
-  return img.addBands(ndsi);
-};
+// /**
+// * @name
+// *      computeNDSI
+// * @description
+// *      Calcula o Índice de Solo por Diferença Normalizada (NDSI).
+// *      O NDSI é utilizado para avaliar o conteúdo de umidade do solo.
+// * @param  
+// *      {ee.Image} image - A imagem de entrada contendo as bandas B8 (NIR) e B11 (SWIR1).
+// * @returns 
+// *      {ee.Image} - A imagem de entrada com uma banda 'ndsi' adicional.
+// */
+// var computeNDSI = function(img) {
+//   var exp = '(b("B11") - b("B8")) / (b("B11") + b("B8"))';
+//   var ndsi = img.expression(exp).rename("ndsi");
+//   return img.addBands(ndsi);
+// };
 
 /**
  * @name
@@ -422,7 +422,7 @@ var computeNDSI = function(img) {
  *      Calcula o Índice de Água por Diferença Normalizada Modificado (MNDWI).
  *      O MNDWI é utilizado para realçar feições de água superficial enquanto atenua ou remove ruídos de solo, vegetação e áreas urbanas construídas.
  * @param 
- *      {ee.Image} image - A imagem de entrada contendo as bandas SR_B3 (Verde) e SR_B6 (SWIR1).
+ *      {ee.Image} image - A imagem de entrada contendo as bandas B3 (Verde) e B11 (SWIR1).
  * @returns 
  *      {ee.Image} - A imagem de entrada com uma banda 'mndwi' adicional.
  */
