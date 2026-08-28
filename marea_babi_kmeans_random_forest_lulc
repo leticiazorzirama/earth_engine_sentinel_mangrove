@@ -9,7 +9,16 @@ var bloco1 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco1_seco_2016-04-2
 var roi = ee.Polygon(babiDegr1)
 var mosaic = ee.Image(bloco1);
 
-Map.addLayer(mosaic, )
+// Visualizacao em cor natural
+var visParams = {
+  bands: ['B4', 'B3', 'B2'],
+  min: 0,
+  max: 0.3,
+  gamma: 1.4  
+};
+
+Map.addLayer(mosaic, visParams, 'Cor natural');
+Map.centerObject(mosaic);
 
 // ==============================
 // DEFINIR VARIAVEIS DE ENTRADA
