@@ -333,6 +333,7 @@ var ordenado = maskEstacao.sort('system:time_start');
 // ---- CALCULAR INDICES ESPECTRAIS ----
 
 // Definir funcoes NDVI, NDWI, EVI, NDSI, MNDWI e MMRI
+
 /**
  * @name
  *      computeNDVI
@@ -345,14 +346,9 @@ var ordenado = maskEstacao.sort('system:time_start');
  *      {ee.Image} - The input image with an additional 'ndvi' band.
  */
 var computeNDVI = function(img) {
-    // NDVI formula: (NIR - Red) / (NIR + Red)
-    var exp = '( b("B8") - b("B4") ) / ( b("B8") + b("B4") )';
-    
-    // Calculate NDVI and rename the band to 'ndvi'.
-    var ndvi = image.expression(exp).rename("ndvi");
-    
-    // Add the NDVI band to the image and return.
-    return image.addBands(ndvi);
+  var exp = '(b("B8") - b("B4")) / (b("B8") + b("B4"))';
+  var ndvi = img.expression(exp).rename("ndvi");
+  return img.addBands(ndvi);
 };
 
 /**
@@ -367,14 +363,9 @@ var computeNDVI = function(img) {
  *       {ee.Image} - The input image with an additional 'ndwi' band.
  */
 var computeNDWI = function(img) {
-    // NDWI formula: (NIR - SWIR1) / (NIR + SWIR1)
-    var exp = 'float(b("B8") - b("B11")) / (b("B8") + b("B11"))';
-
-    // Calculate NDWI and rename the band to 'ndwi'.
-    var ndwi = image.expression(exp).rename("ndwi");
-
-    // Add the NDWI band to the image and return.
-    return image.addBands(ndwi); 
+  var exp = 'float(b("B8") - b("B11")) / (b("B8") + b("B11"))';
+  var ndwi = img.expression(exp).rename("ndwi");
+  return img.addBands(ndwi);
 };
 
 /**
@@ -389,14 +380,12 @@ var computeNDWI = function(img) {
  *      {ee.Image} - The input image with an additional 'evi' band.
  */
 var computeEVI = function(img) {
-    // EVI formula: 2.5 * ((NIR - Red) / (NIR + 6 * Red - 7.5 * Blue + 1))
-    var exp = '2.5 * ((b("B8") - b("B4")) / (b("B8") + 6 * b("B4") - 7.5 * b("B2") + 1))';
+  var exp =
+    '2.5 * ((b("B8") - b("B4")) / ' +
+    '(b("B8") + 6 * b("B4") - 7.5 * b("B2") + 1))';
 
-    // Calculate EVI and rename the band to 'evi'.
-    var evi = image.expression(exp).rename("evi");
-
-    // Add the EVI band to the image and return.
-    return image.addBands(evi);
+  var evi = img.expression(exp).rename("evi");
+  return img.addBands(evi);
 };
 
 /**
@@ -411,14 +400,9 @@ var computeEVI = function(img) {
 *      {ee.Image} - The input image with an additional 'ndsi' band.
 */
 var computeNDSI = function(img) {
-    // NDSI formula: (SWIR1 - NIR) / (SWIR1 + NIR)   
-    var exp = '(b("B11") - b("B8")) / (b("B11") + b("B8"))';
-
-    // Calculate NDSI and rename the band to 'ndsi'.
-    var ndsi = image.expression(exp).rename("ndsi");
-
-    // Add the NDSI band to the image and return.
-    return image.addBands(ndsi);
+  var exp = '(b("B11") - b("B8")) / (b("B11") + b("B8"))';
+  var ndsi = img.expression(exp).rename("ndsi");
+  return img.addBands(ndsi);
 };
 
 /**
@@ -433,16 +417,11 @@ var computeNDSI = function(img) {
  *      {ee.Image} - The input image with an additional 'mndwi' band.
  */
 var computeMNDWI = function(img) {
-    // MNDWI formula: (Green - SWIR1) / (Green + SWIR1)
-    var exp = '(b("B3") - b("B11")) / (b("B3") + b("B11"))';
-
-    // Calculate MNDWI and rename the band to 'mndwi'.
-    var mndwi = image.expression(exp).rename("mndwi");
-
-    // Add the MNDWI band to the image and return.
-    return image.addBands(mndwi);
+  var exp = '(b("B3") - b("B11")) / (b("B3") + b("B11"))';
+  var mndwi = img.expression(exp).rename("mndwi");
+  return img.addBands(mndwi);
 };
-    
+
 /**
  * @name
  *      computeMMRI
@@ -455,15 +434,12 @@ var computeMNDWI = function(img) {
  *      {ee.Image} - The input image with an additional 'mmri' band.
  */
 var computeMMRI = function(img) {
-    // MMRI = (|MNDWI| - |NDVI|) / (|MNDWI| + |NDVI|)
-    var exp = '(abs(b("mndwi")) - abs(b("ndvi"))) / ' +
-              '(abs(b("mndwi")) + abs(b("ndvi")))';
+  var exp =
+    '(abs(b("mndwi")) - abs(b("ndvi"))) / ' +
+    '(abs(b("mndwi")) + abs(b("ndvi")))';
 
-    // Calculate MMRI and rename the band to 'mmri'.
-    var mmri = image.expression(exp).rename("mmri");
-
-    // Add the MMRI band to the image and return.
-    return image.addBands(mmri);
+  var mmri = img.expression(exp).rename("mmri");
+  return img.addBands(mmri);
 };
 
 // Apply the functions to each image
