@@ -483,54 +483,55 @@ listaInfo.forEach(function(f) {
 });
 
 print(AREA_ATUAL + ' - Blocos detectados:', blocos);
+print('Exemplo da coleção:', ordenadoComIndices.first());
 
-// ---- COMPOR/EXPORTAR CADA BLOCO ----
-// Destino possiveis: drive ou asset
-var DESTINO = 'asset'
+// // ---- COMPOR/EXPORTAR CADA BLOCO ----
+// // Destino possiveis: drive ou asset
+// var DESTINO = 'asset'
 
-blocos.forEach(function(bloco, i) {
-  var numImg = bloco.indices.length;
+// blocos.forEach(function(bloco, i) {
+//   var numImg = bloco.indices.length;
 
-  var subColecao = ordenadoComIndices.filter(
-    ee.Filter.inList('system:index', bloco.indices)
-  );
+//   var subColecao = ordenadoComIndices.filter(
+//     ee.Filter.inList('system:index', bloco.indices)
+//   );
 
-  var imagemFinal = (numImg === 1)
-    ? subColecao.first()
-    : subColecao.median();
+//   var imagemFinal = (numImg === 1)
+//     ? subColecao.first()
+//     : subColecao.median();
 
-  imagemFinal = imagemFinal.clip(poligono);
+//   imagemFinal = imagemFinal.clip(poligono);
 
-  var nomeBloco = AREA_ATUAL + '_bloco' + (i + 1) + '_' + bloco.estacao
-    + '_' + bloco.dataInicio + '_a_' + bloco.dataFim;
+//   var nomeBloco = AREA_ATUAL + '_bloco' + (i + 1) + '_' + bloco.estacao
+//     + '_' + bloco.dataInicio + '_a_' + bloco.dataFim;
 
-  print(nomeBloco + ' - n imagens: ' + numImg);
+//   print(nomeBloco + ' - n imagens: ' + numImg);
 
-  // ---- EXPORTAR PARA GOOGLE DRIVE ----
-  if (DESTINO == 'asset') {
-    Export.image.toDrive({
-    image: imagemFinal,
-    description: nomeBloco,
-    folder: 'GEE_Exports',
-    fileNamePrefix: nomeBloco,
-    region: poligono,
-    scale: 10,
-    maxPixels: 1e13
-  })
-  }
+//   // ---- EXPORTAR PARA GOOGLE DRIVE ----
+//   if (DESTINO == 'asset') {
+//     Export.image.toDrive({
+//     image: imagemFinal,
+//     description: nomeBloco,
+//     folder: 'GEE_Exports',
+//     fileNamePrefix: nomeBloco,
+//     region: poligono,
+//     scale: 10,
+//     maxPixels: 1e13
+//   })
+//   }
 
-  // ---- EXPORTAR PARA GOOGLE EARTH ENGINE ASSET ----
-  else { 
-    Export.image.toAsset({
-    image: imagemFinal,
-    description: nomeBloco + '_asset',
-    assetId: 'projects/SEU_PROJETO/assets/' + nomeBloco,
-    pyramidingPolicy: {
-      '.default': 'mean'
-    },
-    region: poligono,
-    scale: 10,
-    maxPixels: 1e13
-  });
-  }
-});
+//   // ---- EXPORTAR PARA GOOGLE EARTH ENGINE ASSET ----
+//   else { 
+//     Export.image.toAsset({
+//     image: imagemFinal,
+//     description: nomeBloco + '_asset',
+//     assetId: 'projects/SEU_PROJETO/assets/' + nomeBloco,
+//     pyramidingPolicy: {
+//       '.default': 'mean'
+//     },
+//     region: poligono,
+//     scale: 10,
+//     maxPixels: 1e13
+//   });
+//   }
+// });
