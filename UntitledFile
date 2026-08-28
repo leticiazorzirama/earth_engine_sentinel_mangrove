@@ -1,6 +1,7 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
 var image = ee.Image("projects/leticiazr/assets/babiDegr1_bloco2_chuvoso_2016-12-06_a_2016-12-06");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
+// Visualizacao em cor natural
 var visParams = {
   bands: ['B4', 'B3', 'B2'],
   min: 0,
@@ -8,4 +9,10 @@ var visParams = {
   gamma: 1.4   // Adjust gamma (e.g., 1.2-1.5) to enhance contrast in darker features
 };
 
-Map.addLayer(image, visParams);
+Map.addLayer(image, visParams, 'Natural color');
+
+// NDVI
+
+
+
+
