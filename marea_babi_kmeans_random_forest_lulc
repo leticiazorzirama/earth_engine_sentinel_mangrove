@@ -1,13 +1,14 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
 var bloco1 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco1_seco_2016-04-20_a_2016-04-20"),
-    babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1");
+    babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1"),
+    bloco2 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco2_chuvoso_2016-12-06_a_2016-12-06");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 // =============================
 // IMPORTAR E VISUALIZAR ASSETS
 // =============================
 
-var roi = ee.Polygon(babiDegr1)
-var mosaic = ee.Image(bloco1);
+var roi = ee.Geometry.Polygon(babiDegr1)
+var mosaic = ee.Image(bloco2);
 
 // Visualizacao em cor natural
 var visParams = {
@@ -43,7 +44,7 @@ print(inputProperties);
 
 var numberOfSamples = 5000;
 
-var trainingSamples = image.select(inputProperties).sample({
+var trainingSamples = mosaic.select(inputProperties).sample({
     region: roi,
     scale: 10,
     numPixels: numberOfSamples,
