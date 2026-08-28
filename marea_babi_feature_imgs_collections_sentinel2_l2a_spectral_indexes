@@ -468,7 +468,7 @@ var computeMMRI = function(img) {
 
 // Apply the functions to each image
 // Apply the compute functions to each image in the collection.
-var collectionWithIndexes = ordenado.map(function(img){
+var ordenado = ordenado.map(function(img){
     .map(computeNDVI)
     .map(computeNDWI)
     .map(computeEVI)
