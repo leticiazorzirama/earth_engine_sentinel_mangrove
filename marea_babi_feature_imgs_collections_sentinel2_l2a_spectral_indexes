@@ -468,13 +468,14 @@ var computeMMRI = function(img) {
 
 // Apply the functions to each image
 // Apply the compute functions to each image in the collection.
-var collectionWithIndexes = collectionWithoutClouds
+var collectionWithIndexes = ordenado.map(function(img){
     .map(computeNDVI)
     .map(computeNDWI)
     .map(computeEVI)
     .map(computeNDSI)
     .map(computeMNDWI)
-    .map(computeMMRI);
+    .map(computeMMRI)
+});
 
 // ---- DETECTAR BLOCOS DE ESTACAO CONSECUTIVOS ----
 var listaInfo = ordenado.map(function(img) {
