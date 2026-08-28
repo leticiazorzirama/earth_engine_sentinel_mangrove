@@ -56,13 +56,14 @@ trainingSamples = trainingSamples.filter(
     ee.Filter.notNull(inputProperties)
 );
 
-// Filtrar pelo 80th percentil
-var p80Reducer = ee.Reducer.percentile([80]);
+// // Filtrar pelo 80th percentil
+// var p80Reducer = ee.Reducer.percentile([80]);
 
-var trainingSamples = trainingSamples.reduceRegion({
-  reducer: p80Reducer,
-  scale: 10
-});
+// var trainingSamples = mosaic.reduceRegions({
+//   collection: trainingSamples,
+//   reducer: p80Reducer,
+//   scale: 10,
+// });
 
 print('Amostras de treinamento do K-means:', trainingSamples);
 print('Número de amostras:', trainingSamples.size());
@@ -75,7 +76,7 @@ print('Número de amostras:', trainingSamples.size());
 var numberOfClusters = 5;
 
 // Criar o agrupador K-means
-var clusterer = ee.Clusterer.KMeans({
+var clusterer = ee.Clusterer.wekaKMeans({
     nClusters: numberOfClusters
 });
 
