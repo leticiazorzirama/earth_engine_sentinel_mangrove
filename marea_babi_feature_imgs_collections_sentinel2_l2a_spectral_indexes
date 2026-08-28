@@ -1,8 +1,4 @@
-// // ====================================
-// // ETAPA: CARREGAR E IMPORTAR MOSAICOS
-// // ===================================
-
-
+// Carregar e visualizar mosaicos
 
 // ? Calculate NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI for each image
 // ? Defining NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI functions
@@ -148,4 +144,16 @@ var collectionWithIndexes = collectionWithoutClouds
     .map(computeNDSI)
     .map(computeMNDWI)
     .map(computeMMRI);
+
+
+Export.image.toDrive({
+  image: imagemFinal,
+  description: nomeBloco,
+  folder: 'GEE_Exports',
+  fileNamePrefix: nomeBloco,
+  region: poligono,
+  scale: 10,
+  maxPixels: 1e13
+});
+});
     
