@@ -204,9 +204,9 @@ print('Babi Preservada 6 - MSI L2A - Metadados:', p6);
 
 // Map.centerObject(p6, 10);
 
-// =================================================
+// ================================================
 // ETAPA: TABELA DE DATAS DISPONIVEIS POR POLIGONO
-// =================================================
+// ================================================
 
 // definirEstacao: 
 // recebe uma imagem e classifica seu mes de aquisicao em uma das duas
@@ -275,11 +275,11 @@ Object.keys(areas).forEach(function(nomeArea) {
 //   });
 // });
 
-// ===============================================================
+// ==============================================================
 // ETAPA: PRE-PROCESSAMENTO + DETECCAO DE BLOCOS + EXPORTACAO
 // Controle manual por area: alterar AREA_ATUAL e rodar o script
 // novamente para processar a proxima area.
-// ===============================================================
+// ==============================================================
 
 // Dicionario: nome da area -> colecao de imagens (ja filtrada por bounds/nuvens)
 var areas = {
