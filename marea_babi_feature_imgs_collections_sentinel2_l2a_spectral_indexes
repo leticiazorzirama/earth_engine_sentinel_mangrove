@@ -256,24 +256,24 @@ var areas = {
 // Objeto para guardar as tabelas geradas (util se quiser reusar em memoria)
 var tabelasDatas = {};
 
-// Object.keys(areas).forEach(function(nomeArea) {
-//   var colecao = areas[nomeArea];
+Object.keys(areas).forEach(function(nomeArea) {
+  var colecao = areas[nomeArea];
   
-//   // Gerar tabela de datas para a area
-//   var tabela = gerarTabelaDatas(colecao, nomeArea);
-//   tabelasDatas[nomeArea] = tabela;
+  // Gerar tabela de datas para a area
+  var tabela = gerarTabelaDatas(colecao, nomeArea);
+  tabelasDatas[nomeArea] = tabela;
   
-//   print(nomeArea + ' - Tabela de datas disponiveis:', tabela);
+  print(nomeArea + ' - Tabela de datas disponiveis:', tabela);
   
-//   // Exportar cada tabela
-//   Export.table.toDrive({
-//     collection: tabela,
-//     description: nomeArea,
-//     folder: 'GEE_Exports',
-//     fileNamePrefix: nomeArea,
-//     fileFormat: 'CSV'
-//   });
-// });
+  // Exportar cada tabela
+  Export.table.toDrive({
+    collection: tabela,
+    description: nomeArea,
+    folder: 'GEE_Exports',
+    fileNamePrefix: nomeArea,
+    fileFormat: 'CSV'
+  });
+});
 
 // ===============================================================
 // ETAPA: PRE-PROCESSAMENTO + DETECCAO DE BLOCOS + EXPORTACAO
