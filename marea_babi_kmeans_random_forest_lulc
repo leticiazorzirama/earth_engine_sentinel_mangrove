@@ -34,9 +34,8 @@ var numberOfSamples = 5000;
 
 var trainingSamples = image.select(inputProperties).sample({
     region: roi,
-    scale: 30,
+    scale: 10,
     numPixels: numberOfSamples,
-    seed: 42,
     geometries: false
 });
 
@@ -45,49 +44,50 @@ trainingSamples = trainingSamples.filter(
     ee.Filter.notNull(inputProperties)
 );
 
+// Filtrar pelo 80th percentil
+var p80Reducer = ee.Reducer.percentile([80]);
+
+var trainingSamples = trainingSamples.reduceRegion({
+  reducer: p80Reducer,
+  scale: 10
+});
+
 print('Amostras de treinamento do K-means:', trainingSamples);
 print('Número de amostras:', trainingSamples.size());
 
 
 // ============================================================
-// 6. Configurar o K-means
+// INSTANCIAR O K-MEANS
 // ============================================================
 
 var numberOfClusters = 5;
 
 // Criar o agrupador K-means
-var clusterer = ee.Clusterer.wekaKMeans({
-    nClusters: numberOfClusters,
-    seed: 42
+var clusterer = ee.Clusterer.KMeans({
+    nClusters: numberOfClusters
 });
 
 // ============================================================
-// 7. Treinar o agrupador K-means
+// TREINAR O K-MEANS
 // ============================================================
 
 // Treinar o modelo de agrupamento não supervisionado utilizando
 // os pixels amostrados.
-//
-// Observe que não há o argumento classProperty.
-
 clusterer = clusterer.train(trainingSamples);
 
 print('Agrupador K-means:', clusterer);
 
 
 // ============================================================
-// 8. Aplicar o K-means a todo o mosaico
+// TESTE INDEPENDENTE EM TODO O MOSAICO
 // ============================================================
-
-// Classificar cada pixel de acordo com o centro de cluster mais próximo.
 
 var classification = mosaic
     .select(inputProperties)
     .cluster(clusterer);
 
-
 // ============================================================
-// 9. Visualizar os clusters
+// VISUALIZAR OS AGRUPAMENTOS
 // ============================================================
 
 // Os IDs dos clusters são arbitrários.
@@ -124,28 +124,25 @@ print('Classificação K-means:', classification);
 
 
 // ============================================================
-// 10. Calcular a área para cada cluster
+// CALCULAR A AREA DE CADA AGRUPAMENTO
 // ============================================================
 
 // Área do pixel em hectares
-
 var areaHa = ee.Image.pixelArea().divide(1e4);
 
 
 // Adicionar a banda de classificação
-
 var areaStack = areaHa.addBands(classification);
 
 
 // Calcular a área agrupada por cluster
-
 var areaDict = areaStack.reduceRegion({
     reducer: ee.Reducer.sum().group({
         groupField: 1,
         groupName: 'cluster'
     }),
     geometry: roi,
-    scale: 30,
+    scale: 10,
     maxPixels: 1e13
 });
 
@@ -155,9 +152,9 @@ print(
 );
 
 
-// ============================================================
-// 11. Converter o dicionário de áreas para FeatureCollection
-// ============================================================
+// ===========================================================
+// CONVERTER O DICIONARIO DE AREAS PARA COLECAO DE ATRIBUTOS
+// ===========================================================
 
 var groups = ee.List(areaDict.get('groups'));
 
@@ -190,9 +187,9 @@ print(
 );
 
 
-// ============================================================
-// 12. Gerar gráfico de barras com as áreas dos clusters
-// ============================================================
+// ============================================
+// PLOTAR OS AGRUPAMENTOS EM GRAFICO DE BARRAS
+// ============================================
 
 var barPlot = ui.Chart.feature.groups({
     features: areaFc,
