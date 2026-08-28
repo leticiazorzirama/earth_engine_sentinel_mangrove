@@ -454,7 +454,7 @@ var ordenadoComIndices = ordenado
   .map(computeMMRI);
 
 // ---- DETECTAR BLOCOS DE ESTACAO CONSECUTIVOS ----
-var listaInfo = ordenado.map(function(img) {
+var listaInfo = ordenadoComIndices.map(function(img) {
   return ee.Feature(null, {
     'indice': img.get('system:index'),
     'time_start': img.get('system:time_start'),
@@ -487,7 +487,7 @@ print(AREA_ATUAL + ' - Blocos detectados:', blocos);
 // ---- COMPOR/EXPORTAR CADA BLOCO ----
 blocos.forEach(function(bloco, i) {
   var numImg = bloco.indices.length;
-  var subColecao = ordenado.filter(ee.Filter.inList('system:index', bloco.indices));
+  var subColecao = ordenadoComIndices.filter(ee.Filter.inList('system:index', bloco.indices));
 
   var imagemFinal = (numImg === 1)
     ? subColecao.first()
@@ -511,15 +511,4 @@ blocos.forEach(function(bloco, i) {
   });
 });
 
-// // Export mosaics with added bands to GEE asset
-// // Export the mosaic image to an Earth Engine asset.
-// Export.image.toAsset({
-//     image: ,                               // The image to export (in this case, the mosaic variable).
-//     description: '',               // A user-defined description for the export task.
-//     assetId: '',                   // The destination path in the Earth Engine Assets where the image will be saved.
-//     pyramidingPolicy: {'.default': 'mean'},      // Defines how data is resampled at lower resolutions. 'mean' computes the average.
-//     region: ,                                 // The region of interest (ROI) to export. Must be a geometry or feature collection.
-//     scale: 10,                                   // The spatial resolution of the output image, in meters per pixel.
-//     maxPixels: 1e13                              // Maximum number of pixels allowed in the export. Ensure this is large enough for the image size.
-// });
-    
+
