@@ -442,18 +442,16 @@ var computeMMRI = function(img) {
   return img.addBands(mmri);
 };
 
-// Apply the functions to each image
-// Apply the compute functions to each image in the collection.
-var ordenado = ordenado.map(function(img){
-  
-    img.map(computeNDVI)
-    img.map(computeNDWI)
-    img.map(computeEVI)
-    img.map(computeNDSI)
-    img.map(computeMNDWI)
-    img.map(computeMMRI)
-    
-});
+// Aplicar os indices sequencialmente a colecao
+// MMRI deve vir por ultimos pois depende de NDVI e MNDWI.
+
+var ordenadoComIndices = ordenado
+  .map(computeNDVI)
+  .map(computeNDWI)
+  .map(computeEVI)
+  .map(computeNDSI)
+  .map(computeMNDWI)
+  .map(computeMMRI);
 
 // ---- DETECTAR BLOCOS DE ESTACAO CONSECUTIVOS ----
 var listaInfo = ordenado.map(function(img) {
