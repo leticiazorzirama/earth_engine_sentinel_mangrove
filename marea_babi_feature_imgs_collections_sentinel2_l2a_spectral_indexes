@@ -19,7 +19,7 @@
  */
 var computeNDVI = function (image) {
     // NDVI formula: (NIR - Red) / (NIR + Red)
-    var exp = '( b("SR_B5") - b("SR_B4") ) / ( b("SR_B5") + b("SR_B4") )';
+    var exp = '( b("B8") - b("B4") ) / ( b("B8") + b("B4") )';
     
     // Calculate NDVI and rename the band to 'ndvi'.
     var ndvi = image.expression(exp).rename("ndvi");
@@ -41,7 +41,7 @@ var computeNDVI = function (image) {
  */
 var computeNDWI = function (image) {
     // NDWI formula: (NIR - SWIR1) / (NIR + SWIR1)
-    var exp = 'float(b("SR_B5") - b("SR_B6"))/(b("SR_B5") + b("SR_B6"))';
+    var exp = 'float(b("B8") - b("B11")) / (b("B8") + b("B11"))';
 
     // Calculate NDWI and rename the band to 'ndwi'.
     var ndwi = image.expression(exp).rename("ndwi");
@@ -63,7 +63,7 @@ var computeNDWI = function (image) {
  */
 var computeEVI = function (image) {
     // EVI formula: 2.5 * ((NIR - Red) / (NIR + 6 * Red - 7.5 * Blue + 1))
-    var exp = '2.5 * ((b("SR_B5") - b("SR_B4")) / (b("SR_B5") + 6 * b("SR_B4") - 7.5 * b("SR_B2") + 1))';
+    var exp = '2.5 * ((b("B8") - b("B4")) / (b("B8") + 6 * b("B4") - 7.5 * b("B2") + 1))';
 
     // Calculate EVI and rename the band to 'evi'.
     var evi = image.expression(exp).rename("evi");
@@ -85,7 +85,7 @@ var computeEVI = function (image) {
 */
 var computeNDSI = function (image) {
     // NDSI formula: (SWIR1 - NIR) / (SWIR1 + NIR)   
-    var exp = '(b("SR_B6") - b("SR_B5")) / (b("SR_B6") + b("SR_B5"))';
+    var exp = '(b("B11") - b("B8")) / (b("B11") + b("B8"))';
 
     // Calculate NDSI and rename the band to 'ndsi'.
     var ndsi = image.expression(exp).rename("ndsi");
@@ -107,7 +107,7 @@ var computeNDSI = function (image) {
  */
 var computeMNDWI = function (image) {
     // MNDWI formula: (Green - SWIR1) / (Green + SWIR1)
-    var exp = '(b("SR_B3") - b("SR_B6")) / (b("SR_B3") + b("SR_B6"))';
+    var exp = '(b("B3") - b("B11")) / (b("B3") + b("B11"))';
 
     // Calculate MNDWI and rename the band to 'mndwi'.
     var mndwi = image.expression(exp).rename("mndwi");
