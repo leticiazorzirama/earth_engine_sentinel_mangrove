@@ -4,8 +4,8 @@
 
 
 
-// 1.8 Calculate NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI for each image
-// 1.8.1 Defining NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI functions
+// ? Calculate NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI for each image
+// ? Defining NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI functions
 /**
  * @name
  *      computeNDVI
