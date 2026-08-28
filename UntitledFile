@@ -1,0 +1,4 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var image = ee.Image("projects/leticiazr/assets/babiDegr1_bloco1_seco_2016-04-20_a_2016-04-20");
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+Map.addLayer(image);
