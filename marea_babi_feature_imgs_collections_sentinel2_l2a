@@ -8,9 +8,9 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
     babiPres5 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada5"),
     babiPres6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
-// // ================================================
+// // ==========================================
 // // CARREGAR, IMPORTAR E VISUALIZAR POLÍGONOS
-// // ================================================
+// // ==========================================
 
 // // Áreas degradadas 
 // //1
@@ -38,9 +38,9 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
 // //6
 // Map.addLayer(babiPres6, {color: '#27500A', fillColor: '#27500A'}, 'Babi Preservada - área 6', false);
 
-// =========================
+// ==================
 // AQUISITAR IMAGENS
-// =========================
+// ==================
 
 // Dataset: Harmonized Sentinel-2 MSI: MultiSpectral Instrument, Level-2A (SR)
 // Importar o dataset para cada area de interesse 
@@ -204,9 +204,9 @@ print('Babi Preservada 6 - MSI L2A - Metadados:', p6);
 
 // Map.centerObject(p6, 10);
 
-// =================================================
+// =========================================
 // TABELA DE DATAS DISPONIVEIS POR POLIGONO
-// =================================================
+// =========================================
 
 // definirEstacao: 
 // recebe uma imagem e classifica seu mes de aquisicao em uma das duas
@@ -275,11 +275,11 @@ var tabelasDatas = {};
 //   });
 // });
 
-// ===============================================================
+// ==============================================================
 // PRE-PROCESSAMENTO + DETECCAO DE BLOCOS + EXPORTACAO
 // Controle manual por area: alterar AREA_ATUAL e rodar o script
 // novamente para processar a proxima area.
-// ===============================================================
+// ==============================================================
 
 // Dicionario: nome da area -> colecao de imagens (ja filtrada por bounds/nuvens)
 var areas = {
