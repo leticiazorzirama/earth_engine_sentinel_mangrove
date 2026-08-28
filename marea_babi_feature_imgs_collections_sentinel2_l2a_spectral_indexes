@@ -493,8 +493,8 @@ listaInfo.forEach(function(f) {
 });
 
 print(AREA_ATUAL + ' - Blocos detectados:', blocos);
-print(AREA_ATUAL, ordenadoComIndices);
-print('Exemplo da coleção:', ordenadoComIndices.first());
+print(AREA_ATUAL, blocos);
+print('Exemplo da coleção:', blocos.first());
 
 // // ---- COMPOR/EXPORTAR CADA BLOCO ----
 // // Destino possiveis: drive ou asset
