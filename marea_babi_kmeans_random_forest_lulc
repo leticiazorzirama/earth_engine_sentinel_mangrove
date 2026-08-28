@@ -1,26 +1,23 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
-var bloco1 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco1_seco_2016-04-20_a_2016-04-20");
+var bloco1 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco1_seco_2016-04-20_a_2016-04-20"),
+    babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
-// ============================================================
-// 4. Definir variáveis de entrada para o K-means
-// ============================================================
+var roi = ee.Polygon(babiDegr1)
+var image = ee.Image(bloco1);
 
-// Estes são os atributos (bandas e índices espectrais) utilizados pelo K-means.
-//
+// ==============================
+// DEFINIR VARIAVEIS DE ENTRADA
+// ==============================
+
 // O K-means utilizará os valores espectrais e dos índices
 // para agrupar os pixels de acordo com sua similaridade.
-//
-// IMPORTANTE:
-// Não inclua a propriedade 'class' aqui, pois o K-means
-// é um algoritmo completamente não supervisionado.
 
-var inputProperties = [
-  
-];
+var inputProperties = image.bandNames();
+print(inputProperties);
 
 
 // ============================================================
-// 5. Preparar pixels para o agrupamento (clustering)
+// PREPARAR AMOSTRAS DE PIXELS PARA O AGRUPAMENTO
 // ============================================================
 
 // O K-means precisa de uma coleção de pixels/amostras a partir da qual
@@ -48,199 +45,199 @@ print('Amostras de treinamento do K-means:', trainingSamples);
 print('Número de amostras:', trainingSamples.size());
 
 
-// ============================================================
-// 6. Configurar o K-means
-// ============================================================
+// // ============================================================
+// // 6. Configurar o K-means
+// // ============================================================
 
-// Número de clusters.
-//
-// Neste caso, utilizamos inicialmente cinco clusters porque as
-// categorias de cobertura do solo desejadas são:
-//
-// 0 - Urbano
-// 1 - Solo exposto
-// 2 - Água
-// 3 - Manguezal
-// 4 - Floresta
-//
-// CONTUDO, o K-means NÃO conhece esses nomes de classes.
-// Os IDs de cluster resultantes devem ser interpretados posteriormente.
+// // Número de clusters.
+// //
+// // Neste caso, utilizamos inicialmente cinco clusters porque as
+// // categorias de cobertura do solo desejadas são:
+// //
+// // 0 - Urbano
+// // 1 - Solo exposto
+// // 2 - Água
+// // 3 - Manguezal
+// // 4 - Floresta
+// //
+// // CONTUDO, o K-means NÃO conhece esses nomes de classes.
+// // Os IDs de cluster resultantes devem ser interpretados posteriormente.
 
-var numberOfClusters = 5;
-
-
-// Criar o agrupador K-means
-var clusterer = ee.Clusterer.wekaKMeans({
-    nClusters: numberOfClusters,
-    seed: 42
-});
+// var numberOfClusters = 5;
 
 
-// ============================================================
-// 7. Treinar o agrupador K-means
-// ============================================================
-
-// Treinar o modelo de agrupamento não supervisionado utilizando
-// os pixels amostrados.
-//
-// Observe que não há o argumento classProperty.
-
-clusterer = clusterer.train(trainingSamples);
-
-print('Agrupador K-means:', clusterer);
+// // Criar o agrupador K-means
+// var clusterer = ee.Clusterer.wekaKMeans({
+//     nClusters: numberOfClusters,
+//     seed: 42
+// });
 
 
-// ============================================================
-// 8. Aplicar o K-means a todo o mosaico
-// ============================================================
+// // ============================================================
+// // 7. Treinar o agrupador K-means
+// // ============================================================
 
-// Classificar cada pixel de acordo com o centro de cluster mais próximo.
+// // Treinar o modelo de agrupamento não supervisionado utilizando
+// // os pixels amostrados.
+// //
+// // Observe que não há o argumento classProperty.
 
-var classification = mosaic
-    .select(inputProperties)
-    .cluster(clusterer);
+// clusterer = clusterer.train(trainingSamples);
 
-
-// ============================================================
-// 9. Visualizar os clusters
-// ============================================================
-
-// Os IDs dos clusters são arbitrários.
-//
-// NÃO assuma que:
-// cluster 0 = urbano
-// cluster 1 = solo exposto
-// cluster 2 = água
-// cluster 3 = manguezal
-// cluster 4 = floresta
-//
-// As cores abaixo são apenas para fins de visualização.
-
-var clusterPalette = [
-    '#d4271e',
-    '#d1af86',
-    '#1488ff',
-    '#076132',
-    '#2cc968'
-];
-
-Map.addLayer(
-    classification,
-    {
-        min: 0,
-        max: numberOfClusters - 1,
-        palette: clusterPalette,
-        format: 'png'
-    },
-    'Classificação K-means'
-);
-
-print('Classificação K-means:', classification);
+// print('Agrupador K-means:', clusterer);
 
 
-// ============================================================
-// 10. Calcular a área para cada cluster
-// ============================================================
+// // ============================================================
+// // 8. Aplicar o K-means a todo o mosaico
+// // ============================================================
 
-// Área do pixel em hectares
+// // Classificar cada pixel de acordo com o centro de cluster mais próximo.
 
-var areaHa = ee.Image.pixelArea().divide(1e4);
-
-
-// Adicionar a banda de classificação
-
-var areaStack = areaHa.addBands(classification);
+// var classification = mosaic
+//     .select(inputProperties)
+//     .cluster(clusterer);
 
 
-// Calcular a área agrupada por cluster
+// // ============================================================
+// // 9. Visualizar os clusters
+// // ============================================================
 
-var areaDict = areaStack.reduceRegion({
-    reducer: ee.Reducer.sum().group({
-        groupField: 1,
-        groupName: 'cluster'
-    }),
-    geometry: roi,
-    scale: 30,
-    maxPixels: 1e13
-});
+// // Os IDs dos clusters são arbitrários.
+// //
+// // NÃO assuma que:
+// // cluster 0 = urbano
+// // cluster 1 = solo exposto
+// // cluster 2 = água
+// // cluster 3 = manguezal
+// // cluster 4 = floresta
+// //
+// // As cores abaixo são apenas para fins de visualização.
 
-print(
-    'Tabela de áreas (ha) para cada cluster:',
-    areaDict
-);
+// var clusterPalette = [
+//     '#d4271e',
+//     '#d1af86',
+//     '#1488ff',
+//     '#076132',
+//     '#2cc968'
+// ];
 
+// Map.addLayer(
+//     classification,
+//     {
+//         min: 0,
+//         max: numberOfClusters - 1,
+//         palette: clusterPalette,
+//         format: 'png'
+//     },
+//     'Classificação K-means'
+// );
 
-// ============================================================
-// 11. Converter o dicionário de áreas para FeatureCollection
-// ============================================================
-
-var groups = ee.List(areaDict.get('groups'));
-
-
-var areaFc = ee.FeatureCollection(
-    groups.map(function(item) {
-
-        item = ee.Dictionary(item);
-
-        var cluster = ee.Number(
-            item.get('cluster')
-        ).int();
-
-        var area = item.get('sum');
-
-        return ee.Feature(null, {
-            cluster: cluster,
-            cluster_label: ee.String('Cluster ')
-                .cat(cluster.format()),
-            area_ha: area
-        });
-
-    })
-);
+// print('Classificação K-means:', classification);
 
 
-print(
-    'FeatureCollection de áreas (ha) para cada cluster:',
-    areaFc
-);
+// // ============================================================
+// // 10. Calcular a área para cada cluster
+// // ============================================================
+
+// // Área do pixel em hectares
+
+// var areaHa = ee.Image.pixelArea().divide(1e4);
 
 
-// ============================================================
-// 12. Gerar gráfico de barras com as áreas dos clusters
-// ============================================================
+// // Adicionar a banda de classificação
 
-var barPlot = ui.Chart.feature.groups({
-    features: areaFc,
-    xProperty: 'cluster_label',
-    yProperty: 'area_ha',
-    seriesProperty: 'cluster_label'
-})
-.setChartType('ColumnChart')
-.setOptions({
-
-    title: 'Área por cluster K-means',
-
-    hAxis: {
-        title: 'Cluster'
-    },
-
-    vAxis: {
-        title: 'Área (ha)'
-    },
-
-    legend: {
-        position: 'right'
-    },
-
-    isStacked: false,
-
-    colors: clusterPalette,
-
-    bar: {
-        groupWidth: '100%'
-    }
-
-});
+// var areaStack = areaHa.addBands(classification);
 
 
-print(barPlot);
+// // Calcular a área agrupada por cluster
+
+// var areaDict = areaStack.reduceRegion({
+//     reducer: ee.Reducer.sum().group({
+//         groupField: 1,
+//         groupName: 'cluster'
+//     }),
+//     geometry: roi,
+//     scale: 30,
+//     maxPixels: 1e13
+// });
+
+// print(
+//     'Tabela de áreas (ha) para cada cluster:',
+//     areaDict
+// );
+
+
+// // ============================================================
+// // 11. Converter o dicionário de áreas para FeatureCollection
+// // ============================================================
+
+// var groups = ee.List(areaDict.get('groups'));
+
+
+// var areaFc = ee.FeatureCollection(
+//     groups.map(function(item) {
+
+//         item = ee.Dictionary(item);
+
+//         var cluster = ee.Number(
+//             item.get('cluster')
+//         ).int();
+
+//         var area = item.get('sum');
+
+//         return ee.Feature(null, {
+//             cluster: cluster,
+//             cluster_label: ee.String('Cluster ')
+//                 .cat(cluster.format()),
+//             area_ha: area
+//         });
+
+//     })
+// );
+
+
+// print(
+//     'FeatureCollection de áreas (ha) para cada cluster:',
+//     areaFc
+// );
+
+
+// // ============================================================
+// // 12. Gerar gráfico de barras com as áreas dos clusters
+// // ============================================================
+
+// var barPlot = ui.Chart.feature.groups({
+//     features: areaFc,
+//     xProperty: 'cluster_label',
+//     yProperty: 'area_ha',
+//     seriesProperty: 'cluster_label'
+// })
+// .setChartType('ColumnChart')
+// .setOptions({
+
+//     title: 'Área por cluster K-means',
+
+//     hAxis: {
+//         title: 'Cluster'
+//     },
+
+//     vAxis: {
+//         title: 'Área (ha)'
+//     },
+
+//     legend: {
+//         position: 'right'
+//     },
+
+//     isStacked: false,
+
+//     colors: clusterPalette,
+
+//     bar: {
+//         groupWidth: '100%'
+//     }
+
+// });
+
+
+// print(barPlot);
