@@ -342,7 +342,7 @@ var ordenado = maskEstacao.sort('system:time_start');
 
 // ---- CALCULAR INDICES ESPECTRAIS ----
 
-// Definir funcoes NDVI, NDWI, EVI, NDSI, MNDWI e MMRI
+// Definir funcoes NDVI, NDWI, EVI, MNDWI e MMRI
 
 /**
  * @name
@@ -398,23 +398,6 @@ var computeEVI = function(img) {
   return img.addBands(evi);
 };
 
-// /**
-// * @name
-// *      computeNDSI
-// * @description
-// *      Calcula o Índice de Solo por Diferença Normalizada (NDSI).
-// *      O NDSI é utilizado para avaliar o conteúdo de umidade do solo.
-// * @param  
-// *      {ee.Image} image - A imagem de entrada contendo as bandas B8 (NIR) e B11 (SWIR1).
-// * @returns 
-// *      {ee.Image} - A imagem de entrada com uma banda 'ndsi' adicional.
-// */
-// var computeNDSI = function(img) {
-//   var exp = '(b("B11") - b("B8")) / (b("B11") + b("B8"))';
-//   var ndsi = img.expression(exp).rename("ndsi");
-//   return img.addBands(ndsi);
-// };
-
 /**
  * @name
  *      computeMNDWI
@@ -459,7 +442,6 @@ var ordenadoComIndices = ordenado
   .map(computeNDVI)
   .map(computeNDWI)
   .map(computeEVI)
-  .map(computeNDSI)
   .map(computeMNDWI)
   .map(computeMMRI);
 
