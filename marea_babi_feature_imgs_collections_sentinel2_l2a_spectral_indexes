@@ -1,4 +1,4 @@
-// Carregar e visualizar mosaicos
+// Load and visualize mosaicks
 
 // ? Calculate NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI for each image
 // ? Defining NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI functions
@@ -145,8 +145,8 @@ var collectionWithIndexes = collectionWithoutClouds
     .map(computeMNDWI)
     .map(computeMMRI);
 
-
-Export.image.toDrive({
+// ? Export images with added bands to assets
+Export.image.toAsset({
   image: imagemFinal,
   description: nomeBloco,
   folder: 'GEE_Exports',
