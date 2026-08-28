@@ -467,7 +467,7 @@ var computeMMRI = function(img) {
     return image.addBands(mmri);
 };
 
-// ? Apply the functions to each image
+// Apply the functions to each image
 // Apply the compute functions to each image in the collection.
 var collectionWithIndexes = collectionWithoutClouds
     .map(computeNDVI)
