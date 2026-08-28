@@ -1,12 +1,12 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
 var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1"),
     babiDegr2 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada2"),
-    babiPres3 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada1"),
-    babiPres4 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada2"),
-    babiPres5 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada3"),
-    babiPres6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada4"),
-    babiPres7 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada5"),
-    babiPres8 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
+    babiPres1 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada1"),
+    babiPres2 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada2"),
+    babiPres3 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada3"),
+    babiPres4 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada4"),
+    babiPres5 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada5"),
+    babiPres6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 // // ================================================
 // // ETAPA: CARREGAR, IMPORTAR E VISUALIZAR POLÍGONOS
@@ -134,7 +134,7 @@ print('Babi Preservada 2 - MSI L2A - Metadados:', p2);
 //p3
 var p3 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
-  .filterBounds(babiPres3);
+  .filterBounds(babiPres1);
 
 // var p3MinData = p3.aggregate_min('system:time_start');
 // var p3MaxData = p3.aggregate_max('system:time_start');
@@ -152,7 +152,7 @@ print('Babi Preservada 3 - MSI L2A - Metadados:', p3);
 //p4
 var p4 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
-  .filterBounds(babiPres4);
+  .filterBounds(babiPres2);
 
 // var p4MinData = p4.aggregate_min('system:time_start');
 // var p4MaxData = p4.aggregate_max('system:time_start');
@@ -170,7 +170,7 @@ print('Babi Preservada 4 - MSI L2A - Metadados:', p4);
 //p5
 var p5 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
-  .filterBounds(babiPres5);
+  .filterBounds(babiPres3);
 
 // var p5MinData = p5.aggregate_min('system:time_start');
 // var p5MaxData = p5.aggregate_max('system:time_start');
@@ -188,7 +188,7 @@ print('Babi Preservada 5 - MSI L2A - Metadados:', p5);
 //p6
 var p6 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
   .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
-  .filterBounds(babiPres6);
+  .filterBounds(babiPres4);
 
 // var p6MinData = p6.aggregate_min('system:time_start');
 // var p6MaxData = p6.aggregate_max('system:time_start');
@@ -299,10 +299,10 @@ var poligonos = {
   'babiDegr2': babiDegr2,
   'babiPres1': babiPres1,
   'babiPres2': babiPres2,
-  'babiPres3': babiPres3,
-  'babiPres4': babiPres4,
-  'babiPres5': babiPres5,
-  'babiPres6': babiPres6
+  'babiPres3': babiPres1,
+  'babiPres4': babiPres2,
+  'babiPres5': babiPres3,
+  'babiPres6': babiPres4
 };
 
 // ======================================================================
