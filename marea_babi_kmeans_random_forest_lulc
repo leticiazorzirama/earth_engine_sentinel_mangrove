@@ -75,10 +75,12 @@ print('Número de amostras:', trainingSamples.size());
 
 var numberOfClusters = 5;
 
-// Criar o agrupador K-means
+// Create K-means clusterer
 var clusterer = ee.Clusterer.wekaKMeans({
-    nClusters: numberOfClusters
+    nClusters: numberOfClusters,
+    seed: 42
 });
+
 
 // ============================================================
 // TREINAR O K-MEANS
