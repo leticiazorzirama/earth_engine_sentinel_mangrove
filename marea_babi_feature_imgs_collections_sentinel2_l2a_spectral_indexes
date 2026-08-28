@@ -1,0 +1,150 @@
+
+
+
+
+
+// 1.8 Calculate NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI for each image
+// 1.8.1 Defining NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI functions
+/**
+ * @name
+ *      computeNDVI
+ * @description
+ *      Calculates the Normalized Difference Vegetation Index (NDVI).
+ *      NDVI is an indicator of vegetation health and greenness.
+ * @param 
+ *      {ee.Image} image - The input image containing bands SR_B5 (NIR) and SR_B4 (Red).
+ * @returns 
+ *      {ee.Image} - The input image with an additional 'ndvi' band.
+ */
+var computeNDVI = function (image) {
+    // NDVI formula: (NIR - Red) / (NIR + Red)
+    var exp = '( b("SR_B5") - b("SR_B4") ) / ( b("SR_B5") + b("SR_B4") )';
+    
+    // Calculate NDVI and rename the band to 'ndvi'.
+    var ndvi = image.expression(exp).rename("ndvi");
+    
+    // Add the NDVI band to the image and return.
+    return image.addBands(ndvi);
+};
+
+/**
+ * @name
+ *      computeNDWI
+ * @description
+ *      Calculates the Normalized Difference Water Index (NDWI).
+ *      NDWI is used to highlight water bodies.
+ * @param 
+ *      {ee.Image} image - The input image containing bands SR_B5 (NIR) and SR_B6 (SWIR1).
+ * @returns 
+ *       {ee.Image} - The input image with an additional 'ndwi' band.
+ */
+var computeNDWI = function (image) {
+    // NDWI formula: (NIR - SWIR1) / (NIR + SWIR1)
+    var exp = 'float(b("SR_B5") - b("SR_B6"))/(b("SR_B5") + b("SR_B6"))';
+
+    // Calculate NDWI and rename the band to 'ndwi'.
+    var ndwi = image.expression(exp).rename("ndwi");
+
+    // Add the NDWI band to the image and return.
+    return image.addBands(ndwi); 
+};
+
+/**
+ * @name
+ *      computeEVI
+ * @description
+ *      Calculates the Enhanced Vegetation Index (EVI).
+ *      EVI is used to quantify vegetation by reducing atmospheric and soil-related noise.
+ * @param 
+ *      {ee.Image} image - The input image containing bands SR_B5 (NIR), SR_B4 (Red), and SR_B2 (Blue).
+ * @returns 
+ *      {ee.Image} - The input image with an additional 'evi' band.
+ */
+var computeEVI = function (image) {
+    // EVI formula: 2.5 * ((NIR - Red) / (NIR + 6 * Red - 7.5 * Blue + 1))
+    var exp = '2.5 * ((b("SR_B5") - b("SR_B4")) / (b("SR_B5") + 6 * b("SR_B4") - 7.5 * b("SR_B2") + 1))';
+
+    // Calculate EVI and rename the band to 'evi'.
+    var evi = image.expression(exp).rename("evi");
+
+    // Add the EVI band to the image and return.
+    return image.addBands(evi);
+};
+
+/**
+* @name
+*      computeNDSI
+* @description
+*      Calculates the Normalized Difference Soil Index (NDSI).
+*      NDSI is used to gauge soil moisture content.
+* @param  
+*      {ee.Image} image - The input image containing bands SR_B5 (NIR) and SR_B6 (SWIR1).
+* @returns 
+*      {ee.Image} - The input image with an additional 'ndsi' band.
+*/
+var computeNDSI = function (image) {
+    // NDSI formula: (SWIR1 - NIR) / (SWIR1 + NIR)   
+    var exp = '(b("SR_B6") - b("SR_B5")) / (b("SR_B6") + b("SR_B5"))';
+
+    // Calculate NDSI and rename the band to 'ndsi'.
+    var ndsi = image.expression(exp).rename("ndsi");
+
+    // Add the NDSI band to the image and return.
+    return image.addBands(ndsi);
+};
+
+/**
+ * @name
+ *      computeMNDWI
+ * @description
+ *      Calculates the Modified Normalized Difference Water Index (MNDWI).
+ *      MNDWI is used to enhance open water features while suppressing or removing noise from soil, vegetation, and built-up urban areas.
+ * @param 
+ *      {ee.Image} image - The input image containing bands SR_B3 (Green) and SR_B6 (SWIR1).
+ * @returns 
+ *      {ee.Image} - The input image with an additional 'mndwi' band.
+ */
+var computeMNDWI = function (image) {
+    // MNDWI formula: (Green - SWIR1) / (Green + SWIR1)
+    var exp = '(b("SR_B3") - b("SR_B6")) / (b("SR_B3") + b("SR_B6"))';
+
+    // Calculate MNDWI and rename the band to 'mndwi'.
+    var mndwi = image.expression(exp).rename("mndwi");
+
+    // Add the MNDWI band to the image and return.
+    return image.addBands(mndwi);
+};
+    
+/**
+ * @name
+ *      computeMMRI
+ * @description
+ *      Calculates the Modular Mangrove Recognition Index (MMRI).
+ *      MMRI is used to better discriminate mangrove forests from the surrounding vegetation.
+ * @param 
+ *      {ee.Image} image - The input image containing bands MNDWI e NDVI.
+ * @returns 
+ *      {ee.Image} - The input image with an additional 'mmri' band.
+ */
+var computeMMRI = function (image) {
+    // MMRI = (|MNDWI| - |NDVI|) / (|MNDWI| + |NDVI|)
+    var exp = '(abs(b("mndwi")) - abs(b("ndvi"))) / ' +
+              '(abs(b("mndwi")) + abs(b("ndvi")))';
+
+    // Calculate MMRI and rename the band to 'mmri'.
+    var mmri = image.expression(exp).rename("mmri");
+
+    // Add the MMRI band to the image and return.
+    return image.addBands(mmri);
+};
+
+// 1.8.2 Apply the functions to each image
+// Apply the compute functions to each image in the collection.
+var collectionWithIndexes = collectionWithoutClouds
+    .map(computeNDVI)
+    .map(computeNDWI)
+    .map(computeEVI)
+    .map(computeNDSI)
+    .map(computeMNDWI)
+    .map(computeMMRI);
+    
