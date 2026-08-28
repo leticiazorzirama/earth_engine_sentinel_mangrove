@@ -9,7 +9,7 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
     babiPres6 = ee.FeatureCollection("projects/leticiazr/assets/babiPreservada6");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 // // ================================================
-// // ETAPA: CARREGAR, IMPORTAR E VISUALIZAR POLÍGONOS
+// // CARREGAR, IMPORTAR E VISUALIZAR POLÍGONOS
 // // ================================================
 
 // // Áreas degradadas 
@@ -39,7 +39,7 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
 // Map.addLayer(babiPres6, {color: '#27500A', fillColor: '#27500A'}, 'Babi Preservada - área 6', false);
 
 // =========================
-// ETAPA: AQUISITAR IMAGENS
+// AQUISITAR IMAGENS
 // =========================
 
 // Dataset: Harmonized Sentinel-2 MSI: MultiSpectral Instrument, Level-2A (SR)
@@ -205,7 +205,7 @@ print('Babi Preservada 6 - MSI L2A - Metadados:', p6);
 // Map.centerObject(p6, 10);
 
 // =================================================
-// ETAPA: TABELA DE DATAS DISPONIVEIS POR POLIGONO
+// TABELA DE DATAS DISPONIVEIS POR POLIGONO
 // =================================================
 
 // definirEstacao: 
@@ -276,7 +276,7 @@ var tabelasDatas = {};
 // });
 
 // ===============================================================
-// ETAPA: PRE-PROCESSAMENTO + DETECCAO DE BLOCOS + EXPORTACAO
+// PRE-PROCESSAMENTO + DETECCAO DE BLOCOS + EXPORTACAO
 // Controle manual por area: alterar AREA_ATUAL e rodar o script
 // novamente para processar a proxima area.
 // ===============================================================
