@@ -1,7 +1,339 @@
-// Load and visualize mosaicks
+// // ================================================
+// // ETAPA: CARREGAR, IMPORTAR E VISUALIZAR POLÍGONOS
+// // ================================================
 
-// ? Calculate NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI for each image
-// ? Defining NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI functions
+// // Áreas degradadas 
+// //1
+// Map.addLayer(babiDegr1, {color: '#F5C4B3', fillColor: '#F5C4B3'}, 'Babi Degradada - área 1', false);
+
+// //2
+// Map.addLayer(babiDegr2, {color: '#F0997B', fillColor: '#F0997B'}, 'Babi Degradada - área 2', false);
+
+// // Áreas preservadas
+// //1
+// Map.addLayer(babiPres1, {color: '#EAF3DE', fillColor: '#EAF3DE'}, 'Babi Preservada - área 1', false);
+
+// //2
+// Map.addLayer(babiPres2, {color: '#C0DD97', fillColor: '#C0DD97'}, 'Babi Preservada - área 2', false);
+
+// //3
+// Map.addLayer(babiPres3, {color: '#97C459', fillColor: '#97C459'}, 'Babi Preservada - área 3', false);
+
+// //4
+// Map.addLayer(babiPres4, {color: '#639922', fillColor: '#639922'}, 'Babi Preservada - área 4', false);
+
+// //5
+// Map.addLayer(babiPres5, {color: '#3B6D11', fillColor: '#3B6D11'}, 'Babi Preservada - área 5', false);
+
+// //6
+// Map.addLayer(babiPres6, {color: '#27500A', fillColor: '#27500A'}, 'Babi Preservada - área 6', false);
+
+// =========================
+// ETAPA: AQUISITAR IMAGENS
+// =========================
+
+// Dataset: Harmonized Sentinel-2 MSI: MultiSpectral Instrument, Level-2A (SR)
+// Importar o dataset para cada area de interesse 
+// Filtrar por cobertura de nuvens de ate 5%
+
+// Áreas degradadas 
+//1
+//d1
+var d1 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiDegr1);
+
+// Verificar colecao de imagens existentes para a area de interesse
+// Conferir os anos das imagens mais antigas e mais recentes
+// var d1MinData = d1.aggregate_min('system:time_start');
+// var d1MaxData = d1.aggregate_max('system:time_start');
+// print('Babi Degradada 1 - MSI L2A - Data mais antiga:', ee.Date(d1MinData));
+// print('Babi Degradada 1 -  MSI L2A - Data mais recente:', ee.Date(d1MaxData));
+// Mais antigo:
+// Mais recente:
+
+// Verificar principais metadados da colecao
+print('Babi Degradada 1 - MSI L2A - Metadados:', d1);
+// X imagens
+// X bandas
+// X propriedades
+
+// Repetir para a outra área degradada
+
+//2
+//d2
+var d2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiDegr2);
+
+// var d2MinData = d2.aggregate_min('system:time_start');
+// var d2MaxData = d2.aggregate_max('system:time_start');
+// print('Babi Degradada 2 - MSI L2A - Data mais antiga:', ee.Date(d2MinData));
+// print('Babi Degradada 2 -  MSI L2A - Data mais recente:', ee.Date(d2MaxData));
+// Mais antigo:
+// Mais recente:
+
+print('Babi Degradada 2 - MSI L2A - Metadados:', d2);
+// X imagens
+// X bandas
+// X propriedades
+
+// Áreas preservadas 
+//1
+//p1
+var p1 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiPres1);
+
+// Verificar colecao de imagens existentes para a area de interesse
+// Conferir os anos das imagens mais antigas e mais recentes
+// var p1MinData = p1.aggregate_min('system:time_start');
+// var p1MaxData = p1.aggregate_max('system:time_start');
+// print('Babi Preservada 1 - MSI L2A - Data mais antiga:', ee.Date(p1MinData));
+// print('Babi Preservada 1 -  MSI L2A - Data mais recente:', ee.Date(p1MaxData));
+// Mais antigo:
+// Mais recente:
+
+// Verificar principais metadados da colecao
+print('Babi Preservada 1 - MSI L2A - Metadados:', p1);
+// X imagens
+// X bandas
+// X propriedades
+
+// Repetir para as demais áreas preservadas
+
+//2
+//p2
+var p2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiPres2);
+
+// var p2MinData = p2.aggregate_min('system:time_start');
+// var p2MaxData = p2.aggregate_max('system:time_start');
+// print('Babi Preservada 2 - MSI L2A - Data mais antiga:', ee.Date(p2MinData));
+// print('Babi Preservada 2 -  MSI L2A - Data mais recente:', ee.Date(p2MaxData));
+// Mais antigo:
+// Mais recente:
+
+print('Babi Preservada 2 - MSI L2A - Metadados:', p2);
+// X imagens
+// X bandas
+// X propriedades
+
+//3
+//p3
+var p3 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiPres3);
+
+// var p3MinData = p3.aggregate_min('system:time_start');
+// var p3MaxData = p3.aggregate_max('system:time_start');
+// print('Babi Preservada 3 - MSI L2A - Data mais antiga:', ee.Date(p3MinData));
+// print('Babi Preservada 3 -  MSI L2A - Data mais recente:', ee.Date(p3MaxData));
+// Mais antigo:
+// Mais recente:
+
+print('Babi Preservada 3 - MSI L2A - Metadados:', p3);
+// X imagens
+// X bandas
+// X propriedades
+
+//4
+//p4
+var p4 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiPres4);
+
+// var p4MinData = p4.aggregate_min('system:time_start');
+// var p4MaxData = p4.aggregate_max('system:time_start');
+// print('Babi Preservada 4 - MSI L2A - Data mais antiga:', ee.Date(p4MinData));
+// print('Babi Preservada 4 -  MSI L2A - Data mais recente:', ee.Date(p4MaxData));
+// Mais antigo:
+// Mais recente:
+
+print('Babi Preservada 4 - MSI L2A - Metadados:', p4);
+// X imagens
+// X bandas
+// X propriedades
+
+//5
+//p5
+var p5 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiPres5);
+
+// var p5MinData = p5.aggregate_min('system:time_start');
+// var p5MaxData = p5.aggregate_max('system:time_start');
+// print('Babi Preservada 5 - MSI L2A - Data mais antiga:', ee.Date(p5MinData));
+// print('Babi Preservada 5 -  MSI L2A - Data mais recente:', ee.Date(p5MaxData));
+// Mais antigo:
+// Mais recente:
+
+print('Babi Preservada 5 - MSI L2A - Metadados:', p5);
+// X imagens
+// X bandas
+// X propriedades
+
+//6
+//p6
+var p6 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') 
+  .filterMetadata('CLOUD_COVERAGE_ASSESSMENT', 'less_than', 5) 
+  .filterBounds(babiPres6);
+
+// var p6MinData = p6.aggregate_min('system:time_start');
+// var p6MaxData = p6.aggregate_max('system:time_start');
+// print('Babi Preservada 6 - MSI L2A - Data mais antiga:', ee.Date(p6MinData));
+// print('Babi Preservada 6 -  MSI L2A - Data mais recente:', ee.Date(p6MaxData));
+// Mais antigo:
+// Mais recente:
+
+print('Babi Preservada 6 - MSI L2A - Metadados:', p6);
+// X imagens
+// X bandas
+// X propriedades
+
+// Map.centerObject(p6, 10);
+
+// =================================================
+// ETAPA: TABELA DE DATAS DISPONIVEIS POR POLIGONO
+// =================================================
+
+// definirEstacao: 
+// recebe uma imagem e classifica seu mes de aquisicao em uma das duas
+// estacoes definidas para a regiao da Baia Babitonga: 
+// 'seco' (meses 4, 5, 6, 7, 8) ou 'chuvoso' (meses 9, 10, 11, 12, 1, 2, 3)
+// baseada em Koehntopp et al. (2021)
+// Retorna a mesma imagem com a propriedade 'estacao' adicionada
+function definirEstacao(img) {
+  var mes = ee.Number(img.date().get('month'));
+  var ehSeco = mes.gte(4).and(mes.lte(8));
+  var estacao = ee.Algorithms.If(ehSeco, 'seco', 'chuvoso');
+  return img.set('estacao', estacao);
+}
+
+
+// gerarTabelasDatas: gera uma FeatureCollection (1 linha por imagem)
+// com area, indice, data, ano, mes, time_start, cobertura de nuvens e estacao pronta para exportar como CSV
+function gerarTabelaDatas(colecao, nomeArea) {
+  var colecaoComEstacao = colecao.map(definirEstacao);
+
+  return colecaoComEstacao.map(function(img) {
+    return ee.Feature(null, {
+      'area': nomeArea, // area de interesse (cada poligono)
+      'indice': img.get('system:index'), // id unico de cada imagem
+      'data': img.date().format('YYYY-MM-dd'), 
+      'ano': img.date().get('year'),
+      'mes': img.date().get('month'),
+      'time_start': img.get('system:time_start'), // milissegundos desde 01/01/1970
+      'nuvem_pct': img.get('CLOUD_COVERAGE_ASSESSMENT'), // porcentagem de nuvens
+      'estacao': img.get('estacao') // estacao seca ou chuvosa
+    });
+  });
+}
+
+// Dicionario com todas as areas: degradadas + preservadas
+var areas = {
+  'babiDegr1': d1,
+  'babiDegr2': d2,
+  'babiPres1': p1,
+  'babiPres2': p2,
+  'babiPres3': p3,
+  'babiPres4': p4,
+  'babiPres5': p5,
+  'babiPres6': p6
+};
+
+// Objeto para guardar as tabelas geradas (util se quiser reusar em memoria)
+var tabelasDatas = {};
+
+// Object.keys(areas).forEach(function(nomeArea) {
+//   var colecao = areas[nomeArea];
+  
+//   // Gerar tabela de datas para a area
+//   var tabela = gerarTabelaDatas(colecao, nomeArea);
+//   tabelasDatas[nomeArea] = tabela;
+  
+//   print(nomeArea + ' - Tabela de datas disponiveis:', tabela);
+  
+//   // Exportar cada tabela
+//   Export.table.toDrive({
+//     collection: tabela,
+//     description: nomeArea,
+//     folder: 'GEE_Exports',
+//     fileNamePrefix: nomeArea,
+//     fileFormat: 'CSV'
+//   });
+// });
+
+// ===============================================================
+// ETAPA: PRE-PROCESSAMENTO + DETECCAO DE BLOCOS + EXPORTACAO
+// Controle manual por area: alterar AREA_ATUAL e rodar o script
+// novamente para processar a proxima area.
+// ===============================================================
+
+// Dicionario: nome da area -> colecao de imagens (ja filtrada por bounds/nuvens)
+var areas = {
+  'babiDegr1': d1,
+  'babiDegr2': d2,
+  'babiPres1': p1,
+  'babiPres2': p2,
+  'babiPres3': p3,
+  'babiPres4': p4,
+  'babiPres5': p5,
+  'babiPres6': p6
+};
+
+// Dicionario: nome da area -> geometria do poligono (para clip e region)
+var poligonos = {
+  'babiDegr1': babiDegr1,
+  'babiDegr2': babiDegr2,
+  'babiPres1': babiPres1,
+  'babiPres2': babiPres2,
+  'babiPres3': babiPres3,
+  'babiPres4': babiPres4,
+  'babiPres5': babiPres5,
+  'babiPres6': babiPres6
+};
+
+// ======================================================================
+// VARIAVEL DE CONTROLE - alterar manualmente a cada execucao
+// Valores possiveis: 'babiDegr1', 'babiDegr2', 'babiPres1', 'babiPres2',
+// 'babiPres3', 'babiPres4', 'babiPres5', 'babiPres6'
+// ======================================================================
+var AREA_ATUAL = 'babiPres6';
+
+// ---- PRE-PROCESSAMENTO ----
+var colecao = areas[AREA_ATUAL];
+var poligono = poligonos[AREA_ATUAL];
+
+var cloudProb = ee.ImageCollection('COPERNICUS/S2_CLOUD_PROBABILITY')
+  .filterBounds(poligono)
+  .filterDate('2015-01-01', '2026-12-31');
+
+var comb = ee.ImageCollection(ee.Join.saveFirst('s2cloudProb').apply({
+  primary: colecao,
+  secondary: cloudProb,
+  condition: ee.Filter.equals({leftField: 'system:index', rightField: 'system:index'})
+}));
+
+function maskNuvens(img) {
+  var nuvemProb = ee.Image(img.get('s2cloudProb')).select('probability');
+  var temNuvem = nuvemProb.gt(50);
+  var bandas = ['B1','B2','B3','B4','B5','B6','B7','B8','B8A','B9','B11','B12'];
+  return img.select(bandas)
+    .updateMask(temNuvem.not())
+    .divide(10000) // Aplicar fator de escala
+    .copyProperties(img, img.propertyNames());
+}
+
+var mask = comb.map(maskNuvens);
+var maskEstacao = mask.map(definirEstacao);
+var ordenado = maskEstacao.sort('system:time_start');
+
+// ---- CALCULAR INDICES ESPECTRAIS ----
+
+// Calculate NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI for each image
+// Defining NDVI, NDWI, EVI, NDSI, MNDWI, and MMRI functions
 /**
  * @name
  *      computeNDVI
@@ -13,7 +345,7 @@
  * @returns 
  *      {ee.Image} - The input image with an additional 'ndvi' band.
  */
-var computeNDVI = function (image) {
+var computeNDVI = function(img) {
     // NDVI formula: (NIR - Red) / (NIR + Red)
     var exp = '( b("B8") - b("B4") ) / ( b("B8") + b("B4") )';
     
@@ -35,7 +367,7 @@ var computeNDVI = function (image) {
  * @returns 
  *       {ee.Image} - The input image with an additional 'ndwi' band.
  */
-var computeNDWI = function (image) {
+var computeNDWI = function(img) {
     // NDWI formula: (NIR - SWIR1) / (NIR + SWIR1)
     var exp = 'float(b("B8") - b("B11")) / (b("B8") + b("B11"))';
 
@@ -57,7 +389,7 @@ var computeNDWI = function (image) {
  * @returns 
  *      {ee.Image} - The input image with an additional 'evi' band.
  */
-var computeEVI = function (image) {
+var computeEVI = function(img) {
     // EVI formula: 2.5 * ((NIR - Red) / (NIR + 6 * Red - 7.5 * Blue + 1))
     var exp = '2.5 * ((b("B8") - b("B4")) / (b("B8") + 6 * b("B4") - 7.5 * b("B2") + 1))';
 
@@ -79,7 +411,7 @@ var computeEVI = function (image) {
 * @returns 
 *      {ee.Image} - The input image with an additional 'ndsi' band.
 */
-var computeNDSI = function (image) {
+var computeNDSI = function(img) {
     // NDSI formula: (SWIR1 - NIR) / (SWIR1 + NIR)   
     var exp = '(b("B11") - b("B8")) / (b("B11") + b("B8"))';
 
@@ -101,7 +433,7 @@ var computeNDSI = function (image) {
  * @returns 
  *      {ee.Image} - The input image with an additional 'mndwi' band.
  */
-var computeMNDWI = function (image) {
+var computeMNDWI = function(img) {
     // MNDWI formula: (Green - SWIR1) / (Green + SWIR1)
     var exp = '(b("B3") - b("B11")) / (b("B3") + b("B11"))';
 
@@ -123,7 +455,7 @@ var computeMNDWI = function (image) {
  * @returns 
  *      {ee.Image} - The input image with an additional 'mmri' band.
  */
-var computeMMRI = function (image) {
+var computeMMRI = function(img) {
     // MMRI = (|MNDWI| - |NDVI|) / (|MNDWI| + |NDVI|)
     var exp = '(abs(b("mndwi")) - abs(b("ndvi"))) / ' +
               '(abs(b("mndwi")) + abs(b("ndvi")))';
@@ -145,15 +477,73 @@ var collectionWithIndexes = collectionWithoutClouds
     .map(computeMNDWI)
     .map(computeMMRI);
 
-// Export mosaics with added bands to GEE asset
-// Export the mosaic image to an Earth Engine asset.
-Export.image.toAsset({
-    image: ,                               // The image to export (in this case, the mosaic variable).
-    description: '',               // A user-defined description for the export task.
-    assetId: '',                   // The destination path in the Earth Engine Assets where the image will be saved.
-    pyramidingPolicy: {'.default': 'mean'},      // Defines how data is resampled at lower resolutions. 'mean' computes the average.
-    region: ,                                 // The region of interest (ROI) to export. Must be a geometry or feature collection.
-    scale: 10,                                   // The spatial resolution of the output image, in meters per pixel.
-    maxPixels: 1e13                              // Maximum number of pixels allowed in the export. Ensure this is large enough for the image size.
+// ---- DETECTAR BLOCOS DE ESTACAO CONSECUTIVOS ----
+var listaInfo = ordenado.map(function(img) {
+  return ee.Feature(null, {
+    'indice': img.get('system:index'),
+    'time_start': img.get('system:time_start'),
+    'estacao': img.get('estacao')
+  });
+}).getInfo().features;
+
+var blocos = [];
+var blocoAtual = null;
+
+listaInfo.forEach(function(f) {
+  var props = f.properties;
+  if (blocoAtual === null || blocoAtual.estacao !== props.estacao) {
+    blocoAtual = {
+      estacao: props.estacao,
+      indices: [],
+      dataInicio: null,
+      dataFim: null
+    };
+    blocos.push(blocoAtual);
+  }
+  blocoAtual.indices.push(props.indice);
+  var dataImg = ee.Date(props.time_start).format('YYYY-MM-dd').getInfo();
+  if (blocoAtual.dataInicio === null) blocoAtual.dataInicio = dataImg;
+  blocoAtual.dataFim = dataImg;
 });
+
+print(AREA_ATUAL + ' - Blocos detectados:', blocos);
+
+// ---- COMPOR/EXPORTAR CADA BLOCO ----
+blocos.forEach(function(bloco, i) {
+  var numImg = bloco.indices.length;
+  var subColecao = ordenado.filter(ee.Filter.inList('system:index', bloco.indices));
+
+  var imagemFinal = (numImg === 1)
+    ? subColecao.first()
+    : subColecao.median();
+
+  imagemFinal = imagemFinal.clip(poligono);
+
+  var nomeBloco = AREA_ATUAL + '_bloco' + (i + 1) + '_' + bloco.estacao
+    + '_' + bloco.dataInicio + '_a_' + bloco.dataFim;
+
+  print(nomeBloco + ' - n imagens: ' + numImg);
+
+  Export.image.toDrive({
+    image: imagemFinal,
+    description: nomeBloco,
+    folder: 'GEE_Exports',
+    fileNamePrefix: nomeBloco,
+    region: poligono,
+    scale: 10,
+    maxPixels: 1e13
+  });
+});
+
+// // Export mosaics with added bands to GEE asset
+// // Export the mosaic image to an Earth Engine asset.
+// Export.image.toAsset({
+//     image: ,                               // The image to export (in this case, the mosaic variable).
+//     description: '',               // A user-defined description for the export task.
+//     assetId: '',                   // The destination path in the Earth Engine Assets where the image will be saved.
+//     pyramidingPolicy: {'.default': 'mean'},      // Defines how data is resampled at lower resolutions. 'mean' computes the average.
+//     region: ,                                 // The region of interest (ROI) to export. Must be a geometry or feature collection.
+//     scale: 10,                                   // The spatial resolution of the output image, in meters per pixel.
+//     maxPixels: 1e13                              // Maximum number of pixels allowed in the export. Ensure this is large enough for the image size.
+// });
     
