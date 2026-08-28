@@ -265,15 +265,15 @@ Object.keys(areas).forEach(function(nomeArea) {
   
   print(nomeArea + ' - Tabela de datas disponiveis:', tabela);
   
-  // Exportar cada tabela
-  Export.table.toDrive({
-    collection: tabela,
-    description: nomeArea,
-    folder: 'GEE_Exports',
-    fileNamePrefix: nomeArea,
-    fileFormat: 'CSV'
-  });
-});
+//   // ---- EXPORTAR CADA TABELA PARA GOOGLE DRIVE ----
+//   Export.table.toDrive({
+//     collection: tabela,
+//     description: nomeArea,
+//     folder: 'GEE_Exports',
+//     fileNamePrefix: nomeArea,
+//     fileFormat: 'CSV'
+//   });
+// });
 
 // ===============================================================
 // ETAPA: PRE-PROCESSAMENTO + DETECCAO DE BLOCOS + EXPORTACAO
@@ -348,12 +348,12 @@ var ordenado = maskEstacao.sort('system:time_start');
  * @name
  *      computeNDVI
  * @description
- *      Calculates the Normalized Difference Vegetation Index (NDVI).
- *      NDVI is an indicator of vegetation health and greenness.
+ *      Calcula o Índice de Vegetação por Diferença Normalizada (NDVI).
+ *      O NDVI é um indicador da saúde e do vigor vegetativo.
  * @param 
- *      {ee.Image} image - The input image containing bands SR_B5 (NIR) and SR_B4 (Red).
+ *      {ee.Image} image - A imagem de entrada contendo as bandas SR_B5 (NIR) e SR_B4 (Vermelho).
  * @returns 
- *      {ee.Image} - The input image with an additional 'ndvi' band.
+ *      {ee.Image} - A imagem de entrada com uma banda 'ndvi' adicional.
  */
 var computeNDVI = function(img) {
   var exp = '(b("B8") - b("B4")) / (b("B8") + b("B4"))';
@@ -365,12 +365,12 @@ var computeNDVI = function(img) {
  * @name
  *      computeNDWI
  * @description
- *      Calculates the Normalized Difference Water Index (NDWI).
- *      NDWI is used to highlight water bodies.
+ *      Calcula o Índice de Água por Diferença Normalizada (NDWI).
+ *      O NDWI é utilizado para realçar corpos d'água.
  * @param 
- *      {ee.Image} image - The input image containing bands SR_B5 (NIR) and SR_B6 (SWIR1).
+ *      {ee.Image} image - A imagem de entrada contendo as bandas SR_B5 (NIR) e SR_B6 (SWIR1).
  * @returns 
- *       {ee.Image} - The input image with an additional 'ndwi' band.
+ *      {ee.Image} - A imagem de entrada com uma banda 'ndwi' adicional.
  */
 var computeNDWI = function(img) {
   var exp = 'float(b("B8") - b("B11")) / (b("B8") + b("B11"))';
@@ -382,12 +382,12 @@ var computeNDWI = function(img) {
  * @name
  *      computeEVI
  * @description
- *      Calculates the Enhanced Vegetation Index (EVI).
- *      EVI is used to quantify vegetation by reducing atmospheric and soil-related noise.
+ *      Calcula o Índice de Vegetação Aprimorado (EVI).
+ *      O EVI é utilizado para quantificar a vegetação, reduzindo ruídos atmosféricos e do solo.
  * @param 
- *      {ee.Image} image - The input image containing bands SR_B5 (NIR), SR_B4 (Red), and SR_B2 (Blue).
+ *      {ee.Image} image - A imagem de entrada contendo as bandas SR_B5 (NIR), SR_B4 (Vermelho) e SR_B2 (Azul).
  * @returns 
- *      {ee.Image} - The input image with an additional 'evi' band.
+ *      {ee.Image} - A imagem de entrada com uma banda 'evi' adicional.
  */
 var computeEVI = function(img) {
   var exp =
@@ -402,12 +402,12 @@ var computeEVI = function(img) {
 * @name
 *      computeNDSI
 * @description
-*      Calculates the Normalized Difference Soil Index (NDSI).
-*      NDSI is used to gauge soil moisture content.
+*      Calcula o Índice de Solo por Diferença Normalizada (NDSI).
+*      O NDSI é utilizado para avaliar o conteúdo de umidade do solo.
 * @param  
-*      {ee.Image} image - The input image containing bands SR_B5 (NIR) and SR_B6 (SWIR1).
+*      {ee.Image} image - A imagem de entrada contendo as bandas SR_B5 (NIR) e SR_B6 (SWIR1).
 * @returns 
-*      {ee.Image} - The input image with an additional 'ndsi' band.
+*      {ee.Image} - A imagem de entrada com uma banda 'ndsi' adicional.
 */
 var computeNDSI = function(img) {
   var exp = '(b("B11") - b("B8")) / (b("B11") + b("B8"))';
@@ -419,12 +419,12 @@ var computeNDSI = function(img) {
  * @name
  *      computeMNDWI
  * @description
- *      Calculates the Modified Normalized Difference Water Index (MNDWI).
- *      MNDWI is used to enhance open water features while suppressing or removing noise from soil, vegetation, and built-up urban areas.
+ *      Calcula o Índice de Água por Diferença Normalizada Modificado (MNDWI).
+ *      O MNDWI é utilizado para realçar feições de água superficial enquanto atenua ou remove ruídos de solo, vegetação e áreas urbanas construídas.
  * @param 
- *      {ee.Image} image - The input image containing bands SR_B3 (Green) and SR_B6 (SWIR1).
+ *      {ee.Image} image - A imagem de entrada contendo as bandas SR_B3 (Verde) e SR_B6 (SWIR1).
  * @returns 
- *      {ee.Image} - The input image with an additional 'mndwi' band.
+ *      {ee.Image} - A imagem de entrada com uma banda 'mndwi' adicional.
  */
 var computeMNDWI = function(img) {
   var exp = '(b("B3") - b("B11")) / (b("B3") + b("B11"))';
@@ -436,12 +436,12 @@ var computeMNDWI = function(img) {
  * @name
  *      computeMMRI
  * @description
- *      Calculates the Modular Mangrove Recognition Index (MMRI).
- *      MMRI is used to better discriminate mangrove forests from the surrounding vegetation.
+ *      Calcula o Índice Modular de Reconhecimento de Manguezais (MMRI).
+ *      O MMRI é utilizado para discriminar melhor as florestas de mangue da vegetação circundante.
  * @param 
- *      {ee.Image} image - The input image containing bands MNDWI e NDVI.
+ *      {ee.Image} image - A imagem de entrada contendo as bandas MNDWI e NDVI.
  * @returns 
- *      {ee.Image} - The input image with an additional 'mmri' band.
+ *      {ee.Image} - A imagem de entrada com uma banda 'mmri' adicional.
  */
 var computeMMRI = function(img) {
   var exp =
