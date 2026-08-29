@@ -421,14 +421,14 @@ var barPlot = ui.Chart.feature.groups({
 .setChartType('ColumnChart')
 .setOptions({
 
-    title: 'Área por cluster K-means',
+    title: 'Area per cluster Weka K-means',
 
     hAxis: {
-        title: 'Agrupamento'
+        title: 'Clustering'
     },
 
     vAxis: {
-        title: 'Área (ha)'
+        title: 'Area (ha)'
     },
 
     legend: {
