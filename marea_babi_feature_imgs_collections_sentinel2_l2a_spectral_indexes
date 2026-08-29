@@ -525,6 +525,7 @@ blocos.forEach(function(bloco, i) {
     region: poligono,
     scale: 10,
     maxPixels: 1e13
-  });
+      
+    })
   }
 });
