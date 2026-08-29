@@ -7,7 +7,9 @@ var bloco1 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco1_seco_2016-04-2
 // IMPORTAR E VISUALIZAR ASSETS
 // =============================
 
-var roi = ee.Geometry.Polygon(babiDegr1)
+// Load uploaded table asset
+var table = ee.FeatureCollection(babiDegr1);
+var roi = table.union();
 var mosaic = ee.Image(bloco2);
 
 // Visualizacao em cor natural
