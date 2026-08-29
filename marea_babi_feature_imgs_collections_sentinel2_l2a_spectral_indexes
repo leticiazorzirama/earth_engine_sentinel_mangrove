@@ -256,14 +256,14 @@ var areas = {
 // Objeto para guardar as tabelas geradas (util se quiser reusar em memoria)
 var tabelasDatas = {};
 
-Object.keys(areas).forEach(function(nomeArea) {
-  var colecao = areas[nomeArea];
+// Object.keys(areas).forEach(function(nomeArea) {
+//   var colecao = areas[nomeArea];
   
-  // Gerar tabela de datas para a area
-  var tabela = gerarTabelaDatas(colecao, nomeArea);
-  tabelasDatas[nomeArea] = tabela;
+//   // Gerar tabela de datas para a area
+//   var tabela = gerarTabelaDatas(colecao, nomeArea);
+//   tabelasDatas[nomeArea] = tabela;
   
-  print(nomeArea + ' - Tabela de datas disponiveis:', tabela);
+//   print(nomeArea + ' - Tabela de datas disponiveis:', tabela);
   
 //   // ---- EXPORTAR CADA TABELA PARA GOOGLE DRIVE ----
 //   Export.table.toDrive({
@@ -478,7 +478,7 @@ print(AREA_ATUAL + ' - Blocos detectados:', blocos);
 
 // ---- COMPOR/EXPORTAR CADA BLOCO ----
 // Destino possiveis: drive ou asset
-var DESTINO = 'asset'
+var DESTINO = 'asset';
 
 blocos.forEach(function(bloco, i) {
   var numImg = bloco.indices.length;
@@ -510,7 +510,7 @@ blocos.forEach(function(bloco, i) {
     region: poligono,
     scale: 10,
     maxPixels: 1e13
-  })
+  });
   }
 
   // ---- EXPORTAR PARA GOOGLE EARTH ENGINE ASSET ----
@@ -526,6 +526,6 @@ blocos.forEach(function(bloco, i) {
     scale: 10,
     maxPixels: 1e13
       
-    })
+  });
   }
 });
