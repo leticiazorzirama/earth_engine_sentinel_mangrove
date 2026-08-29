@@ -1,7 +1,189 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
 var bloco1 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco1_seco_2016-04-20_a_2016-04-20"),
     babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1"),
-    bloco2 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco2_chuvoso_2016-12-06_a_2016-12-06");
+    bloco2 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco2_chuvoso_2016-12-06_a_2016-12-06"),
+    mangrove = /* color: #12ff83 */ee.FeatureCollection(
+        [ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.78792865794825, -26.306012348795623],
+                  [-48.787370758241686, -26.30514674706834],
+                  [-48.789280491852615, -26.302992332479757]]]),
+            {
+              "class": 0,
+              "system:index": "0"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.77741976498229, -26.304733189828323],
+                  [-48.77656145126048, -26.303829099958428],
+                  [-48.778771609093255, -26.301328389124517]]]),
+            {
+              "class": 0,
+              "system:index": "1"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.771840768636544, -26.29782253977592],
+                  [-48.77078934135072, -26.29726466839414],
+                  [-48.77289219592226, -26.29547561447716]]]),
+            {
+              "class": 0,
+              "system:index": "2"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.795471028987286, -26.296923210997132],
+                  [-48.79811032397164, -26.29846216334126],
+                  [-48.798410731530865, -26.299116211901755]]]),
+            {
+              "class": 0,
+              "system:index": "3"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.803657123955816, -26.309420977309436],
+                  [-48.80284174347996, -26.308920874359178],
+                  [-48.80372149609908, -26.30699738135841]]]),
+            {
+              "class": 0,
+              "system:index": "4"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.81858630947517, -26.312989017163098],
+                  [-48.81970210448919, -26.31091169541292],
+                  [-48.820066883628364, -26.312046533206765]]]),
+            {
+              "class": 0,
+              "system:index": "5"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.804338412890345, -26.3019960673338],
+                  [-48.80339427230116, -26.301476687633382],
+                  [-48.80487485640675, -26.299764641773375]]]),
+            {
+              "class": 0,
+              "system:index": "6"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.795140389453536, -26.290200459866856],
+                  [-48.794228437518704, -26.289421311930923],
+                  [-48.797211056787845, -26.287891858168724]]]),
+            {
+              "class": 0,
+              "system:index": "7"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.78380537075353, -26.290339939354762],
+                  [-48.785275226048, -26.288271816914516],
+                  [-48.785822398456794, -26.288666205899837]]]),
+            {
+              "class": 0,
+              "system:index": "8"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.75122949500432, -26.315593548160244],
+                  [-48.75236138645691, -26.313367201580938],
+                  [-48.75285491258793, -26.31373265233453]]]),
+            {
+              "class": 0,
+              "system:index": "9"
+            })]),
+    nonmangrove = /* color: #ffc82d */ee.FeatureCollection(
+        [ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.789132359193204, -26.29705298523474],
+                  [-48.79001212375009, -26.293263234132624],
+                  [-48.79067731158578, -26.29430206147807]]]),
+            {
+              "class": 1,
+              "system:index": "0"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.76351189868295, -26.306497967894742],
+                  [-48.763619187043545, -26.303401021720816],
+                  [-48.764370205567715, -26.303112482149096]]]),
+            {
+              "class": 1,
+              "system:index": "1"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.779216769954964, -26.292713771391092],
+                  [-48.779710296413704, -26.289250929956864],
+                  [-48.78031111123304, -26.28898159351173]]]),
+            {
+              "class": 1,
+              "system:index": "2"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.806430289482996, -26.30922893838549],
+                  [-48.80508918497555, -26.3079257611465],
+                  [-48.80590457651608, -26.308454727844417]]]),
+            {
+              "class": 1,
+              "system:index": "3"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.76404579832795, -26.333080415852976],
+                  [-48.76347717001679, -26.33255156160774],
+                  [-48.764153086688545, -26.328320640671713]]]),
+            {
+              "class": 1,
+              "system:index": "4"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.747421475352084, -26.321580832752872],
+                  [-48.74696549981955, -26.3205807160988],
+                  [-48.74775929955016, -26.318851724698735]]]),
+            {
+              "class": 1,
+              "system:index": "5"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.76062581472607, -26.30194075913679],
+                  [-48.76009473734112, -26.301402144570105],
+                  [-48.76157531671734, -26.299997887682235]]]),
+            {
+              "class": 1,
+              "system:index": "6"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.802829697771415, -26.28634054787783],
+                  [-48.80297453705822, -26.285090020574238],
+                  [-48.803360775156364, -26.28544594125615]]]),
+            {
+              "class": 1,
+              "system:index": "7"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.77031800892417, -26.304281783675453],
+                  [-48.77061305191581, -26.3055369129169],
+                  [-48.77016780521934, -26.306113979271327]]]),
+            {
+              "class": 1,
+              "system:index": "8"
+            }),
+        ee.Feature(
+            ee.Geometry.Polygon(
+                [[[-48.81673043385594, -26.31152602044253],
+                  [-48.815067464266704, -26.311314439660997],
+                  [-48.816075974856304, -26.311357717579547]]]),
+            {
+              "class": 1,
+              "system:index": "9"
+            })]);
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 // =============================
 // IMPORTAR E VISUALIZAR ASSETS
@@ -259,243 +441,243 @@ var barPlot = ui.Chart.feature.groups({
 
 print(barPlot);
 
-// 2.2. Collect manual samples
-// Manually collect samples for the classification process. 
-// Using the code editor's shape editing tool, draw polygons representing each class and import them as a FeatureCollection
+// // 2.2. Collect manual samples
+// // Manually collect samples for the classification process. 
+// // Using the code editor's shape editing tool, draw polygons representing each class and import them as a FeatureCollection
 
-// 2.2.1. Create a feature collection
-// Classify five land cover classes: urban (0), bare soil (1), water (2), mangrove (3), forest (4). 
+// // 2.2.1. Create a feature collection
+// // Classify five land cover classes: urban (0), bare soil (1), water (2), mangrove (3), forest (4). 
 
-// 2.3. Generate random points
-// Generate random points within these regions. 
-// Proper distribution of the sampling polygons, combined with the random placement of points within them, ensures better representation of class variability. 
-// Function to generate random points within the previously defined polygons.
+// // 2.3. Generate random points
+// // Generate random points within these regions. 
+// // Proper distribution of the sampling polygons, combined with the random placement of points within them, ensures better representation of class variability. 
+// // Function to generate random points within the previously defined polygons.
 
-// OBS.: There are other, more accurate ways to define the number of points to be collected. 
-// For example, we can determine the size of the set of points using the proportion of the known area of your region of interest (ROI) as a reference.
+// // OBS.: There are other, more accurate ways to define the number of points to be collected. 
+// // For example, we can determine the size of the set of points using the proportion of the known area of your region of interest (ROI) as a reference.
 
-// Create a function to collect random point inside the polygons
-var generatePoints = function(polygons, nPoints){
+// // Create a function to collect random point inside the polygons
+// var generatePoints = function(polygons, nPoints){
     
-    // Generate N random points inside the polygons
-    var points = ee.FeatureCollection.randomPoints(polygons, nPoints);
+//     // Generate N random points inside the polygons
+//     var points = ee.FeatureCollection.randomPoints(polygons, nPoints);
     
-    // Get the class value propertie
-    var classValue = polygons.first().get('class');
+//     // Get the class value propertie
+//     var classValue = polygons.first().get('class');
     
-    // Iterate over points and assign the class value
-    points = points.map(
-        function(point){
-            return point.set('class', classValue);
-        }
-    );
+//     // Iterate over points and assign the class value
+//     points = points.map(
+//         function(point){
+//             return point.set('class', classValue);
+//         }
+//     );
     
-    return points;
-};
+//     return points;
+// };
 
-// Collect random points inside the polygons
-var urbanPoints = generatePoints(urban, 1000);
-var barePoints = generatePoints(bare, 1000);
-var waterPoints = generatePoints(water, 1000);
-var mangrovePoints = generatePoints(mangrove, 1000);
-var forestPoints = generatePoints(forest, 1000);
+// // Collect random points inside the polygons
+// var urbanPoints = generatePoints(urban, 1000);
+// var barePoints = generatePoints(bare, 1000);
+// var waterPoints = generatePoints(water, 1000);
+// var mangrovePoints = generatePoints(mangrove, 1000);
+// var forestPoints = generatePoints(forest, 1000);
 
-// Merge all samples into a featureCollection
-var samples = urbanPoints.merge(barePoints).merge(waterPoints).merge(mangrovePoints).merge(forestPoints);
+// // Merge all samples into a featureCollection
+// var samples = urbanPoints.merge(barePoints).merge(waterPoints).merge(mangrovePoints).merge(forestPoints);
 
-print('Samples:', samples);
+// print('Samples:', samples);
 
-Map.addLayer(samples.filter(ee.Filter.eq('class', 0)), {color: '#d4271e'}, 'samples', false);
-Map.addLayer(samples.filter(ee.Filter.eq('class', 1)), {color: '#d1af86'}, 'samples', false);
-Map.addLayer(samples.filter(ee.Filter.eq('class', 2)), {color: '#1488ff'}, 'samples', false);
-Map.addLayer(samples.filter(ee.Filter.eq('class', 3)), {color: '#076132'}, 'samples', false);
-Map.addLayer(samples.filter(ee.Filter.eq('class', 4)), {color: '#2cc968'}, 'samples', false);
+// Map.addLayer(samples.filter(ee.Filter.eq('class', 0)), {color: '#d4271e'}, 'samples', false);
+// Map.addLayer(samples.filter(ee.Filter.eq('class', 1)), {color: '#d1af86'}, 'samples', false);
+// Map.addLayer(samples.filter(ee.Filter.eq('class', 2)), {color: '#1488ff'}, 'samples', false);
+// Map.addLayer(samples.filter(ee.Filter.eq('class', 3)), {color: '#076132'}, 'samples', false);
+// Map.addLayer(samples.filter(ee.Filter.eq('class', 4)), {color: '#2cc968'}, 'samples', false);
 
-// 2.4. Collect the spectral information
-// Extract the spectral information from their pixels.
+// // 2.4. Collect the spectral information
+// // Extract the spectral information from their pixels.
 
-// Collect the spectral information to get the trained samples
-var trainedSamples = mosaic.reduceRegions({
-    'collection': samples, 
-    'reducer': ee.Reducer.first(), 
-    'scale': 30,
-  });
+// // Collect the spectral information to get the trained samples
+// var trainedSamples = mosaic.reduceRegions({
+//     'collection': samples, 
+//     'reducer': ee.Reducer.first(), 
+//     'scale': 30,
+//   });
 
-var trainedSamples = trainedSamples.filter(ee.Filter.notNull(['SR_B2_max']));
+// var trainedSamples = trainedSamples.filter(ee.Filter.notNull(['SR_B2_max']));
 
-print('Train samples:', trainedSamples);
+// print('Train samples:', trainedSamples);
 
-// 2.? Train and test splits
-var trainedSamples = trainedSamples.randomColumn('random', 42); // seed for reprodutibility
-var trainSet = trainedSamples.filter(ee.Filter.lessThan('random', 0.8));
-var testSet = trainedSamples.filter(ee.Filter.greaterThanOrEquals('random', 0.8));
+// // 2.? Train and test splits
+// var trainedSamples = trainedSamples.randomColumn('random', 42); // seed for reprodutibility
+// var trainSet = trainedSamples.filter(ee.Filter.lessThan('random', 0.8));
+// var testSet = trainedSamples.filter(ee.Filter.greaterThanOrEquals('random', 0.8));
 
-print('Train set:', trainSet);
-print('Test set:', testSet);
+// print('Train set:', trainSet);
+// print('Test set:', testSet);
 
-// 2.5. Training the Random Forest classifier
-// Set up the Random Forest classifier
-var classifier = ee.Classifier.smileRandomForest({
-    'numberOfTrees': 200
-});
+// // 2.5. Training the Random Forest classifier
+// // Set up the Random Forest classifier
+// var classifier = ee.Classifier.smileRandomForest({
+//     'numberOfTrees': 200
+// });
 
-// Training the classifier on train set
-classifier = classifier.train({
-    'features': trainSet, 
-    'classProperty': 'class', 
-    'inputProperties': [
-        'SR_B2_max',
-        'SR_B2_median',
-        'SR_B2_min',
-        'SR_B3_max',
-        'SR_B3_median',
-        'SR_B3_min',
-        'SR_B4_max',
-        'SR_B4_median',
-        'SR_B4_min',
-        'SR_B5_max',
-        'SR_B5_median',
-        'SR_B5_min',
-        'SR_B6_max',
-        'SR_B6_median',
-        'SR_B6_min',
-        'SR_B7_max',
-        'SR_B7_median',
-        'SR_B7_min',
-        'evi_max', 
-        'evi_median',
-        'evi_min',
-        'mmri_max',
-        'mmri_median',
-        'mmri_min',
-        'mndwi_max',
-        'mndwi_median',
-        'mndwi_min',
-        'ndsi_max',
-        'ndsi_median',
-        'ndsi_min',
-        'ndvi_max',
-        'ndvi_median',
-        'ndvi_min',
-        'ndwi_max',
-        'ndwi_median',
-        'ndwi_min'
-    ]
-});
+// // Training the classifier on train set
+// classifier = classifier.train({
+//     'features': trainSet, 
+//     'classProperty': 'class', 
+//     'inputProperties': [
+//         'SR_B2_max',
+//         'SR_B2_median',
+//         'SR_B2_min',
+//         'SR_B3_max',
+//         'SR_B3_median',
+//         'SR_B3_min',
+//         'SR_B4_max',
+//         'SR_B4_median',
+//         'SR_B4_min',
+//         'SR_B5_max',
+//         'SR_B5_median',
+//         'SR_B5_min',
+//         'SR_B6_max',
+//         'SR_B6_median',
+//         'SR_B6_min',
+//         'SR_B7_max',
+//         'SR_B7_median',
+//         'SR_B7_min',
+//         'evi_max', 
+//         'evi_median',
+//         'evi_min',
+//         'mmri_max',
+//         'mmri_median',
+//         'mmri_min',
+//         'mndwi_max',
+//         'mndwi_median',
+//         'mndwi_min',
+//         'ndsi_max',
+//         'ndsi_median',
+//         'ndsi_min',
+//         'ndvi_max',
+//         'ndvi_median',
+//         'ndvi_min',
+//         'ndwi_max',
+//         'ndwi_median',
+//         'ndwi_min'
+//     ]
+// });
 
 
-// 2. Evaluate the classifier on train set
+// // 2. Evaluate the classifier on train set
 
-// Confusion matrix: 
-// Rows correspond to actual values, columns to predicted values
-var trainMatrix = classifier.confusionMatrix(); 
-var trainAccuracy = trainMatrix.accuracy()
-print('Training confusion matrix: ', trainMatrix);
-print('Training accuracy: ', trainAccuracy);
+// // Confusion matrix: 
+// // Rows correspond to actual values, columns to predicted values
+// var trainMatrix = classifier.confusionMatrix(); 
+// var trainAccuracy = trainMatrix.accuracy()
+// print('Training confusion matrix: ', trainMatrix);
+// print('Training accuracy: ', trainAccuracy);
 
-// 2.? Evaluate the classifier on test set
+// // 2.? Evaluate the classifier on test set
 
-var testResults = testSet.classify(classifier);
-var testMatrix = testResults.errorMatrix('class', ' ');
-var testAccuracy = testMatrix.accuracy();
-var testKappa = testMatrix.kappa();
+// var testResults = testSet.classify(classifier);
+// var testMatrix = testResults.errorMatrix('class', ' ');
+// var testAccuracy = testMatrix.accuracy();
+// var testKappa = testMatrix.kappa();
 
-print('Test confusion matrix: ', testMatrix);
-print('Test accuracy:', testAccuracy)
-print('Test kappa:', testKappa)
+// print('Test confusion matrix: ', testMatrix);
+// print('Test accuracy:', testAccuracy)
+// print('Test kappa:', testKappa)
 
-// 2.6. Predict with the classifier on entire image mosaic
+// // 2.6. Predict with the classifier on entire image mosaic
 
-// Run the Random Forest classifier
-var classification = mosaic.classify(classifier);
+// // Run the Random Forest classifier
+// var classification = mosaic.classify(classifier);
 
-// Pallete
-var palette = [
-  '#d4271e', // urban
-  '#d1af86', // bare
-  '#1488ff', // water
-  '#076132', // mangrove
-  '#2cc968', // forest
-];
+// // Pallete
+// var palette = [
+//   '#d4271e', // urban
+//   '#d1af86', // bare
+//   '#1488ff', // water
+//   '#076132', // mangrove
+//   '#2cc968', // forest
+// ];
 
-// Add classification to map
-Map.addLayer(classification, {
-        'min': 0,
-        'max': 4,
-        'palette': palette,
-        'format': 'png'
-    },
-    'classification'
-);
+// // Add classification to map
+// Map.addLayer(classification, {
+//         'min': 0,
+//         'max': 4,
+//         'palette': palette,
+//         'format': 'png'
+//     },
+//     'classification'
+// );
 
-print('Classification:', classification);
+// print('Classification:', classification);
 
-// 2.? Calculate area for each class
+// // 2.? Calculate area for each class
 
-// m2 to ha
-var areaHa = ee.Image.pixelArea().divide(1e4); 
+// // m2 to ha
+// var areaHa = ee.Image.pixelArea().divide(1e4); 
 
-// Add classification band
-var areaStack = areaHa.addBands(classification); 
+// // Add classification band
+// var areaStack = areaHa.addBands(classification); 
 
-// Group area per class
-var areaDict = areaStack.reduceRegion({
-    reducer: ee.Reducer.sum().group({
-    groupField: 1,
-    groupName: 'classification'
-  }),
-  geometry: roi,
-  scale: 30,
-  maxPixels: 1e13
-});
-print('Table of areas (ha) for each class:', areaDict);
+// // Group area per class
+// var areaDict = areaStack.reduceRegion({
+//     reducer: ee.Reducer.sum().group({
+//     groupField: 1,
+//     groupName: 'classification'
+//   }),
+//   geometry: roi,
+//   scale: 30,
+//   maxPixels: 1e13
+// });
+// print('Table of areas (ha) for each class:', areaDict);
 
-// Get groups data
-var groups = ee.List(areaDict.get('groups'));
+// // Get groups data
+// var groups = ee.List(areaDict.get('groups'));
 
-// Classes attributes table
-var classDict = ee.Dictionary({
-  '0': 'Urban',
-  '1': 'Bare',
-  '2': 'Water',
-  '3': 'Mangrove',
-  '4': 'Forest'
-})
+// // Classes attributes table
+// var classDict = ee.Dictionary({
+//   '0': 'Urban',
+//   '1': 'Bare',
+//   '2': 'Water',
+//   '3': 'Mangrove',
+//   '4': 'Forest'
+// })
 
-// Convert to feature collection
-var areaFc = ee.FeatureCollection(
-  groups.map(function(item){
-    item = ee.Dictionary(item);
-    var code = ee.Number(item.get('classification')).int();
-    var area = item.get('sum');
-    return ee.Feature(null, {
-      class_code: code,
-      class_label: classDict.get(code.format(), 'Desconhecido'),
-      area_ha: area
-    });
-  })
-);
+// // Convert to feature collection
+// var areaFc = ee.FeatureCollection(
+//   groups.map(function(item){
+//     item = ee.Dictionary(item);
+//     var code = ee.Number(item.get('classification')).int();
+//     var area = item.get('sum');
+//     return ee.Feature(null, {
+//       class_code: code,
+//       class_label: classDict.get(code.format(), 'Desconhecido'),
+//       area_ha: area
+//     });
+//   })
+// );
 
-print('Feature collection of areas (ha) for each class:', areaFc);
+// print('Feature collection of areas (ha) for each class:', areaFc);
 
-// Plot
-var barPlot = ui.Chart.feature.groups({
-    features: areaFc,
-    xProperty: 'class_label',
-    yProperty: 'area_ha',
-    seriesProperty: 'class_label'
-})
-.setChartType('ColumnChart')     
-.setOptions({
-  title: 'Area per class',
-  hAxis: {title: 'Land cover'},
-  vAxis: {title: 'Area (ha)'},
-  legend: {position: 'right'},
-  isStacked: true,              
-  colors: palette,       
-  bar: {                      
-    groupWidth: '100%' 
-  }
-});
+// // Plot
+// var barPlot = ui.Chart.feature.groups({
+//     features: areaFc,
+//     xProperty: 'class_label',
+//     yProperty: 'area_ha',
+//     seriesProperty: 'class_label'
+// })
+// .setChartType('ColumnChart')     
+// .setOptions({
+//   title: 'Area per class',
+//   hAxis: {title: 'Land cover'},
+//   vAxis: {title: 'Area (ha)'},
+//   legend: {position: 'right'},
+//   isStacked: true,              
+//   colors: palette,       
+//   bar: {                      
+//     groupWidth: '100%' 
+//   }
+// });
 
-print(barPlot);
+// print(barPlot);
