@@ -28,28 +28,26 @@ Map.centerObject(mosaic);
 // O K-means utilizará os valores espectrais e dos índices
 // para agrupar os pixels de acordo com sua similaridade.
 
-var inputProperties = mosaic.bandNames();
-
-List (17 elements)
-0: B1
-1: B2
-2: B3
-3: B4
-4: B5
-5: B6
-6: B7
-7: B8
-8: B8A
-9: B9
-10: B11
-11: B12
-12: ndvi
-13: ndwi
-14: evi
-15: mndwi
-16: mmri
-
-print(inputProperties);
+var inputProperties = [
+  'B1',
+  'B2',
+  'B3',
+  'B4',
+  'B5',
+  'B6',
+  'B7',
+  'B8',
+  'B8A',
+  'B9',
+  'B10',
+  'B11',
+  'B12',
+  'ndvi',
+  'ndwi',
+  'evi',
+  'mndwi',
+  'mmri'
+  ]
 
 // ============================================================
 // PREPARAR AMOSTRAS DE PIXELS PARA O AGRUPAMENTO
