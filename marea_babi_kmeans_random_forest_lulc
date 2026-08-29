@@ -446,7 +446,7 @@ print(barPlot);
 // // Using the code editor's shape editing tool, draw polygons representing each class and import them as a FeatureCollection
 
 // // 2.2.1. Create a feature collection
-// // Classify five land cover classes: urban (0), bare soil (1), water (2), mangrove (3), forest (4). 
+// // Classify two land cover classes: mangrove (0) and non-mangrove(1)
 
 // // 2.3. Generate random points
 // // Generate random points within these regions. 
@@ -456,21 +456,21 @@ print(barPlot);
 // // OBS.: There are other, more accurate ways to define the number of points to be collected. 
 // // For example, we can determine the size of the set of points using the proportion of the known area of your region of interest (ROI) as a reference.
 
-// // Create a function to collect random point inside the polygons
-// var generatePoints = function(polygons, nPoints){
+// Create a function to collect random point inside the polygons
+var generatePoints = function(polygons, nPoints){
     
-//     // Generate N random points inside the polygons
-//     var points = ee.FeatureCollection.randomPoints(polygons, nPoints);
+    // Generate N random points inside the polygons
+    var points = ee.FeatureCollection.randomPoints(polygons, nPoints);
     
-//     // Get the class value propertie
-//     var classValue = polygons.first().get('class');
+    // Get the class value propertie
+    var classValue = polygons.first().get('class');
     
-//     // Iterate over points and assign the class value
-//     points = points.map(
-//         function(point){
-//             return point.set('class', classValue);
-//         }
-//     );
+    // Iterate over points and assign the class value
+    points = points.map(
+        function(point){
+            return point.set('class', classValue);
+        }
+    );
     
 //     return points;
 // };
