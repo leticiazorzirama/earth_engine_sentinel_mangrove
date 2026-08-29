@@ -501,7 +501,7 @@ blocos.forEach(function(bloco, i) {
   print(nomeBloco + ' - n imagens: ' + numImg);
 
   // ---- EXPORTAR PARA GOOGLE DRIVE ----
-  if (DESTINO == 'asset') {
+  if (DESTINO == 'drive') {
     Export.image.toDrive({
     image: imagemFinal,
     description: nomeBloco,
