@@ -39,7 +39,6 @@ var inputProperties = [
   'B8',
   'B8A',
   'B9',
-  'B10',
   'B11',
   'B12',
   'ndvi',
