@@ -2,7 +2,10 @@
 var bloco1 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco1_seco_2016-04-20_a_2016-04-20"),
     babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1"),
     bloco2 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco2_chuvoso_2016-12-06_a_2016-12-06"),
-    mangrove = /* color: #12ff83 */ee.FeatureCollection(
+    mangrove = 
+    /* color: #12ff83 */
+    /* shown: false */
+    ee.FeatureCollection(
         [ee.Feature(
             ee.Geometry.Polygon(
                 [[[-48.78792865794825, -26.306012348795623],
@@ -93,7 +96,10 @@ var bloco1 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco1_seco_2016-04-2
               "class": 0,
               "system:index": "9"
             })]),
-    nonmangrove = /* color: #ffc82d */ee.FeatureCollection(
+    nonmangrove = 
+    /* color: #ffc82d */
+    /* shown: false */
+    ee.FeatureCollection(
         [ee.Feature(
             ee.Geometry.Polygon(
                 [[[-48.789132359193204, -26.29705298523474],
@@ -189,12 +195,12 @@ var bloco1 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco1_seco_2016-04-2
 // IMPORTAR E VISUALIZAR ASSETS
 // =============================
 
-// Load uploaded table asset
+// Carregar asset de tabela enviado
 var table = ee.FeatureCollection(babiDegr1);
 var roi = table.union();
 var mosaic = ee.Image(bloco2);
 
-// Visualizacao em cor natural
+// Visualização em cor natural
 var visParams = {
   bands: ['B4', 'B3', 'B2'],
   min: 0,
@@ -256,13 +262,13 @@ trainingSamples = trainingSamples.filter(
     ee.Filter.notNull(inputProperties)
 );
 
-// // Filtrar pelo 80th percentil
+// // Filtrar pelo 80º percentil
 // var p80Reducer = ee.Reducer.percentile([80]);
 
 // var trainingSamples = mosaic.reduceRegions({
-//   collection: trainingSamples,
-//   reducer: p80Reducer,
-//   scale: 10,
+//    collection: trainingSamples,
+//    reducer: p80Reducer,
+//    scale: 10,
 // });
 
 print('Amostras de treinamento do K-means:', trainingSamples);
@@ -275,7 +281,7 @@ print('Número de amostras:', trainingSamples.size());
 
 var numberOfClusters = 5;
 
-// Create K-means clusterer
+// Criar agrupador K-means
 var clusterer = ee.Clusterer.wekaKMeans({
     nClusters: numberOfClusters,
     seed: 42
@@ -441,26 +447,26 @@ var barPlot = ui.Chart.feature.groups({
 
 print(barPlot);
 
-// // 2.2. Collect manual samples
-// // Manually collect samples for the classification process. 
-// // Using the code editor's shape editing tool, draw polygons representing each class and import them as a FeatureCollection
+// // 2.2. Coletar amostras manuais
+// // Coletar amostras manualmente para o processo de classificação. 
+// // Utilizando a ferramenta de edição de formas do editor de código, desenhe polígonos representando cada classe e importe-os como uma FeatureCollection
 
-// // 2.2.1. Create a feature collection
-// // Classify two land cover classes: mangrove (0) and non-mangrove(1)
+// // 2.2.1. Criar uma coleção de feições (FeatureCollection)
+// // Classificar duas classes de cobertura do solo: manguezal (0) e não manguezal (1)
 
-// // 2.3. Generate random points
-// // Generate random points within these regions. 
-// // Proper distribution of the sampling polygons, combined with the random placement of points within them, ensures better representation of class variability. 
-// // Function to generate random points within the previously defined polygons.
+// // 2.3. Gerar pontos aleatórios
+// // Gerar pontos aleatórios dentro destas regiões. 
+// // A distribuição adequada dos polígonos de amostragem, combinada com o posicionamento aleatório dos pontos dentro deles, garante uma melhor representação da variabilidade das classes. 
+// // Função para gerar pontos aleatórios dentro dos polígonos previamente definidos.
 
-// // OBS.: There are other, more accurate ways to define the number of points to be collected. 
-// // For example, we can determine the size of the set of points using the proportion of the known area of your region of interest (ROI) as a reference.
+// // OBS.: Existem outras formas mais precisas de definir o número de pontos a serem coletados. 
+// // Por exemplo, podemos determinar o tamanho do conjunto de pontos utilizando como referência a proporção da área conhecida da sua região de interesse (ROI).
 
 // ============================================================
-// RANDOM FOREST CLASSIFICATION
+// CLASSIFICAÇÃO COM RANDOM FOREST
 // ============================================================
 
-// Predictor variables
+// Variáveis preditoras
 var inputProperties = [
   'B1',
   'B2',
@@ -477,14 +483,13 @@ var inputProperties = [
   'ndvi',
   'ndwi',
   'evi',
-  'ndsi',
   'mndwi',
   'mmri'
 ];
 
 
 // ============================================================
-// GENERATE RANDOM TRAINING POINTS
+// GERAR PONTOS ALEATÓRIOS DE TREINAMENTO
 // ============================================================
 
 var generatePoints = function(polygons, nPoints, classValue) {
@@ -500,14 +505,14 @@ var generatePoints = function(polygons, nPoints, classValue) {
 };
 
 
-// Class 0: Mangrove
+// Classe 0: Manguezal
 var mangrovePoints = generatePoints(
   mangrove,
   2500,
   0
 );
 
-// Class 1: Non-mangrove
+// Classe 1: Não manguezal
 var nonmangrovePoints = generatePoints(
   nonmangrove,
   2500,
@@ -515,7 +520,7 @@ var nonmangrovePoints = generatePoints(
 );
 
 
-// Merge samples
+// Mesclar amostras
 var samples = mangrovePoints.merge(nonmangrovePoints);
 
 print('Samples:', samples);
@@ -536,7 +541,7 @@ Map.addLayer(
 
 
 // ============================================================
-// EXTRACT PREDICTOR VALUES
+// EXTRAIR VALORES DAS VARIÁVEIS PREDITORAS
 // ============================================================
 
 var trainedSamples = mosaic
@@ -549,7 +554,7 @@ var trainedSamples = mosaic
   });
 
 
-// Remove samples with missing predictor values
+// Remover amostras com valores nulos de preditores
 trainedSamples = trainedSamples.filter(
   ee.Filter.notNull(inputProperties)
 );
@@ -562,7 +567,7 @@ print(
 
 
 // ============================================================
-// TRAIN / TEST SPLIT
+// DIVISÃO TREINO / TESTE
 // ============================================================
 
 trainedSamples = trainedSamples.randomColumn(
@@ -583,7 +588,7 @@ print('Test set:', testSet);
 
 
 // ============================================================
-// TRAIN RANDOM FOREST
+// TREINAR RANDOM FOREST
 // ============================================================
 
 var classifier = ee.Classifier.smileRandomForest({
@@ -598,7 +603,7 @@ classifier = classifier.train({
 
 
 // ============================================================
-// TRAINING ACCURACY
+// ACURÁCIA DE TREINAMENTO
 // ============================================================
 
 var trainMatrix = classifier.confusionMatrix();
@@ -617,7 +622,7 @@ print(
 
 
 // ============================================================
-// TEST ACCURACY
+// ACURÁCIA DE TESTE
 // ============================================================
 
 var testResults = testSet.classify(classifier);
@@ -647,7 +652,7 @@ print(
 
 
 // ============================================================
-// CLASSIFY ENTIRE MOSAIC
+// CLASSIFICAR TODO O MOSAICO
 // ============================================================
 
 var classification = mosaic
@@ -656,8 +661,8 @@ var classification = mosaic
 
 
 var palette = [
-  '#076132', // Mangrove
-  '#2cc968'  // Non-mangrove
+  '#076132', // Manguezal
+  '#2cc968'  // Não manguezal
 ];
 
 Map.addLayer(
@@ -678,7 +683,7 @@ print(
 
 
 // ============================================================
-// AREA BY CLASS
+// ÁREA POR CLASSE
 // ============================================================
 
 var areaHa = ee.Image.pixelArea()
