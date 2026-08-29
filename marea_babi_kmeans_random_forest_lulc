@@ -707,3 +707,50 @@ print(
   'Table of areas (ha) for each class:',
   areaDict
 );
+
+// Obter dados dos grupos
+var groups = ee.List(areaDict.get('groups'));
+
+// Tabela de atributos das classes
+var classDict = ee.Dictionary({
+  '0': 'Mangrove',
+  '1': 'Non-mangrove'
+});
+
+// Converter para coleção de feições (FeatureCollection)
+var areaFc = ee.FeatureCollection(
+  groups.map(function(item){
+    item = ee.Dictionary(item);
+    var code = ee.Number(item.get('classification')).int();
+    var area = item.get('sum');
+    return ee.Feature(null, {
+      class_code: code,
+      class_label: classDict.get(code.format(), 'Desconhecido'),
+      area_ha: area
+    });
+  })
+);
+
+print('Feature collection of areas (ha) for each class:', areaFc);
+
+// Gerar o gráfico
+var barPlot = ui.Chart.feature.groups({
+    features: areaFc,
+    xProperty: 'class_label',
+    yProperty: 'area_ha',
+    seriesProperty: 'class_label'
+})
+.setChartType('ColumnChart')     
+.setOptions({
+  title: 'Area per class',
+  hAxis: {title: 'Land cover'},
+  vAxis: {title: 'Area (ha)'},
+  legend: {position: 'right'},
+  isStacked: true,              
+  colors: palette,       
+  bar: {                    
+    groupWidth: '100%' 
+  }
+});
+
+print(barPlot);
