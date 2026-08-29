@@ -456,228 +456,249 @@ print(barPlot);
 // // OBS.: There are other, more accurate ways to define the number of points to be collected. 
 // // For example, we can determine the size of the set of points using the proportion of the known area of your region of interest (ROI) as a reference.
 
-// Create a function to collect random point inside the polygons
-var generatePoints = function(polygons, nPoints){
-    
-    // Generate N random points inside the polygons
-    var points = ee.FeatureCollection.randomPoints(polygons, nPoints);
-    
-    // Get the class value propertie
-    var classValue = polygons.first().get('class');
-    
-    // Iterate over points and assign the class value
-    points = points.map(
-        function(point){
-            return point.set('class', classValue);
-        }
-    );
-    
-//     return points;
-// };
+// ============================================================
+// RANDOM FOREST CLASSIFICATION
+// ============================================================
 
-// // Collect random points inside the polygons
-// var urbanPoints = generatePoints(urban, 1000);
-// var barePoints = generatePoints(bare, 1000);
-// var waterPoints = generatePoints(water, 1000);
-// var mangrovePoints = generatePoints(mangrove, 1000);
-// var forestPoints = generatePoints(forest, 1000);
-
-// // Merge all samples into a featureCollection
-// var samples = urbanPoints.merge(barePoints).merge(waterPoints).merge(mangrovePoints).merge(forestPoints);
-
-// print('Samples:', samples);
-
-// Map.addLayer(samples.filter(ee.Filter.eq('class', 0)), {color: '#d4271e'}, 'samples', false);
-// Map.addLayer(samples.filter(ee.Filter.eq('class', 1)), {color: '#d1af86'}, 'samples', false);
-// Map.addLayer(samples.filter(ee.Filter.eq('class', 2)), {color: '#1488ff'}, 'samples', false);
-// Map.addLayer(samples.filter(ee.Filter.eq('class', 3)), {color: '#076132'}, 'samples', false);
-// Map.addLayer(samples.filter(ee.Filter.eq('class', 4)), {color: '#2cc968'}, 'samples', false);
-
-// // 2.4. Collect the spectral information
-// // Extract the spectral information from their pixels.
-
-// // Collect the spectral information to get the trained samples
-// var trainedSamples = mosaic.reduceRegions({
-//     'collection': samples, 
-//     'reducer': ee.Reducer.first(), 
-//     'scale': 30,
-//   });
-
-// var trainedSamples = trainedSamples.filter(ee.Filter.notNull(['SR_B2_max']));
-
-// print('Train samples:', trainedSamples);
-
-// // 2.? Train and test splits
-// var trainedSamples = trainedSamples.randomColumn('random', 42); // seed for reprodutibility
-// var trainSet = trainedSamples.filter(ee.Filter.lessThan('random', 0.8));
-// var testSet = trainedSamples.filter(ee.Filter.greaterThanOrEquals('random', 0.8));
-
-// print('Train set:', trainSet);
-// print('Test set:', testSet);
-
-// // 2.5. Training the Random Forest classifier
-// // Set up the Random Forest classifier
-// var classifier = ee.Classifier.smileRandomForest({
-//     'numberOfTrees': 200
-// });
-
-// // Training the classifier on train set
-// classifier = classifier.train({
-//     'features': trainSet, 
-//     'classProperty': 'class', 
-//     'inputProperties': [
-//         'SR_B2_max',
-//         'SR_B2_median',
-//         'SR_B2_min',
-//         'SR_B3_max',
-//         'SR_B3_median',
-//         'SR_B3_min',
-//         'SR_B4_max',
-//         'SR_B4_median',
-//         'SR_B4_min',
-//         'SR_B5_max',
-//         'SR_B5_median',
-//         'SR_B5_min',
-//         'SR_B6_max',
-//         'SR_B6_median',
-//         'SR_B6_min',
-//         'SR_B7_max',
-//         'SR_B7_median',
-//         'SR_B7_min',
-//         'evi_max', 
-//         'evi_median',
-//         'evi_min',
-//         'mmri_max',
-//         'mmri_median',
-//         'mmri_min',
-//         'mndwi_max',
-//         'mndwi_median',
-//         'mndwi_min',
-//         'ndsi_max',
-//         'ndsi_median',
-//         'ndsi_min',
-//         'ndvi_max',
-//         'ndvi_median',
-//         'ndvi_min',
-//         'ndwi_max',
-//         'ndwi_median',
-//         'ndwi_min'
-//     ]
-// });
+// Predictor variables
+var inputProperties = [
+  'B1',
+  'B2',
+  'B3',
+  'B4',
+  'B5',
+  'B6',
+  'B7',
+  'B8',
+  'B8A',
+  'B9',
+  'B11',
+  'B12',
+  'ndvi',
+  'ndwi',
+  'evi',
+  'ndsi',
+  'mndwi',
+  'mmri'
+];
 
 
-// // 2. Evaluate the classifier on train set
+// ============================================================
+// GENERATE RANDOM TRAINING POINTS
+// ============================================================
 
-// // Confusion matrix: 
-// // Rows correspond to actual values, columns to predicted values
-// var trainMatrix = classifier.confusionMatrix(); 
-// var trainAccuracy = trainMatrix.accuracy()
-// print('Training confusion matrix: ', trainMatrix);
-// print('Training accuracy: ', trainAccuracy);
+var generatePoints = function(polygons, nPoints, classValue) {
 
-// // 2.? Evaluate the classifier on test set
+  var points = ee.FeatureCollection.randomPoints(
+    polygons,
+    nPoints
+  );
 
-// var testResults = testSet.classify(classifier);
-// var testMatrix = testResults.errorMatrix('class', ' ');
-// var testAccuracy = testMatrix.accuracy();
-// var testKappa = testMatrix.kappa();
+  return points.map(function(point) {
+    return point.set('class', classValue);
+  });
+};
 
-// print('Test confusion matrix: ', testMatrix);
-// print('Test accuracy:', testAccuracy)
-// print('Test kappa:', testKappa)
 
-// // 2.6. Predict with the classifier on entire image mosaic
+// Class 0: Mangrove
+var mangrovePoints = generatePoints(
+  mangrove,
+  2500,
+  0
+);
 
-// // Run the Random Forest classifier
-// var classification = mosaic.classify(classifier);
+// Class 1: Non-mangrove
+var nonmangrovePoints = generatePoints(
+  nonmangrove,
+  2500,
+  1
+);
 
-// // Pallete
-// var palette = [
-//   '#d4271e', // urban
-//   '#d1af86', // bare
-//   '#1488ff', // water
-//   '#076132', // mangrove
-//   '#2cc968', // forest
-// ];
 
-// // Add classification to map
-// Map.addLayer(classification, {
-//         'min': 0,
-//         'max': 4,
-//         'palette': palette,
-//         'format': 'png'
-//     },
-//     'classification'
-// );
+// Merge samples
+var samples = mangrovePoints.merge(nonmangrovePoints);
 
-// print('Classification:', classification);
+print('Samples:', samples);
 
-// // 2.? Calculate area for each class
+Map.addLayer(
+  samples.filter(ee.Filter.eq('class', 0)),
+  {color: '#076a36'},
+  'Mangrove samples',
+  false
+);
 
-// // m2 to ha
-// var areaHa = ee.Image.pixelArea().divide(1e4); 
+Map.addLayer(
+  samples.filter(ee.Filter.eq('class', 1)),
+  {color: '#ffc82d'},
+  'Non-mangrove samples',
+  false
+);
 
-// // Add classification band
-// var areaStack = areaHa.addBands(classification); 
 
-// // Group area per class
-// var areaDict = areaStack.reduceRegion({
-//     reducer: ee.Reducer.sum().group({
-//     groupField: 1,
-//     groupName: 'classification'
-//   }),
-//   geometry: roi,
-//   scale: 30,
-//   maxPixels: 1e13
-// });
-// print('Table of areas (ha) for each class:', areaDict);
+// ============================================================
+// EXTRACT PREDICTOR VALUES
+// ============================================================
 
-// // Get groups data
-// var groups = ee.List(areaDict.get('groups'));
+var trainedSamples = mosaic
+  .select(inputProperties)
+  .sampleRegions({
+    collection: samples,
+    properties: ['class'],
+    scale: 10,
+    geometries: true
+  });
 
-// // Classes attributes table
-// var classDict = ee.Dictionary({
-//   '0': 'Urban',
-//   '1': 'Bare',
-//   '2': 'Water',
-//   '3': 'Mangrove',
-//   '4': 'Forest'
-// })
 
-// // Convert to feature collection
-// var areaFc = ee.FeatureCollection(
-//   groups.map(function(item){
-//     item = ee.Dictionary(item);
-//     var code = ee.Number(item.get('classification')).int();
-//     var area = item.get('sum');
-//     return ee.Feature(null, {
-//       class_code: code,
-//       class_label: classDict.get(code.format(), 'Desconhecido'),
-//       area_ha: area
-//     });
-//   })
-// );
+// Remove samples with missing predictor values
+trainedSamples = trainedSamples.filter(
+  ee.Filter.notNull(inputProperties)
+);
 
-// print('Feature collection of areas (ha) for each class:', areaFc);
+print('Train samples:', trainedSamples);
+print(
+  'Number of valid samples:',
+  trainedSamples.size()
+);
 
-// // Plot
-// var barPlot = ui.Chart.feature.groups({
-//     features: areaFc,
-//     xProperty: 'class_label',
-//     yProperty: 'area_ha',
-//     seriesProperty: 'class_label'
-// })
-// .setChartType('ColumnChart')     
-// .setOptions({
-//   title: 'Area per class',
-//   hAxis: {title: 'Land cover'},
-//   vAxis: {title: 'Area (ha)'},
-//   legend: {position: 'right'},
-//   isStacked: true,              
-//   colors: palette,       
-//   bar: {                      
-//     groupWidth: '100%' 
-//   }
-// });
 
-// print(barPlot);
+// ============================================================
+// TRAIN / TEST SPLIT
+// ============================================================
+
+trainedSamples = trainedSamples.randomColumn(
+  'random',
+  42
+);
+
+var trainSet = trainedSamples.filter(
+  ee.Filter.lessThan('random', 0.8)
+);
+
+var testSet = trainedSamples.filter(
+  ee.Filter.greaterThanOrEquals('random', 0.8)
+);
+
+print('Train set:', trainSet);
+print('Test set:', testSet);
+
+
+// ============================================================
+// TRAIN RANDOM FOREST
+// ============================================================
+
+var classifier = ee.Classifier.smileRandomForest({
+  numberOfTrees: 200
+});
+
+classifier = classifier.train({
+  features: trainSet,
+  classProperty: 'class',
+  inputProperties: inputProperties
+});
+
+
+// ============================================================
+// TRAINING ACCURACY
+// ============================================================
+
+var trainMatrix = classifier.confusionMatrix();
+
+var trainAccuracy = trainMatrix.accuracy();
+
+print(
+  'Training confusion matrix:',
+  trainMatrix
+);
+
+print(
+  'Training accuracy:',
+  trainAccuracy
+);
+
+
+// ============================================================
+// TEST ACCURACY
+// ============================================================
+
+var testResults = testSet.classify(classifier);
+
+var testMatrix = testResults.errorMatrix(
+  'class',
+  'classification'
+);
+
+var testAccuracy = testMatrix.accuracy();
+var testKappa = testMatrix.kappa();
+
+print(
+  'Test confusion matrix:',
+  testMatrix
+);
+
+print(
+  'Test accuracy:',
+  testAccuracy
+);
+
+print(
+  'Test kappa:',
+  testKappa
+);
+
+
+// ============================================================
+// CLASSIFY ENTIRE MOSAIC
+// ============================================================
+
+var classification = mosaic
+  .select(inputProperties)
+  .classify(classifier);
+
+
+var palette = [
+  '#076132', // Mangrove
+  '#2cc968'  // Non-mangrove
+];
+
+Map.addLayer(
+  classification,
+  {
+    min: 0,
+    max: 1,
+    palette: palette,
+    format: 'png'
+  },
+  'Random Forest classification'
+);
+
+print(
+  'Random Forest classification:',
+  classification
+);
+
+
+// ============================================================
+// AREA BY CLASS
+// ============================================================
+
+var areaHa = ee.Image.pixelArea()
+  .divide(1e4);
+
+var areaStack = areaHa.addBands(
+  classification
+);
+
+var areaDict = areaStack.reduceRegion({
+  reducer: ee.Reducer.sum().group({
+    groupField: 1,
+    groupName: 'classification'
+  }),
+  geometry: roi,
+  scale: 10,
+  maxPixels: 1e13
+});
+
+print(
+  'Table of areas (ha) for each class:',
+  areaDict
+);
