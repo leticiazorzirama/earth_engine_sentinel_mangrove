@@ -368,177 +368,187 @@ var wcssPlot = ui.Chart.feature.byFeature({
 // Imprimir o plot
 print(wcssPlot);
 
-// // ============================================================
-// // INSTANCIAR O K-MEANS
-// // ============================================================
+// Afericao do grafico indica o cotovelo em k = 3
+// Ha 81% de reducao no WCSS de 1 para 3 agrupamentos
+// Para 4 agrupamentos a reducao e de 84%
+// Ou seja, de 3 para 4 k ha um ganho de 3% na reducao do WCSS
+// k = 3 ja indica um bom balanco
 
-// var numberOfClusters = 5;
+// ============================================================
+// INSTANCIAR O K-MEANS COM K = 3
+// ============================================================
 
-// // Criar agrupador K-means
-// var clusterer = ee.Clusterer.wekaKMeans({
-//     nClusters: numberOfClusters,
-//     seed: 42
-// });
+var numberOfClusters = 3;
 
-
-// // ============================================================
-// // TREINAR O K-MEANS
-// // ============================================================
-
-// // Treinar o modelo de agrupamento não supervisionado utilizando
-// // os pixels amostrados.
-// clusterer = clusterer.train(trainingSamples);
-
-// print('Agrupador K-means:', clusterer);
-
-
-// // ============================================================
-// // TESTE INDEPENDENTE EM TODO O MOSAICO
-// // ============================================================
-
-// var classification = mosaic
-//     .select(inputProperties)
-//     .cluster(clusterer);
-
-// // ============================================================
-// // VISUALIZAR OS AGRUPAMENTOS
-// // ============================================================
-
-// // Os IDs dos clusters são arbitrários.
-// //
-// // NÃO assuma que:
-// // cluster 0 = urbano
-// // cluster 1 = solo exposto
-// // cluster 2 = água
-// // cluster 3 = manguezal
-// // cluster 4 = floresta
-// //
-// // As cores abaixo são apenas para fins de visualização.
-
-// var clusterPalette = [
-//     '#d4271e',
-//     '#d1af86',
-//     '#1488ff',
-//     '#076132',
-//     '#2cc968'
-// ];
-
-// Map.addLayer(
-//     classification,
-//     {
-//         min: 0,
-//         max: numberOfClusters - 1,
-//         palette: clusterPalette,
-//         format: 'png'
-//     },
-//     'Classificação K-means'
-// );
-
-// print('Classificação K-means:', classification);
+// Criar agrupador K-means
+var clusterer = ee.Clusterer.wekaKMeans(
+    numberOfClusters,
+    1,        
+    false,    
+    100,      
+    10000,    
+    2,        
+    -1.5,     
+    -1,       
+    'Euclidean',
+    null,     
+    false,    
+    false,    
+    randomSeed
+);
 
 
-// // ============================================================
-// // CALCULAR A AREA DE CADA AGRUPAMENTO
-// // ============================================================
+// ============================================================
+// TREINAR O K-MEANS
+// ============================================================
 
-// // Área do pixel em hectares
-// var areaHa = ee.Image.pixelArea().divide(1e4);
+// Treinar o modelo de agrupamento não supervisionado utilizando
+// os pixels amostrados.
+clusterer = clusterer.train(trainingData);
 
-
-// // Adicionar a banda de classificação
-// var areaStack = areaHa.addBands(classification);
-
-
-// // Calcular a área agrupada por cluster
-// var areaDict = areaStack.reduceRegion({
-//     reducer: ee.Reducer.sum().group({
-//         groupField: 1,
-//         groupName: 'cluster'
-//     }),
-//     geometry: roi,
-//     scale: 10,
-//     maxPixels: 1e13
-// });
-
-// print(
-//     'Tabela de áreas (ha) para cada cluster:',
-//     areaDict
-// );
+print('Agrupador K-means:', clusterer);
 
 
-// // ===========================================================
-// // CONVERTER O DICIONARIO DE AREAS PARA COLECAO DE ATRIBUTOS
-// // ===========================================================
+// ============================================================
+// TESTE INDEPENDENTE EM TODO O MOSAICO
+// ============================================================
 
-// var groups = ee.List(areaDict.get('groups'));
+var classification = mosaic
+    .select(bands)
+    .cluster(clusterer);
+
+// ============================================================
+// VISUALIZAR OS AGRUPAMENTOS
+// ============================================================
+
+// Os IDs dos clusters são arbitrários.
+//
+// As cores abaixo são apenas para fins de visualização.
+
+var clusterPalette = [
+    '#d4271e',
+    '#d1af86',
+    '#1488ff',
+    '#076132',
+    '#2cc968'
+];
+
+Map.addLayer(
+    classification,
+    {
+        min: 0,
+        max: numberOfClusters - 1,
+        palette: clusterPalette,
+        format: 'png'
+    },
+    'Classificação K-means'
+);
+
+print('Classificação K-means:', classification);
 
 
-// var areaFc = ee.FeatureCollection(
-//     groups.map(function(item) {
+// ============================================================
+// CALCULAR A AREA DE CADA AGRUPAMENTO
+// ============================================================
 
-//         item = ee.Dictionary(item);
-
-//         var cluster = ee.Number(
-//             item.get('cluster')
-//         ).int();
-
-//         var area = item.get('sum');
-
-//         return ee.Feature(null, {
-//             cluster: cluster,
-//             cluster_label: ee.String('Cluster ')
-//                 .cat(cluster.format()),
-//             area_ha: area
-//         });
-
-//     })
-// );
+// Área do pixel em hectares
+var areaHa = ee.Image.pixelArea().divide(1e4);
 
 
-// print(
-//     'FeatureCollection de áreas (ha) para cada cluster:',
-//     areaFc
-// );
+// Adicionar a banda de classificação
+var areaStack = areaHa.addBands(classification);
 
 
-// // ============================================
-// // PLOTAR OS AGRUPAMENTOS EM GRAFICO DE BARRAS
-// // ============================================
+// Calcular a área agrupada por cluster
+var areaDict = areaStack.reduceRegion({
+    reducer: ee.Reducer.sum().group({
+        groupField: 1,
+        groupName: 'cluster'
+    }),
+    geometry: roi,
+    scale: 10,
+    maxPixels: 1e13
+});
 
-// var barPlot = ui.Chart.feature.groups({
-//     features: areaFc,
-//     xProperty: 'cluster_label',
-//     yProperty: 'area_ha',
-//     seriesProperty: 'cluster_label'
-// })
-// .setChartType('ColumnChart')
-// .setOptions({
+print(
+    'Tabela de áreas (ha) para cada cluster:',
+    areaDict
+);
 
-//     title: 'Area per cluster Weka K-means',
 
-//     hAxis: {
-//         title: 'Clustering'
-//     },
+// ===========================================================
+// CONVERTER O DICIONARIO DE AREAS PARA COLECAO DE ATRIBUTOS
+// ===========================================================
 
-//     vAxis: {
-//         title: 'Area (ha)'
-//     },
+var groups = ee.List(areaDict.get('groups'));
 
-//     legend: {
-//         position: 'right'
-//     },
 
-//     isStacked: false,
+var areaFc = ee.FeatureCollection(
+    groups.map(function(item) {
 
-//     colors: clusterPalette,
+        item = ee.Dictionary(item);
 
-//     bar: {
-//         groupWidth: '100%'
-//     }
+        var cluster = ee.Number(
+            item.get('cluster')
+        ).int();
 
-// });
+        var area = item.get('sum');
 
-// print(barPlot);
+        return ee.Feature(null, {
+            cluster: cluster,
+            cluster_label: ee.String('Cluster ')
+                .cat(cluster.format()),
+            area_ha: area
+        });
+
+    })
+);
+
+
+print(
+    'FeatureCollection de áreas (ha) para cada cluster:',
+    areaFc
+);
+
+
+// ============================================
+// PLOTAR OS AGRUPAMENTOS EM GRAFICO DE BARRAS
+// ============================================
+
+var clusterPlot = ui.Chart.feature.groups({
+    features: areaFc,
+    xProperty: 'cluster_label',
+    yProperty: 'area_ha',
+    seriesProperty: 'cluster_label'
+})
+.setChartType('ColumnChart')
+.setOptions({
+
+    title: 'Area per cluster Weka K-means',
+
+    hAxis: {
+        title: 'Clustering'
+    },
+
+    vAxis: {
+        title: 'Area (ha)'
+    },
+
+    legend: {
+        position: 'right'
+    },
+
+    isStacked: false,
+
+    colors: clusterPalette,
+
+    bar: {
+        groupWidth: '100%'
+    }
+
+});
+
+print(clusterPlot);
 
 // // // 2.2. Coletar amostras manuais
 // // // Coletar amostras manualmente para o processo de classificação. 
