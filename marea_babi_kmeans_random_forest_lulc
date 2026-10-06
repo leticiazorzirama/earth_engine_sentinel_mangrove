@@ -601,12 +601,12 @@ var vector2 = cluster2Mask.selfMask().reduceToVectors({
 // Visualizar o poligono
 Map.addLayer(vector2, {color: '#F55F74'}, 'Cluster 2 - Polígono', false, 0.5);
 
-// Cluster 4
+// Cluster 3
 
-var cluster4 = 3;
-var cluster4Mask = classification.eq(cluster4);
+var cluster3 = 3;
+var cluster3Mask = classification.eq(cluster3);
 
-var vector4 = cluster4Mask.selfMask().reduceToVectors({
+var vector3 = cluster3Mask.selfMask().reduceToVectors({
   geometry: roi,             
   scale: 10,                 
   geometryType: 'polygon',
@@ -616,7 +616,7 @@ var vector4 = cluster4Mask.selfMask().reduceToVectors({
 });
 
 // Visualizar o poligono
-Map.addLayer(vector4, {color: '#8CC5E3'}, 'Cluster 4 - Polígono', false, 0.5);
+Map.addLayer(vector3, {color: '#8CC5E3'}, 'Cluster 3 - Polígono', false, 0.5);
 
 // ============================================================
 // MERGE DOS CLUSTERS EM DUAS CLASSES
@@ -649,9 +649,14 @@ print('Polígonos para amostragem:', trainingPolygons);
 // ============================================================
 
 // Contagem por cluster
-var pixelCount = classification
+var pixelCount = ee.Image.constant(1)
+    .updateMask(classification.mask())
+    .addBands(classification)
     .reduceRegion({
-      reducer: ee.Reducer.frequencyHistogram(),
+      reducer: ee.Reducer.count().group({
+        groupField: 1,
+        groupName: 'cluster'
+      }),
       geometry: roi,
       scale: 10,
       maxPixels: 1e13
@@ -666,30 +671,20 @@ var binaryClassification = classification
       [0, 1, 0, 1]   // classes: mangue / nao-mangue
     );
 
-var classPixelCount = binaryClassification
+var classPixelCount = ee.Image.constant(1)
+    .updateMask(binaryClassification.mask())
+    .addBands(binaryClassification)
     .reduceRegion({
-      reducer: ee.Reducer.frequencyHistogram(),
+      reducer: ee.Reducer.count().group({
+        groupField: 1,
+        groupName: 'class'
+      }),
       geometry: roi,
       scale: 10,
       maxPixels: 1e13
     });
 
 print('Número de pixels por classe:', classPixelCount);
-
-// // 2.2. Coletar amostras manuais
-// // Coletar amostras manualmente para o processo de classificação. 
-// // Utilizando a ferramenta de edição de formas do editor de código, desenhe polígonos representando cada classe e importe-os como uma FeatureCollection
-
-// // 2.2.1. Criar uma coleção de feições (FeatureCollection)
-// // Classificar duas classes de cobertura do solo: manguezal (0) e não manguezal (1)
-
-// // 2.3. Gerar pontos aleatórios
-// // Gerar pontos aleatórios dentro destas regiões. 
-// // A distribuição adequada dos polígonos de amostragem, combinada com o posicionamento aleatório dos pontos dentro deles, garante uma melhor representação da variabilidade das classes. 
-// // Função para gerar pontos aleatórios dentro dos polígonos previamente definidos.
-
-// // OBS.: Existem outras formas mais precisas de definir o número de pontos a serem coletados. 
-// // Por exemplo, podemos determinar o tamanho do conjunto de pontos utilizando como referência a proporção da área conhecida da sua região de interesse (ROI).
 
 // // ============================================================
 // // CLASSIFICAÇÃO COM RANDOM FOREST
