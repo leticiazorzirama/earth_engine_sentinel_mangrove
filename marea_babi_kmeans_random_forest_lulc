@@ -618,6 +618,64 @@ var vector4 = cluster4Mask.selfMask().reduceToVectors({
 // Visualizar o poligono
 Map.addLayer(vector4, {color: '#8CC5E3'}, 'Cluster 4 - Polígono', false, 0.5);
 
+// ============================================================
+// MERGE DOS CLUSTERS EM DUAS CLASSES
+// ============================================================
+
+// Mangue = clusters 1 e 3
+var mangrovePolygons = vector1
+    .merge(vector3)
+    .map(function(feature) {
+      return feature.set('class', 1);
+    });
+
+// Nao-mangue = clusters 0 e 2
+var nonMangrovePolygons = vector0
+    .merge(vector2)
+    .map(function(feature) {
+      return feature.set('class', 0);
+    });
+
+print('Polígonos de manguezal:', mangrovePolygons);
+print('Polígonos de não-manguezal:', nonMangrovePolygons);
+
+// Combinar as amostras em uma FeatureCollection para amostragem
+var trainingPolygons = mangrovePolygons.merge(nonMangrovePolygons);
+
+print('Polígonos para amostragem:', trainingPolygons);
+
+// ============================================================
+// CONTAGEM DE PIXELS
+// ============================================================
+
+// Contagem por cluster
+var pixelCount = classification
+    .reduceRegion({
+      reducer: ee.Reducer.frequencyHistogram(),
+      geometry: roi,
+      scale: 10,
+      maxPixels: 1e13
+    });
+
+print('Número de pixels por cluster:', pixelCount);
+
+// Contagem por classe
+var binaryClassification = classification
+    .remap(
+      [0, 1, 2, 3],  // clusters
+      [0, 1, 0, 1]   // classes: mangue / nao-mangue
+    );
+
+var classPixelCount = binaryClassification
+    .reduceRegion({
+      reducer: ee.Reducer.frequencyHistogram(),
+      geometry: roi,
+      scale: 10,
+      maxPixels: 1e13
+    });
+
+print('Número de pixels por classe:', classPixelCount);
+
 // // 2.2. Coletar amostras manuais
 // // Coletar amostras manualmente para o processo de classificação. 
 // // Utilizando a ferramenta de edição de formas do editor de código, desenhe polígonos representando cada classe e importe-os como uma FeatureCollection
