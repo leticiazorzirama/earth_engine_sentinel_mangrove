@@ -549,6 +549,29 @@ var clusterPlot = ui.Chart.feature.groups({
 
 print(clusterPlot);
 
+// ============================================
+// COLETAR AMOSTRAS DOS CLUSTERS
+// ============================================
+
+// Assuming 'classified' is your image with a cluster band named 'cluster'
+// and you want to extract the cluster with ID = 1
+
+var cluster1 = 1;
+var cluster1Mask = classification.eq(cluster1);
+
+// Convert raster to vector polygons
+var vector1 = cluster1Mask.selfMask().reduceToVectors({
+  geometry: roi,              // Your region of interest (ee.Geometry)
+  scale: 10,                 
+  geometryType: 'polygon',
+  eightConnected: false,
+  labelProperty: 'cluster',
+  maxPixels: 1e12
+});
+
+// Display the resulting polygons on the map
+Map.addLayer(vector1, {color: '#A00000'}, 'Cluster 1 Polygons');
+
 // // // 2.2. Coletar amostras manuais
 // // // Coletar amostras manualmente para o processo de classificação. 
 // // // Utilizando a ferramenta de edição de formas do editor de código, desenhe polígonos representando cada classe e importe-os como uma FeatureCollection
