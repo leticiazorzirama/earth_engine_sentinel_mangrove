@@ -565,7 +565,7 @@ var vector0 = cluster0Mask.selfMask().reduceToVectors({
 });
 
 // Visualizar o poligono
-Map.addLayer(vector0, {color: '#4A2377'}, 'Cluster 0 - Polígono', false);
+Map.addLayer(vector0, {color: '#4A2377'}, 'Cluster 0 - Polígono', false, 0.5);
 
 // Cluster 1
 
@@ -582,7 +582,7 @@ var vector1 = cluster1Mask.selfMask().reduceToVectors({
 });
 
 // Visualizar o poligono
-Map.addLayer(vector1, {color: '#0D7D87'}, 'Cluster 1 - Polígono', false);
+Map.addLayer(vector1, {color: '#0D7D87'}, 'Cluster 1 - Polígono', false, 0.5);
 
 // Cluster 2
 
@@ -599,7 +599,7 @@ var vector2 = cluster2Mask.selfMask().reduceToVectors({
 });
 
 // Visualizar o poligono
-Map.addLayer(vector2, {color: '#F55F74'}, 'Cluster 2 - Polígono', false);
+Map.addLayer(vector2, {color: '#F55F74'}, 'Cluster 2 - Polígono', false, 0.5);
 
 // Cluster 4
 
@@ -616,7 +616,7 @@ var vector4 = cluster4Mask.selfMask().reduceToVectors({
 });
 
 // Visualizar o poligono
-Map.addLayer(vector4, {color: '#8CC5E3'}, 'Cluster 4 - Polígono', false);
+Map.addLayer(vector4, {color: '#8CC5E3'}, 'Cluster 4 - Polígono', false, 0.5);
 
 // // 2.2. Coletar amostras manuais
 // // Coletar amostras manualmente para o processo de classificação. 
