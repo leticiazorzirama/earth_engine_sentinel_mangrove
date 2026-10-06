@@ -207,7 +207,7 @@ var visParams = {
   gamma: 1.4  
 };
 
-Map.addLayer(mosaic, visParams, 'Cor natural');
+Map.addLayer(mosaic, visParams, 'Cor natural', false);
 Map.centerObject(mosaic);
 
 // ==============================
