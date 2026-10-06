@@ -358,8 +358,8 @@ var wcssPlot = ui.Chart.feature.byFeature({
 })
 .setChartType('LineChart')
 .setOptions({
-  title: 'K-Means Elbow Method: WCSS vs. Number of Clusters (K)',
-  hAxis: {title: 'Number of Clusters (K)', gridlines: {count: 9}},
+  title: 'K-Means método do cotovelo: WCSS vs. Número de Clusters (K)',
+  hAxis: {title: 'Número de Clusters (K)', gridlines: {count: 9}},
   vAxis: {title: 'Within-Cluster Sum of Squared Errors (WCSS)'},
   lineWidth: 2,
   pointSize: 6,
