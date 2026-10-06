@@ -426,9 +426,10 @@ var classification = mosaic
 // As cores abaixo são apenas para fins de visualização.
 
 var clusterPalette = [
-    '#1F77B4',
-    '#D62728',
-    '#2CA02C'
+    '#298C8C',
+    '#A00000',
+    '#B8B8B8',
+    
 ];
 
 Map.addLayer(
