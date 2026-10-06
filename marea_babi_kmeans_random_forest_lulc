@@ -287,20 +287,20 @@ var calculateWCSS = function(k) {
   
   // Instanciar e treinar o Weka K-Means
   var clusterer = ee.Clusterer.wekaKMeans(
-            k,        // nClusters
-            1,        // init: k-means++
-            false,    // canopies
-            100,      // maxCandidates
-            10000,    // periodicPruning
-            2,        // minDensity
-            -1.5,     // t1
-            -1,       // t2
-            'Euclidean',
-            null,     // maxIterations
-            false,    // preserveOrder
-            false,    // fast
-            randomSeed
-          ).train(trainingData);
+    k,        // nClusters
+    1,        // init: k-means++
+    false,    // canopies
+    100,      // maxCandidates
+    10000,    // periodicPruning
+    2,        // minDensity
+    -1.5,     // t1
+    -1,       // t2
+    'Euclidean',
+    null,     // maxIterations
+    false,    // preserveOrder
+    false,    // fast
+    randomSeed
+    ).train(trainingData);
   
   // K-means atribui cada pixel a um cluster
   var clusteredData = trainingData.cluster(clusterer, 'cluster_id');
