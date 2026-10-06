@@ -232,7 +232,7 @@ var bands = [
   'evi',
   'mndwi',
   'mmri'
-  ]
+  ];
   
 // Semente para reprodutibilidade
 var randomSeed = 42;
@@ -378,7 +378,7 @@ print('Número de amostras:', trainingData.size());
 // // k = 3 ja indica um bom balanco
 
 // ============================================================
-// INSTANCIAR O K-MEANS COM K = 3
+// INSTANCIAR O K-MEANS COM K = 4
 // ============================================================
 
 var numberOfClusters = 4;
@@ -421,10 +421,6 @@ var classification = mosaic
 // ============================================================
 // VISUALIZAR OS AGRUPAMENTOS
 // ============================================================
-
-// Os IDs dos clusters são arbitrários.
-//
-// As cores abaixo são apenas para fins de visualização.
 
 var clusterPalette = [
     '#4A2377',
@@ -477,7 +473,7 @@ print(
 );
 
 // ============================================================
-// CONVERTER O DICIONARIO DE AREAS PARA COLECAO DE ATRIBUTOS
+// CONVERTER O DICIONARIO DE ÁREAS PARA COLEÇÃO DE ATRIBUTOS
 // ============================================================
 
 var groups = ee.List(areaDict.get('groups'));
@@ -511,7 +507,7 @@ print(
 );
 
 // ============================================================
-// PLOTAR OS AGRUPAMENTOS EM GRAFICO DE BARRAS
+// PLOTAR OS AGRUPAMENTOS EM GRÁFICO DE BARRAS
 // ============================================================
 
 var clusterPlot = ui.Chart.feature.groups({
@@ -550,7 +546,7 @@ var clusterPlot = ui.Chart.feature.groups({
 print(clusterPlot);
 
 // ============================================================
-// CONVERTER OS CLUSTERS DE RASTER PARA POLIGONO
+// CONVERTER OS CLUSTERS DE RASTER PARA POLÍGONO
 // ============================================================
 
 // Cluster 0
@@ -567,7 +563,7 @@ var vector0 = cluster0Mask.selfMask().reduceToVectors({
   maxPixels: 1e12
 });
 
-// Visualizar o poligono
+// Visualizar o polígono
 Map.addLayer(vector0, {color: '#4A2377'}, 'Cluster 0 - Polígono', false, 0.5);
 
 // Cluster 1
@@ -584,7 +580,7 @@ var vector1 = cluster1Mask.selfMask().reduceToVectors({
   maxPixels: 1e12
 });
 
-// Visualizar o poligono
+// Visualizar o polígono
 Map.addLayer(vector1, {color: '#0D7D87'}, 'Cluster 1 - Polígono', false, 0.5);
 
 // Cluster 2
@@ -601,7 +597,7 @@ var vector2 = cluster2Mask.selfMask().reduceToVectors({
   maxPixels: 1e12
 });
 
-// Visualizar o poligono
+// Visualizar o polígono
 Map.addLayer(vector2, {color: '#F55F74'}, 'Cluster 2 - Polígono', false, 0.5);
 
 // Cluster 3
@@ -618,7 +614,7 @@ var vector3 = cluster3Mask.selfMask().reduceToVectors({
   maxPixels: 1e12
 });
 
-// Visualizar o poligono
+// Visualizar o polígono
 Map.addLayer(vector3, {color: '#8CC5E3'}, 'Cluster 3 - Polígono', false, 0.5);
 
 // ============================================================
@@ -671,7 +667,7 @@ print('Número de pixels por cluster:', pixelCount);
 var binaryClassification = classification
     .remap(
       [0, 1, 2, 3],  // clusters
-      [0, 1, 0, 1]   // classes: mangue / nao-mangue
+      [0, 1, 0, 1]   // classes: 1 mangue / 0 nao-mangue
     );
 
 var classPixelCount = ee.Image.constant(1)
@@ -712,8 +708,12 @@ print('Número de pixels por classe:', classPixelCount);
 // ============================================================
 
 // ============================================================
-// PARÂMETROS
+// CLASSIFICAÇÃO COM RANDOM FOREST
 // ============================================================
+
+// ------------------------------------------------------------
+// PARÂMETROS
+// ------------------------------------------------------------
 
 var numberOfTrainings = 10;
 var sampleSizePerClass = 2500;
@@ -721,8 +721,6 @@ var trainFraction = 0.8;
 var numberOfTrees = 200;
 
 var generateFinalPlot = false;
-
-var randomSeed = 42;
 
 // ============================================================
 // CRIAR POOL DE PIXELS PARA CADA CLASSE
@@ -742,12 +740,16 @@ var mangrovePool = mosaic
   .select(bands)
   .sample({
     region: mangrovePolygons.geometry(),
-    numPixels: totalSamplesPerClass,
     scale: 10,
-    seed: randomSeed,
     geometries: true
   })
   .filter(ee.Filter.notNull(bands))
+  .randomColumn(
+    'random',
+    randomSeed
+  )
+  .sort('random')
+  .limit(totalSamplesPerClass)
   .map(function(feature) {
     return feature.set('class', 1);
   });
@@ -761,52 +763,39 @@ var nonMangrovePool = mosaic
   .select(bands)
   .sample({
     region: nonMangrovePolygons.geometry(),
-    numPixels: totalSamplesPerClass,
     scale: 10,
-    seed: randomSeed + 1,
     geometries: true
   })
   .filter(ee.Filter.notNull(bands))
+  .randomColumn(
+    'random',
+    randomSeed + 1
+  )
+  .sort('random')
+  .limit(totalSamplesPerClass)
   .map(function(feature) {
     return feature.set('class', 0);
   });
 
 
+// ============================================================
+// VERIFICAR SE HÁ PIXELS SUFICIENTES
+// ============================================================
+
 print(
-  'Pool de pixels - manguezal:',
+  'Pixels necessários por classe:',
+  totalSamplesPerClass
+);
+
+print(
+  'Pixels disponíveis - manguezal:',
   mangrovePool.size()
 );
 
 print(
-  'Pool de pixels - não-manguezal:',
+  'Pixels disponíveis - não-manguezal:',
   nonMangrovePool.size()
 );
-
-
-// ============================================================
-// RANDOMIZAR OS POOLS
-// ============================================================
-
-// Cada pixel recebe um valor aleatório uma única vez.
-// Depois os pools são particionados entre os treinamentos.
-
-mangrovePool = mangrovePool.randomColumn(
-  'random',
-  randomSeed
-);
-
-nonMangrovePool = nonMangrovePool.randomColumn(
-  'random',
-  randomSeed + 1
-);
-
-
-// Ordenar os pixels pelo valor aleatório.
-// Isso permite dividir o pool em conjuntos mutuamente exclusivos.
-
-mangrovePool = mangrovePool.sort('random');
-nonMangrovePool = nonMangrovePool.sort('random');
-
 
 // ============================================================
 // HISTÓRICO DOS TREINAMENTOS
@@ -824,29 +813,22 @@ for (var i = 0; i < numberOfTrainings; i++) {
   var trainingNumber = i + 1;
 
   // ----------------------------------------------------------
-  // Selecionar o bloco exclusivo de pixels
+  // Selecionar bloco exclusivo de pixels
   // ----------------------------------------------------------
-
+  
   var start = i * sampleSizePerClass;
-  var end = start + sampleSizePerClass;
-
+  
   var mangroveSamples = ee.FeatureCollection(
     mangrovePool.toList(
-      totalSamplesPerClass,
+      sampleSizePerClass,
       start
-    ).slice(
-      0,
-      sampleSizePerClass
     )
   );
-
+  
   var nonMangroveSamples = ee.FeatureCollection(
     nonMangrovePool.toList(
-      totalSamplesPerClass,
+      sampleSizePerClass,
       start
-    ).slice(
-      0,
-      sampleSizePerClass
     )
   );
 
@@ -994,7 +976,7 @@ for (var i = 0; i < numberOfTrainings; i++) {
       groupList
     );
 
-  });
+  }); 
 
 
   // Obter as áreas usando filtros sobre os grupos.
