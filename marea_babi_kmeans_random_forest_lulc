@@ -378,7 +378,7 @@ print('Número de amostras:', trainingData.size());
 // INSTANCIAR O K-MEANS COM K = 3
 // ============================================================
 
-var numberOfClusters = 3;
+var numberOfClusters = 4;
 
 // Criar agrupador K-means
 var clusterer = ee.Clusterer.wekaKMeans(
@@ -424,9 +424,10 @@ var classification = mosaic
 // As cores abaixo são apenas para fins de visualização.
 
 var clusterPalette = [
-    '#298C8C',
-    '#A00000',
-    '#B8B8B8',
+    '#4A2377',
+    '#0D7D87',
+    '#F55F74',
+    '#8CC5E3'
     
 ];
 
@@ -564,7 +565,7 @@ var vector0 = cluster0Mask.selfMask().reduceToVectors({
 });
 
 // Visualizar o poligono
-Map.addLayer(vector0, {color: '#298C8C'}, 'Cluster 0 - Polígono', false);
+Map.addLayer(vector0, {color: '#4A2377'}, 'Cluster 0 - Polígono', false);
 
 // Cluster 1
 
@@ -581,7 +582,7 @@ var vector1 = cluster1Mask.selfMask().reduceToVectors({
 });
 
 // Visualizar o poligono
-Map.addLayer(vector1, {color: '#A00000'}, 'Cluster 1 - Polígono', false);
+Map.addLayer(vector1, {color: '#0D7D87'}, 'Cluster 1 - Polígono', false);
 
 // Cluster 2
 
@@ -598,11 +599,24 @@ var vector2 = cluster2Mask.selfMask().reduceToVectors({
 });
 
 // Visualizar o poligono
-Map.addLayer(vector2, {color: '#B8B8B8'}, 'Cluster 2 - Polígono', false);
+Map.addLayer(vector2, {color: '#F55F74'}, 'Cluster 2 - Polígono', false);
 
-print(vector0);
-print(vector1);
-print(vector2);
+// Cluster 4
+
+var cluster4 = 3;
+var cluster4Mask = classification.eq(cluster4);
+
+var vector4 = cluster4Mask.selfMask().reduceToVectors({
+  geometry: roi,             
+  scale: 10,                 
+  geometryType: 'polygon',
+  eightConnected: false,
+  labelProperty: 'cluster',
+  maxPixels: 1e12
+});
+
+// Visualizar o poligono
+Map.addLayer(vector4, {color: '#8CC5E3'}, 'Cluster 4 - Polígono', false);
 
 // // 2.2. Coletar amostras manuais
 // // Coletar amostras manualmente para o processo de classificação. 
