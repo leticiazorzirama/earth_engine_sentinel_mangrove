@@ -211,11 +211,8 @@ Map.addLayer(mosaic, visParams, 'Cor natural', false);
 Map.centerObject(mosaic);
 
 // ============================================================
-// DEFINIR VARIAVEIS DE ENTRADA
+// VARIÁVEIS PREDITORAS
 // ============================================================
-
-// O K-means utilizará os valores espectrais e dos índices
-// para agrupar os pixels de acordo com sua similaridade.
 
 var bands = [
   'B1',
@@ -239,6 +236,12 @@ var bands = [
   
 // Semente para reprodutibilidade
 var randomSeed = 42;
+
+// ============================================================
+//
+//                           K-MEANS
+//
+// ============================================================
 
 // ============================================================
 // PREPARAR AMOSTRAS DE PIXELS PARA O AGRUPAMENTO
@@ -686,295 +689,474 @@ var classPixelCount = ee.Image.constant(1)
 
 print('Número de pixels por classe:', classPixelCount);
 
-// // ============================================================
-// // CLASSIFICAÇÃO COM RANDOM FOREST
-// // ============================================================
+// COMO ESTAVA SENDO FEITO ANTES
+// 2.2. Coletar amostras manuais
+// Coletar amostras manualmente para o processo de classificação. 
+// Utilizando a ferramenta de edição de formas do editor de código, desenhe polígonos representando cada classe e importe-os como uma FeatureCollection
 
-// // Variáveis preditoras
-// var bands = [
-//   'B1',
-//   'B2',
-//   'B3',
-//   'B4',
-//   'B5',
-//   'B6',
-//   'B7',
-//   'B8',
-//   'B8A',
-//   'B9',
-//   'B11',
-//   'B12',
-//   'ndvi',
-//   'ndwi',
-//   'evi',
-//   'mndwi',
-//   'mmri'
-// ];
+// 2.2.1. Criar uma coleção de feições (FeatureCollection)
+// Classificar duas classes de cobertura do solo: manguezal (0) e não manguezal (1)
 
+// 2.3. Gerar pontos aleatórios
+// Gerar pontos aleatórios dentro destas regiões. 
+// A distribuição adequada dos polígonos de amostragem, combinada com o posicionamento aleatório dos pontos dentro deles, garante uma melhor representação da variabilidade das classes. 
+// Função para gerar pontos aleatórios dentro dos polígonos previamente definidos.
 
-// // ============================================================
-// // GERAR PONTOS ALEATÓRIOS DE TREINAMENTO
-// // ============================================================
+// OBS.: Existem outras formas mais precisas de definir o número de pontos a serem coletados. 
+// Por exemplo, podemos determinar o tamanho do conjunto de pontos utilizando como referência a proporção da área conhecida da sua região de interesse (ROI).
 
-// var generatePoints = function(polygons, nPoints, classValue) {
+// ============================================================
+//
+//                      RANDOM FOREST
+//
+// ============================================================
 
-//   var points = ee.FeatureCollection.randomPoints(
-//     polygons,
-//     nPoints
-//   );
+// ============================================================
+// PARÂMETROS
+// ============================================================
 
-//   return points.map(function(point) {
-//     return point.set('class', classValue);
-//   });
-// };
+var numberOfTrainings = 10;
+var sampleSizePerClass = 2500;
+var trainFraction = 0.8;
+var numberOfTrees = 200;
 
+var generateFinalPlot = false;
 
-// // Classe 0: Manguezal
-// var mangrovePoints = generatePoints(
-//   mangrove,
-//   2500,
-//   0
-// );
+var randomSeed = 42;
 
-// // Classe 1: Não manguezal
-// var nonmangrovePoints = generatePoints(
-//   nonmangrove,
-//   2500,
-//   1
-// );
+// ============================================================
+// CRIAR POOL DE PIXELS PARA CADA CLASSE
+// ============================================================
+
+// Número total de pixels necessários por classe.
+// Cada pixel poderá pertencer a apenas um treinamento.
+var totalSamplesPerClass =
+  numberOfTrainings * sampleSizePerClass;
 
 
-// // Mesclar amostras
-// var samples = mangrovePoints.merge(nonmangrovePoints);
+// ------------------------------------------------------------
+// Manguezal = classe 1
+// ------------------------------------------------------------
 
-// print('Samples:', samples);
-
-// Map.addLayer(
-//   samples.filter(ee.Filter.eq('class', 0)),
-//   {color: '#076a36'},
-//   'Mangrove samples',
-//   false
-// );
-
-// Map.addLayer(
-//   samples.filter(ee.Filter.eq('class', 1)),
-//   {color: '#ffc82d'},
-//   'Non-mangrove samples',
-//   false
-// );
-
-
-// // ============================================================
-// // EXTRAIR VALORES DAS VARIÁVEIS PREDITORAS
-// // ============================================================
-
-// var trainedSamples = mosaic
-//   .select(bands)
-//   .sampleRegions({
-//     collection: samples,
-//     properties: ['class'],
-//     scale: 10,
-//     geometries: true
-//   });
+var mangrovePool = mosaic
+  .select(bands)
+  .sample({
+    region: mangrovePolygons.geometry(),
+    numPixels: totalSamplesPerClass,
+    scale: 10,
+    seed: randomSeed,
+    geometries: true
+  })
+  .filter(ee.Filter.notNull(bands))
+  .map(function(feature) {
+    return feature.set('class', 1);
+  });
 
 
-// // Remover amostras com valores nulos de preditores
-// trainedSamples = trainedSamples.filter(
-//   ee.Filter.notNull(bands)
-// );
+// ------------------------------------------------------------
+// Não-manguezal = classe 0
+// ------------------------------------------------------------
 
-// print('Train samples:', trainedSamples);
-// print(
-//   'Number of valid samples:',
-//   trainedSamples.size()
-// );
-
-
-// // ============================================================
-// // DIVISÃO TREINO / TESTE
-// // ============================================================
-
-// trainedSamples = trainedSamples.randomColumn(
-//   'random',
-//   42
-// );
-
-// var trainSet = trainedSamples.filter(
-//   ee.Filter.lessThan('random', 0.8)
-// );
-
-// var testSet = trainedSamples.filter(
-//   ee.Filter.greaterThanOrEquals('random', 0.8)
-// );
-
-// print('Train set:', trainSet);
-// print('Test set:', testSet);
+var nonMangrovePool = mosaic
+  .select(bands)
+  .sample({
+    region: nonMangrovePolygons.geometry(),
+    numPixels: totalSamplesPerClass,
+    scale: 10,
+    seed: randomSeed + 1,
+    geometries: true
+  })
+  .filter(ee.Filter.notNull(bands))
+  .map(function(feature) {
+    return feature.set('class', 0);
+  });
 
 
-// // ============================================================
-// // TREINAR RANDOM FOREST
-// // ============================================================
+print(
+  'Pool de pixels - manguezal:',
+  mangrovePool.size()
+);
 
-// var classifier = ee.Classifier.smileRandomForest({
-//   numberOfTrees: 200
-// });
-
-// classifier = classifier.train({
-//   features: trainSet,
-//   classProperty: 'class',
-//   inputProperties: bands
-// });
+print(
+  'Pool de pixels - não-manguezal:',
+  nonMangrovePool.size()
+);
 
 
-// // ============================================================
-// // ACURÁCIA DE TREINAMENTO
-// // ============================================================
+// ============================================================
+// RANDOMIZAR OS POOLS
+// ============================================================
 
-// var trainMatrix = classifier.confusionMatrix();
+// Cada pixel recebe um valor aleatório uma única vez.
+// Depois os pools são particionados entre os treinamentos.
 
-// var trainAccuracy = trainMatrix.accuracy();
+mangrovePool = mangrovePool.randomColumn(
+  'random',
+  randomSeed
+);
 
-// print(
-//   'Training confusion matrix:',
-//   trainMatrix
-// );
-
-// print(
-//   'Training accuracy:',
-//   trainAccuracy
-// );
-
-
-// // ============================================================
-// // ACURÁCIA DE TESTE
-// // ============================================================
-
-// var testResults = testSet.classify(classifier);
-
-// var testMatrix = testResults.errorMatrix(
-//   'class',
-//   'classification'
-// );
-
-// var testAccuracy = testMatrix.accuracy();
-// var testKappa = testMatrix.kappa();
-
-// print(
-//   'Test confusion matrix:',
-//   testMatrix
-// );
-
-// print(
-//   'Test accuracy:',
-//   testAccuracy
-// );
-
-// print(
-//   'Test kappa:',
-//   testKappa
-// );
+nonMangrovePool = nonMangrovePool.randomColumn(
+  'random',
+  randomSeed + 1
+);
 
 
-// // ============================================================
-// // CLASSIFICAR TODO O MOSAICO
-// // ============================================================
+// Ordenar os pixels pelo valor aleatório.
+// Isso permite dividir o pool em conjuntos mutuamente exclusivos.
 
-// var classification = mosaic
-//   .select(bands)
-//   .classify(classifier);
+mangrovePool = mangrovePool.sort('random');
+nonMangrovePool = nonMangrovePool.sort('random');
 
 
-// var palette = [
-//   '#076132', // Manguezal
-//   '#2cc968'  // Não manguezal
-// ];
+// ============================================================
+// HISTÓRICO DOS TREINAMENTOS
+// ============================================================
 
-// Map.addLayer(
-//   classification,
-//   {
-//     min: 0,
-//     max: 1,
-//     palette: palette,
-//     format: 'png'
-//   },
-//   'Random Forest classification'
-// );
-
-// print(
-//   'Random Forest classification:',
-//   classification
-// );
+var trainingHistory = [];
 
 
-// // ============================================================
-// // ÁREA POR CLASSE
-// // ============================================================
+// ============================================================
+// TREINAMENTOS
+// ============================================================
 
-// var areaHa = ee.Image.pixelArea()
-//   .divide(1e4);
+for (var i = 0; i < numberOfTrainings; i++) {
 
-// var areaStack = areaHa.addBands(
-//   classification
-// );
+  var trainingNumber = i + 1;
 
-// var areaDict = areaStack.reduceRegion({
-//   reducer: ee.Reducer.sum().group({
-//     groupField: 1,
-//     groupName: 'classification'
-//   }),
-//   geometry: roi,
-//   scale: 10,
-//   maxPixels: 1e13
-// });
+  // ----------------------------------------------------------
+  // Selecionar o bloco exclusivo de pixels
+  // ----------------------------------------------------------
 
-// print(
-//   'Table of areas (ha) for each class:',
-//   areaDict
-// );
+  var start = i * sampleSizePerClass;
+  var end = start + sampleSizePerClass;
 
-// // Obter dados dos grupos
-// var groups = ee.List(areaDict.get('groups'));
+  var mangroveSamples = ee.FeatureCollection(
+    mangrovePool.toList(
+      totalSamplesPerClass,
+      start
+    ).slice(
+      0,
+      sampleSizePerClass
+    )
+  );
 
-// // Tabela de atributos das classes
-// var classDict = ee.Dictionary({
-//   '0': 'Mangrove',
-//   '1': 'Non-mangrove'
-// });
+  var nonMangroveSamples = ee.FeatureCollection(
+    nonMangrovePool.toList(
+      totalSamplesPerClass,
+      start
+    ).slice(
+      0,
+      sampleSizePerClass
+    )
+  );
 
-// // Converter para coleção de feições (FeatureCollection)
-// var areaFc = ee.FeatureCollection(
-//   groups.map(function(item){
-//     item = ee.Dictionary(item);
-//     var code = ee.Number(item.get('classification')).int();
-//     var area = item.get('sum');
-//     return ee.Feature(null, {
-//       class_code: code,
-//       class_label: classDict.get(code.format(), 'Desconhecido'),
-//       area_ha: area
-//     });
-//   })
-// );
 
-// print('Feature collection of areas (ha) for each class:', areaFc);
+  // ----------------------------------------------------------
+  // Mesclar as duas classes
+  // ----------------------------------------------------------
 
-// // Gerar o gráfico
-// var barPlot = ui.Chart.feature.groups({
-//     features: areaFc,
-//     xProperty: 'class_label',
-//     yProperty: 'area_ha',
-//     seriesProperty: 'class_label'
-// })
-// .setChartType('ColumnChart')     
-// .setOptions({
-//   title: 'Area per class',
-//   hAxis: {title: 'Land cover'},
-//   vAxis: {title: 'Area (ha)'},
-//   legend: {position: 'right'},
-//   isStacked: true,              
-//   colors: palette,       
-//   bar: {                    
-//     groupWidth: '100%' 
-//   }
-// });
+  var samples = mangroveSamples.merge(
+    nonMangroveSamples
+  );
 
-// print(barPlot);
+
+  // ----------------------------------------------------------
+  // Divisão treino / teste
+  // ----------------------------------------------------------
+
+  samples = samples.randomColumn(
+    'split',
+    randomSeed + trainingNumber
+  );
+
+  var trainSet = samples.filter(
+    ee.Filter.lt(
+      'split',
+      trainFraction
+    )
+  );
+
+  var testSet = samples.filter(
+    ee.Filter.gte(
+      'split',
+      trainFraction
+    )
+  );
+
+
+  // ----------------------------------------------------------
+  // TREINAR RANDOM FOREST
+  // ----------------------------------------------------------
+
+  var classifier = ee.Classifier.smileRandomForest({
+    numberOfTrees: numberOfTrees
+  });
+
+  classifier = classifier.train({
+    features: trainSet,
+    classProperty: 'class',
+    inputProperties: bands
+  });
+
+
+  // ==========================================================
+  // AVALIAÇÃO
+  // ==========================================================
+
+  // ----------------------------------------------------------
+  // Treinamento
+  // ----------------------------------------------------------
+
+  var trainMatrix = classifier.confusionMatrix();
+
+  var trainAccuracy = trainMatrix.accuracy();
+
+
+  // ----------------------------------------------------------
+  // Teste
+  // ----------------------------------------------------------
+
+  var testResults = testSet.classify(
+    classifier
+  );
+
+  var testMatrix = testResults.errorMatrix(
+    'class',
+    'classification'
+  );
+
+  var testAccuracy = testMatrix.accuracy();
+  var testKappa = testMatrix.kappa();
+
+
+  // ----------------------------------------------------------
+  // Matriz de confusão
+  // ----------------------------------------------------------
+
+  var matrixArray = testMatrix.array();
+
+  var tn = matrixArray.get([0, 0]);
+  var fp = matrixArray.get([0, 1]);
+  var fn = matrixArray.get([1, 0]);
+  var tp = matrixArray.get([1, 1]);
+
+
+  // ==========================================================
+  // CLASSIFICAR TODO O MOSAICO
+  // ==========================================================
+
+  var classification = mosaic
+    .select(bands)
+    .classify(classifier);
+
+
+  // ==========================================================
+  // ÁREA POR CLASSE
+  // ==========================================================
+
+  var areaHa = ee.Image.pixelArea()
+    .divide(1e4);
+
+  var areaStack = areaHa.addBands(
+    classification
+  );
+
+  var areaDict = areaStack.reduceRegion({
+    reducer: ee.Reducer.sum().group({
+      groupField: 1,
+      groupName: 'classification'
+    }),
+    geometry: roi,
+    scale: 10,
+    maxPixels: 1e13
+  });
+
+
+  var groups = ee.List(
+    areaDict.get('groups')
+  );
+
+
+  // Área inicializada como zero.
+  // Isso permite tratar o caso em que uma classe
+  // eventualmente não apareça na classificação.
+
+  var mangroveArea = ee.Number(0);
+  var nonMangroveArea = ee.Number(0);
+
+
+  groups.evaluate(function(groupList) {
+
+    // Esta função apenas permite visualizar os resultados
+    // no console quando necessário.
+    print(
+      'Training ' + trainingNumber + ' - áreas:',
+      groupList
+    );
+
+  });
+
+
+  // Obter as áreas usando filtros sobre os grupos.
+  var mangroveGroup = groups.filter(
+    ee.Filter.eq(
+      'classification',
+      1
+    )
+  );
+
+  var nonMangroveGroup = groups.filter(
+    ee.Filter.eq(
+      'classification',
+      0
+    )
+  );
+
+
+  mangroveArea = ee.Number(
+    ee.Algorithms.If(
+      mangroveGroup.size().gt(0),
+      ee.Dictionary(
+        mangroveGroup.get(0)
+      ).get('sum'),
+      0
+    )
+  );
+
+  nonMangroveArea = ee.Number(
+    ee.Algorithms.If(
+      nonMangroveGroup.size().gt(0),
+      ee.Dictionary(
+        nonMangroveGroup.get(0)
+      ).get('sum'),
+      0
+    )
+  );
+
+
+  // ==========================================================
+  // HISTÓRICO
+  // ==========================================================
+
+  var historyFeature = ee.Feature(
+    null,
+    {
+      training: trainingNumber,
+
+      sample_mangrove: mangroveSamples.size(),
+      sample_non_mangrove: nonMangroveSamples.size(),
+
+      train_size: trainSet.size(),
+      test_size: testSet.size(),
+
+      train_accuracy: trainAccuracy,
+
+      test_accuracy: testAccuracy,
+      test_kappa: testKappa,
+
+      tn: tn,
+      fp: fp,
+      fn: fn,
+      tp: tp,
+
+      mangrove_area_ha: mangroveArea,
+      non_mangrove_area_ha: nonMangroveArea
+    }
+  );
+
+  trainingHistory.push(
+    historyFeature
+  );
+
+
+  // ==========================================================
+  // EXPORTAR CLASSIFIER
+  // ==========================================================
+
+  Export.classifier.toAsset({
+    classifier: classifier,
+    description: 'RF_training_' + trainingNumber,
+    assetId: 'RF_training_' + trainingNumber
+  });
+
+
+  // ==========================================================
+  // PLOT FINAL
+  // ==========================================================
+
+  if (generateFinalPlot) {
+
+    Map.addLayer(
+      classification,
+      {
+        min: 0,
+        max: 1,
+        palette: [
+          '#2cc968',
+          '#076132'
+        ]
+      },
+      'RF training ' + trainingNumber,
+      false
+    );
+
+  }
+
+}
+
+
+// ============================================================
+// HISTÓRICO DOS TREINAMENTOS
+// ============================================================
+
+var trainingHistoryFc = ee.FeatureCollection(
+  trainingHistory
+);
+
+print(
+  'Training history:',
+  trainingHistoryFc
+);
+
+
+// ============================================================
+// EXPORTAR HISTÓRICO
+// ============================================================
+
+Export.table.toAsset({
+  collection: trainingHistoryFc,
+  description: 'RF_training_history',
+  assetId: 'RF_training_history'
+});
+
+
+// ============================================================
+// GRÁFICO FINAL
+// ============================================================
+
+if (generateFinalPlot) {
+
+  var areaPlot = ui.Chart.feature.byFeature({
+    features: trainingHistoryFc,
+    xProperty: 'training',
+    yProperties: [
+      'mangrove_area_ha',
+      'non_mangrove_area_ha'
+    ]
+  })
+  .setChartType('LineChart')
+  .setOptions({
+    title: 'Predicted area by training',
+    hAxis: {
+      title: 'Training'
+    },
+    vAxis: {
+      title: 'Area (ha)'
+    },
+    lineWidth: 2,
+    pointSize: 4
+  });
+
+  print(areaPlot);
+
+}
