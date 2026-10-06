@@ -320,7 +320,7 @@ var calculateWCSS = function(k) {
     
     // Parear valores dos centroides com seus respectivos clusters
     var centroidList = ee.List(centroids);
-    var centroidMeans = ee.List(ee.Dictionary(centroids.get(clusterId)).get('mean'));
+    var centroidMeans = ee.List(ee.Dictionary(centroidList.get(clusterId)).get('mean'));
     
     // Funcao para computar o quadrado da distancia euclidiana: sum((Xi - Cj)^2)
     var distanceSq = ee.Number(bands.reduce(function(acc, bandName, index) {
@@ -345,8 +345,8 @@ var calculateWCSS = function(k) {
   });
 };
 
-// Iterar em um range de k valores (ex., de 2 a 10)
-var kList = ee.List.sequence(2, 10);
+// Iterar em k valores
+var kList = ee.List.sequence(1, 10);
 var wcssFeatures = ee.FeatureCollection(kList.map(calculateWCSS));
 
 // Plotar os resultados
@@ -362,7 +362,7 @@ var wcssPlot = ui.Chart.feature.byFeature({
   vAxis: {title: 'Within-Cluster Sum of Squared Errors (WCSS)'},
   lineWidth: 2,
   pointSize: 6,
-  colors: ['#e06666']
+  colors: ['#3f3f3f']
 });
 
 // Imprimir o plot
