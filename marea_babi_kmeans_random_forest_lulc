@@ -1,6 +1,5 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
-var bloco1 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco1_seco_2016-04-20_a_2016-04-20"),
-    babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1"),
+var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1"),
     bloco2 = ee.Image("projects/leticiazr/assets/babiDegr1_bloco2_chuvoso_2016-12-06_a_2016-12-06"),
     mangrove = 
     /* color: #12ff83 */
@@ -218,7 +217,7 @@ Map.centerObject(mosaic);
 // O K-means utilizará os valores espectrais e dos índices
 // para agrupar os pixels de acordo com sua similaridade.
 
-var inputProperties = [
+var bands = [
   'B1',
   'B2',
   'B3',
@@ -237,6 +236,9 @@ var inputProperties = [
   'mndwi',
   'mmri'
   ]
+  
+// Semente para reprodutibilidade
+var randomSeed = 42;
 
 // ============================================================
 // PREPARAR AMOSTRAS DE PIXELS PARA O AGRUPAMENTO
@@ -250,507 +252,599 @@ var inputProperties = [
 
 var numberOfSamples = 5000;
 
-var trainingSamples = mosaic.select(inputProperties).sample({
+var trainingData = mosaic.select(bands).sample({
     region: roi,
     scale: 10,
     numPixels: numberOfSamples,
-    geometries: false
+    geometries: false,
+    seed: randomSeed
 });
 
 // Remover amostras que contenham valores nulos
-trainingSamples = trainingSamples.filter(
-    ee.Filter.notNull(inputProperties)
+trainingData = trainingData.filter(
+    ee.Filter.notNull(bands)
 );
 
 // // Filtrar pelo 80º percentil
 // var p80Reducer = ee.Reducer.percentile([80]);
 
-// var trainingSamples = mosaic.reduceRegions({
-//    collection: trainingSamples,
+// var trainingData = mosaic.reduceRegions({
+//    collection: trainingData,
 //    reducer: p80Reducer,
 //    scale: 10,
 // });
 
-print('Amostras de treinamento do K-means:', trainingSamples);
-print('Número de amostras:', trainingSamples.size());
-
-
-// ============================================================
-// INSTANCIAR O K-MEANS
-// ============================================================
-
-var numberOfClusters = 5;
-
-// Criar agrupador K-means
-var clusterer = ee.Clusterer.wekaKMeans({
-    nClusters: numberOfClusters,
-    seed: 42
-});
-
+print('Amostras de treinamento do K-means:', trainingData);
+print('Número de amostras:', trainingData.size());
 
 // ============================================================
-// TREINAR O K-MEANS
+// ENCONTRAR O K PELO METODO DO COTOVELO
 // ============================================================
 
-// Treinar o modelo de agrupamento não supervisionado utilizando
-// os pixels amostrados.
-clusterer = clusterer.train(trainingSamples);
-
-print('Agrupador K-means:', clusterer);
-
-
-// ============================================================
-// TESTE INDEPENDENTE EM TODO O MOSAICO
-// ============================================================
-
-var classification = mosaic
-    .select(inputProperties)
-    .cluster(clusterer);
-
-// ============================================================
-// VISUALIZAR OS AGRUPAMENTOS
-// ============================================================
-
-// Os IDs dos clusters são arbitrários.
-//
-// NÃO assuma que:
-// cluster 0 = urbano
-// cluster 1 = solo exposto
-// cluster 2 = água
-// cluster 3 = manguezal
-// cluster 4 = floresta
-//
-// As cores abaixo são apenas para fins de visualização.
-
-var clusterPalette = [
-    '#d4271e',
-    '#d1af86',
-    '#1488ff',
-    '#076132',
-    '#2cc968'
-];
-
-Map.addLayer(
-    classification,
-    {
-        min: 0,
-        max: numberOfClusters - 1,
-        palette: clusterPalette,
-        format: 'png'
-    },
-    'Classificação K-means'
-);
-
-print('Classificação K-means:', classification);
-
-
-// ============================================================
-// CALCULAR A AREA DE CADA AGRUPAMENTO
-// ============================================================
-
-// Área do pixel em hectares
-var areaHa = ee.Image.pixelArea().divide(1e4);
-
-
-// Adicionar a banda de classificação
-var areaStack = areaHa.addBands(classification);
-
-
-// Calcular a área agrupada por cluster
-var areaDict = areaStack.reduceRegion({
-    reducer: ee.Reducer.sum().group({
-        groupField: 1,
-        groupName: 'cluster'
+// Funcao para calcular WCSS para um determinado k
+var calculateWCSS = function(k) {
+  k = ee.Number(k);
+  
+  // Instanciar e treinar o Weka K-Means
+  var clusterer = ee.Clusterer.wekaKMeans(
+            k,        // nClusters
+            1,        // init: k-means++
+            false,    // canopies
+            100,      // maxCandidates
+            10000,    // periodicPruning
+            2,        // minDensity
+            -1.5,     // t1
+            -1,       // t2
+            'Euclidean',
+            null,     // maxIterations
+            false,    // preserveOrder
+            false,    // fast
+            randomSeed
+          ).train(trainingData);
+  
+  // K-means atribui cada pixel a um cluster
+  var clusteredData = trainingData.cluster(clusterer, 'cluster_id');
+  
+  // Calcular a media de cada banda de cada cluster e assim definir os centroides
+  var centroids = clusteredData.reduceColumns({
+    reducer: ee.Reducer.mean().repeat(bands.length).group({
+      groupField: bands.length, // Adicionar 'cluster_id' nas propriedades
+      groupName: 'cluster_id'
     }),
-    geometry: roi,
-    scale: 10,
-    maxPixels: 1e13
-});
-
-print(
-    'Tabela de áreas (ha) para cada cluster:',
-    areaDict
-);
-
-
-// ===========================================================
-// CONVERTER O DICIONARIO DE AREAS PARA COLECAO DE ATRIBUTOS
-// ===========================================================
-
-var groups = ee.List(areaDict.get('groups'));
-
-
-var areaFc = ee.FeatureCollection(
-    groups.map(function(item) {
-
-        item = ee.Dictionary(item);
-
-        var cluster = ee.Number(
-            item.get('cluster')
-        ).int();
-
-        var area = item.get('sum');
-
-        return ee.Feature(null, {
-            cluster: cluster,
-            cluster_label: ee.String('Cluster ')
-                .cat(cluster.format()),
-            area_ha: area
-        });
-
-    })
-);
-
-
-print(
-    'FeatureCollection de áreas (ha) para cada cluster:',
-    areaFc
-);
-
-
-// ============================================
-// PLOTAR OS AGRUPAMENTOS EM GRAFICO DE BARRAS
-// ============================================
-
-var barPlot = ui.Chart.feature.groups({
-    features: areaFc,
-    xProperty: 'cluster_label',
-    yProperty: 'area_ha',
-    seriesProperty: 'cluster_label'
-})
-.setChartType('ColumnChart')
-.setOptions({
-
-    title: 'Area per cluster Weka K-means',
-
-    hAxis: {
-        title: 'Clustering'
-    },
-
-    vAxis: {
-        title: 'Area (ha)'
-    },
-
-    legend: {
-        position: 'right'
-    },
-
-    isStacked: false,
-
-    colors: clusterPalette,
-
-    bar: {
-        groupWidth: '100%'
-    }
-
-});
-
-print(barPlot);
-
-// // 2.2. Coletar amostras manuais
-// // Coletar amostras manualmente para o processo de classificação. 
-// // Utilizando a ferramenta de edição de formas do editor de código, desenhe polígonos representando cada classe e importe-os como uma FeatureCollection
-
-// // 2.2.1. Criar uma coleção de feições (FeatureCollection)
-// // Classificar duas classes de cobertura do solo: manguezal (0) e não manguezal (1)
-
-// // 2.3. Gerar pontos aleatórios
-// // Gerar pontos aleatórios dentro destas regiões. 
-// // A distribuição adequada dos polígonos de amostragem, combinada com o posicionamento aleatório dos pontos dentro deles, garante uma melhor representação da variabilidade das classes. 
-// // Função para gerar pontos aleatórios dentro dos polígonos previamente definidos.
-
-// // OBS.: Existem outras formas mais precisas de definir o número de pontos a serem coletados. 
-// // Por exemplo, podemos determinar o tamanho do conjunto de pontos utilizando como referência a proporção da área conhecida da sua região de interesse (ROI).
-
-// ============================================================
-// CLASSIFICAÇÃO COM RANDOM FOREST
-// ============================================================
-
-// Variáveis preditoras
-var inputProperties = [
-  'B1',
-  'B2',
-  'B3',
-  'B4',
-  'B5',
-  'B6',
-  'B7',
-  'B8',
-  'B8A',
-  'B9',
-  'B11',
-  'B12',
-  'ndvi',
-  'ndwi',
-  'evi',
-  'mndwi',
-  'mmri'
-];
-
-
-// ============================================================
-// GERAR PONTOS ALEATÓRIOS DE TREINAMENTO
-// ============================================================
-
-var generatePoints = function(polygons, nPoints, classValue) {
-
-  var points = ee.FeatureCollection.randomPoints(
-    polygons,
-    nPoints
-  );
-
-  return points.map(function(point) {
-    return point.set('class', classValue);
+    selectors: bands.concat(['cluster_id'])
+  }).get('groups');
+  
+  // Funcao para iterar sobre os pixels calculando o quadrado da distancia desses ao seu respectivo centroide
+  var squaredErrors = clusteredData.map(function(feature) {
+    var clusterId = feature.get('cluster_id');
+    
+    // Parear valores dos centroides com seus respectivos clusters
+    var centroidList = ee.List(centroids);
+    var matchingGroup = ee.Dictionary(centroidList.filter(ee.Filter.eq('cluster_id', clusterId)).get(0));
+    var centroidMeans = ee.List(matchingGroup.get('mean'));
+    
+    // Funcao para computar o quadrado da distancia euclidiana: sum((Xi - Cj)^2)
+    var distanceSq = ee.Number(bands.reduce(function(acc, bandName, index) {
+      var pixelVal = ee.Number(feature.get(bandName));
+      var centroidVal = ee.Number(centroidMeans.get(index));
+      var diff = pixelVal.subtract(centroidVal);
+      return ee.Number(acc).add(diff.multiply(diff));
+    }, 0));
+    
+    return feature.set('error_sq', distanceSq);
+  });
+  
+  // Total Within-Cluster Sum of Squares Error (WCSS)
+  var totalWcss = squaredErrors.reduceColumns({
+    reducer: ee.Reducer.sum(),
+    selectors: ['error_sq']
+  }).get('sum');
+  
+  return ee.Feature(null, {
+    'k': k,
+    'wcss': totalWcss
   });
 };
 
+// Iterar em um range de k valores (ex., de 2 a 10)
+var kList = ee.List.sequence(2, 10);
+var wcssFeatures = ee.FeatureCollection(kList.map(calculateWCSS));
 
-// Classe 0: Manguezal
-var mangrovePoints = generatePoints(
-  mangrove,
-  2500,
-  0
-);
-
-// Classe 1: Não manguezal
-var nonmangrovePoints = generatePoints(
-  nonmangrove,
-  2500,
-  1
-);
-
-
-// Mesclar amostras
-var samples = mangrovePoints.merge(nonmangrovePoints);
-
-print('Samples:', samples);
-
-Map.addLayer(
-  samples.filter(ee.Filter.eq('class', 0)),
-  {color: '#076a36'},
-  'Mangrove samples',
-  false
-);
-
-Map.addLayer(
-  samples.filter(ee.Filter.eq('class', 1)),
-  {color: '#ffc82d'},
-  'Non-mangrove samples',
-  false
-);
-
-
-// ============================================================
-// EXTRAIR VALORES DAS VARIÁVEIS PREDITORAS
-// ============================================================
-
-var trainedSamples = mosaic
-  .select(inputProperties)
-  .sampleRegions({
-    collection: samples,
-    properties: ['class'],
-    scale: 10,
-    geometries: true
-  });
-
-
-// Remover amostras com valores nulos de preditores
-trainedSamples = trainedSamples.filter(
-  ee.Filter.notNull(inputProperties)
-);
-
-print('Train samples:', trainedSamples);
-print(
-  'Number of valid samples:',
-  trainedSamples.size()
-);
-
-
-// ============================================================
-// DIVISÃO TREINO / TESTE
-// ============================================================
-
-trainedSamples = trainedSamples.randomColumn(
-  'random',
-  42
-);
-
-var trainSet = trainedSamples.filter(
-  ee.Filter.lessThan('random', 0.8)
-);
-
-var testSet = trainedSamples.filter(
-  ee.Filter.greaterThanOrEquals('random', 0.8)
-);
-
-print('Train set:', trainSet);
-print('Test set:', testSet);
-
-
-// ============================================================
-// TREINAR RANDOM FOREST
-// ============================================================
-
-var classifier = ee.Classifier.smileRandomForest({
-  numberOfTrees: 200
-});
-
-classifier = classifier.train({
-  features: trainSet,
-  classProperty: 'class',
-  inputProperties: inputProperties
-});
-
-
-// ============================================================
-// ACURÁCIA DE TREINAMENTO
-// ============================================================
-
-var trainMatrix = classifier.confusionMatrix();
-
-var trainAccuracy = trainMatrix.accuracy();
-
-print(
-  'Training confusion matrix:',
-  trainMatrix
-);
-
-print(
-  'Training accuracy:',
-  trainAccuracy
-);
-
-
-// ============================================================
-// ACURÁCIA DE TESTE
-// ============================================================
-
-var testResults = testSet.classify(classifier);
-
-var testMatrix = testResults.errorMatrix(
-  'class',
-  'classification'
-);
-
-var testAccuracy = testMatrix.accuracy();
-var testKappa = testMatrix.kappa();
-
-print(
-  'Test confusion matrix:',
-  testMatrix
-);
-
-print(
-  'Test accuracy:',
-  testAccuracy
-);
-
-print(
-  'Test kappa:',
-  testKappa
-);
-
-
-// ============================================================
-// CLASSIFICAR TODO O MOSAICO
-// ============================================================
-
-var classification = mosaic
-  .select(inputProperties)
-  .classify(classifier);
-
-
-var palette = [
-  '#076132', // Manguezal
-  '#2cc968'  // Não manguezal
-];
-
-Map.addLayer(
-  classification,
-  {
-    min: 0,
-    max: 1,
-    palette: palette,
-    format: 'png'
-  },
-  'Random Forest classification'
-);
-
-print(
-  'Random Forest classification:',
-  classification
-);
-
-
-// ============================================================
-// ÁREA POR CLASSE
-// ============================================================
-
-var areaHa = ee.Image.pixelArea()
-  .divide(1e4);
-
-var areaStack = areaHa.addBands(
-  classification
-);
-
-var areaDict = areaStack.reduceRegion({
-  reducer: ee.Reducer.sum().group({
-    groupField: 1,
-    groupName: 'classification'
-  }),
-  geometry: roi,
-  scale: 10,
-  maxPixels: 1e13
-});
-
-print(
-  'Table of areas (ha) for each class:',
-  areaDict
-);
-
-// Obter dados dos grupos
-var groups = ee.List(areaDict.get('groups'));
-
-// Tabela de atributos das classes
-var classDict = ee.Dictionary({
-  '0': 'Mangrove',
-  '1': 'Non-mangrove'
-});
-
-// Converter para coleção de feições (FeatureCollection)
-var areaFc = ee.FeatureCollection(
-  groups.map(function(item){
-    item = ee.Dictionary(item);
-    var code = ee.Number(item.get('classification')).int();
-    var area = item.get('sum');
-    return ee.Feature(null, {
-      class_code: code,
-      class_label: classDict.get(code.format(), 'Desconhecido'),
-      area_ha: area
-    });
-  })
-);
-
-print('Feature collection of areas (ha) for each class:', areaFc);
-
-// Gerar o gráfico
-var barPlot = ui.Chart.feature.groups({
-    features: areaFc,
-    xProperty: 'class_label',
-    yProperty: 'area_ha',
-    seriesProperty: 'class_label'
+// Plotar os resultados
+var wcssPlot = ui.Chart.feature.byFeature({
+  features: wcssFeatures,
+  xProperty: 'k',
+  yProperties: ['wcss']
 })
-.setChartType('ColumnChart')     
+.setChartType('LineChart')
 .setOptions({
-  title: 'Area per class',
-  hAxis: {title: 'Land cover'},
-  vAxis: {title: 'Area (ha)'},
-  legend: {position: 'right'},
-  isStacked: true,              
-  colors: palette,       
-  bar: {                    
-    groupWidth: '100%' 
-  }
+  title: 'K-Means Elbow Method: WCSS vs. Number of Clusters (K)',
+  hAxis: {title: 'Number of Clusters (K)', gridlines: {count: 9}},
+  vAxis: {title: 'Within-Cluster Sum of Squared Errors (WCSS)'},
+  lineWidth: 2,
+  pointSize: 6,
+  colors: ['#e06666']
 });
 
-print(barPlot);
+// Imprimir o plot
+print(wcssPlot);
+
+// // ============================================================
+// // INSTANCIAR O K-MEANS
+// // ============================================================
+
+// var numberOfClusters = 5;
+
+// // Criar agrupador K-means
+// var clusterer = ee.Clusterer.wekaKMeans({
+//     nClusters: numberOfClusters,
+//     seed: 42
+// });
+
+
+// // ============================================================
+// // TREINAR O K-MEANS
+// // ============================================================
+
+// // Treinar o modelo de agrupamento não supervisionado utilizando
+// // os pixels amostrados.
+// clusterer = clusterer.train(trainingSamples);
+
+// print('Agrupador K-means:', clusterer);
+
+
+// // ============================================================
+// // TESTE INDEPENDENTE EM TODO O MOSAICO
+// // ============================================================
+
+// var classification = mosaic
+//     .select(inputProperties)
+//     .cluster(clusterer);
+
+// // ============================================================
+// // VISUALIZAR OS AGRUPAMENTOS
+// // ============================================================
+
+// // Os IDs dos clusters são arbitrários.
+// //
+// // NÃO assuma que:
+// // cluster 0 = urbano
+// // cluster 1 = solo exposto
+// // cluster 2 = água
+// // cluster 3 = manguezal
+// // cluster 4 = floresta
+// //
+// // As cores abaixo são apenas para fins de visualização.
+
+// var clusterPalette = [
+//     '#d4271e',
+//     '#d1af86',
+//     '#1488ff',
+//     '#076132',
+//     '#2cc968'
+// ];
+
+// Map.addLayer(
+//     classification,
+//     {
+//         min: 0,
+//         max: numberOfClusters - 1,
+//         palette: clusterPalette,
+//         format: 'png'
+//     },
+//     'Classificação K-means'
+// );
+
+// print('Classificação K-means:', classification);
+
+
+// // ============================================================
+// // CALCULAR A AREA DE CADA AGRUPAMENTO
+// // ============================================================
+
+// // Área do pixel em hectares
+// var areaHa = ee.Image.pixelArea().divide(1e4);
+
+
+// // Adicionar a banda de classificação
+// var areaStack = areaHa.addBands(classification);
+
+
+// // Calcular a área agrupada por cluster
+// var areaDict = areaStack.reduceRegion({
+//     reducer: ee.Reducer.sum().group({
+//         groupField: 1,
+//         groupName: 'cluster'
+//     }),
+//     geometry: roi,
+//     scale: 10,
+//     maxPixels: 1e13
+// });
+
+// print(
+//     'Tabela de áreas (ha) para cada cluster:',
+//     areaDict
+// );
+
+
+// // ===========================================================
+// // CONVERTER O DICIONARIO DE AREAS PARA COLECAO DE ATRIBUTOS
+// // ===========================================================
+
+// var groups = ee.List(areaDict.get('groups'));
+
+
+// var areaFc = ee.FeatureCollection(
+//     groups.map(function(item) {
+
+//         item = ee.Dictionary(item);
+
+//         var cluster = ee.Number(
+//             item.get('cluster')
+//         ).int();
+
+//         var area = item.get('sum');
+
+//         return ee.Feature(null, {
+//             cluster: cluster,
+//             cluster_label: ee.String('Cluster ')
+//                 .cat(cluster.format()),
+//             area_ha: area
+//         });
+
+//     })
+// );
+
+
+// print(
+//     'FeatureCollection de áreas (ha) para cada cluster:',
+//     areaFc
+// );
+
+
+// // ============================================
+// // PLOTAR OS AGRUPAMENTOS EM GRAFICO DE BARRAS
+// // ============================================
+
+// var barPlot = ui.Chart.feature.groups({
+//     features: areaFc,
+//     xProperty: 'cluster_label',
+//     yProperty: 'area_ha',
+//     seriesProperty: 'cluster_label'
+// })
+// .setChartType('ColumnChart')
+// .setOptions({
+
+//     title: 'Area per cluster Weka K-means',
+
+//     hAxis: {
+//         title: 'Clustering'
+//     },
+
+//     vAxis: {
+//         title: 'Area (ha)'
+//     },
+
+//     legend: {
+//         position: 'right'
+//     },
+
+//     isStacked: false,
+
+//     colors: clusterPalette,
+
+//     bar: {
+//         groupWidth: '100%'
+//     }
+
+// });
+
+// print(barPlot);
+
+// // // 2.2. Coletar amostras manuais
+// // // Coletar amostras manualmente para o processo de classificação. 
+// // // Utilizando a ferramenta de edição de formas do editor de código, desenhe polígonos representando cada classe e importe-os como uma FeatureCollection
+
+// // // 2.2.1. Criar uma coleção de feições (FeatureCollection)
+// // // Classificar duas classes de cobertura do solo: manguezal (0) e não manguezal (1)
+
+// // // 2.3. Gerar pontos aleatórios
+// // // Gerar pontos aleatórios dentro destas regiões. 
+// // // A distribuição adequada dos polígonos de amostragem, combinada com o posicionamento aleatório dos pontos dentro deles, garante uma melhor representação da variabilidade das classes. 
+// // // Função para gerar pontos aleatórios dentro dos polígonos previamente definidos.
+
+// // // OBS.: Existem outras formas mais precisas de definir o número de pontos a serem coletados. 
+// // // Por exemplo, podemos determinar o tamanho do conjunto de pontos utilizando como referência a proporção da área conhecida da sua região de interesse (ROI).
+
+// // ============================================================
+// // CLASSIFICAÇÃO COM RANDOM FOREST
+// // ============================================================
+
+// // Variáveis preditoras
+// var inputProperties = [
+//   'B1',
+//   'B2',
+//   'B3',
+//   'B4',
+//   'B5',
+//   'B6',
+//   'B7',
+//   'B8',
+//   'B8A',
+//   'B9',
+//   'B11',
+//   'B12',
+//   'ndvi',
+//   'ndwi',
+//   'evi',
+//   'mndwi',
+//   'mmri'
+// ];
+
+
+// // ============================================================
+// // GERAR PONTOS ALEATÓRIOS DE TREINAMENTO
+// // ============================================================
+
+// var generatePoints = function(polygons, nPoints, classValue) {
+
+//   var points = ee.FeatureCollection.randomPoints(
+//     polygons,
+//     nPoints
+//   );
+
+//   return points.map(function(point) {
+//     return point.set('class', classValue);
+//   });
+// };
+
+
+// // Classe 0: Manguezal
+// var mangrovePoints = generatePoints(
+//   mangrove,
+//   2500,
+//   0
+// );
+
+// // Classe 1: Não manguezal
+// var nonmangrovePoints = generatePoints(
+//   nonmangrove,
+//   2500,
+//   1
+// );
+
+
+// // Mesclar amostras
+// var samples = mangrovePoints.merge(nonmangrovePoints);
+
+// print('Samples:', samples);
+
+// Map.addLayer(
+//   samples.filter(ee.Filter.eq('class', 0)),
+//   {color: '#076a36'},
+//   'Mangrove samples',
+//   false
+// );
+
+// Map.addLayer(
+//   samples.filter(ee.Filter.eq('class', 1)),
+//   {color: '#ffc82d'},
+//   'Non-mangrove samples',
+//   false
+// );
+
+
+// // ============================================================
+// // EXTRAIR VALORES DAS VARIÁVEIS PREDITORAS
+// // ============================================================
+
+// var trainedSamples = mosaic
+//   .select(inputProperties)
+//   .sampleRegions({
+//     collection: samples,
+//     properties: ['class'],
+//     scale: 10,
+//     geometries: true
+//   });
+
+
+// // Remover amostras com valores nulos de preditores
+// trainedSamples = trainedSamples.filter(
+//   ee.Filter.notNull(inputProperties)
+// );
+
+// print('Train samples:', trainedSamples);
+// print(
+//   'Number of valid samples:',
+//   trainedSamples.size()
+// );
+
+
+// // ============================================================
+// // DIVISÃO TREINO / TESTE
+// // ============================================================
+
+// trainedSamples = trainedSamples.randomColumn(
+//   'random',
+//   42
+// );
+
+// var trainSet = trainedSamples.filter(
+//   ee.Filter.lessThan('random', 0.8)
+// );
+
+// var testSet = trainedSamples.filter(
+//   ee.Filter.greaterThanOrEquals('random', 0.8)
+// );
+
+// print('Train set:', trainSet);
+// print('Test set:', testSet);
+
+
+// // ============================================================
+// // TREINAR RANDOM FOREST
+// // ============================================================
+
+// var classifier = ee.Classifier.smileRandomForest({
+//   numberOfTrees: 200
+// });
+
+// classifier = classifier.train({
+//   features: trainSet,
+//   classProperty: 'class',
+//   inputProperties: inputProperties
+// });
+
+
+// // ============================================================
+// // ACURÁCIA DE TREINAMENTO
+// // ============================================================
+
+// var trainMatrix = classifier.confusionMatrix();
+
+// var trainAccuracy = trainMatrix.accuracy();
+
+// print(
+//   'Training confusion matrix:',
+//   trainMatrix
+// );
+
+// print(
+//   'Training accuracy:',
+//   trainAccuracy
+// );
+
+
+// // ============================================================
+// // ACURÁCIA DE TESTE
+// // ============================================================
+
+// var testResults = testSet.classify(classifier);
+
+// var testMatrix = testResults.errorMatrix(
+//   'class',
+//   'classification'
+// );
+
+// var testAccuracy = testMatrix.accuracy();
+// var testKappa = testMatrix.kappa();
+
+// print(
+//   'Test confusion matrix:',
+//   testMatrix
+// );
+
+// print(
+//   'Test accuracy:',
+//   testAccuracy
+// );
+
+// print(
+//   'Test kappa:',
+//   testKappa
+// );
+
+
+// // ============================================================
+// // CLASSIFICAR TODO O MOSAICO
+// // ============================================================
+
+// var classification = mosaic
+//   .select(inputProperties)
+//   .classify(classifier);
+
+
+// var palette = [
+//   '#076132', // Manguezal
+//   '#2cc968'  // Não manguezal
+// ];
+
+// Map.addLayer(
+//   classification,
+//   {
+//     min: 0,
+//     max: 1,
+//     palette: palette,
+//     format: 'png'
+//   },
+//   'Random Forest classification'
+// );
+
+// print(
+//   'Random Forest classification:',
+//   classification
+// );
+
+
+// // ============================================================
+// // ÁREA POR CLASSE
+// // ============================================================
+
+// var areaHa = ee.Image.pixelArea()
+//   .divide(1e4);
+
+// var areaStack = areaHa.addBands(
+//   classification
+// );
+
+// var areaDict = areaStack.reduceRegion({
+//   reducer: ee.Reducer.sum().group({
+//     groupField: 1,
+//     groupName: 'classification'
+//   }),
+//   geometry: roi,
+//   scale: 10,
+//   maxPixels: 1e13
+// });
+
+// print(
+//   'Table of areas (ha) for each class:',
+//   areaDict
+// );
+
+// // Obter dados dos grupos
+// var groups = ee.List(areaDict.get('groups'));
+
+// // Tabela de atributos das classes
+// var classDict = ee.Dictionary({
+//   '0': 'Mangrove',
+//   '1': 'Non-mangrove'
+// });
+
+// // Converter para coleção de feições (FeatureCollection)
+// var areaFc = ee.FeatureCollection(
+//   groups.map(function(item){
+//     item = ee.Dictionary(item);
+//     var code = ee.Number(item.get('classification')).int();
+//     var area = item.get('sum');
+//     return ee.Feature(null, {
+//       class_code: code,
+//       class_label: classDict.get(code.format(), 'Desconhecido'),
+//       area_ha: area
+//     });
+//   })
+// );
+
+// print('Feature collection of areas (ha) for each class:', areaFc);
+
+// // Gerar o gráfico
+// var barPlot = ui.Chart.feature.groups({
+//     features: areaFc,
+//     xProperty: 'class_label',
+//     yProperty: 'area_ha',
+//     seriesProperty: 'class_label'
+// })
+// .setChartType('ColumnChart')     
+// .setOptions({
+//   title: 'Area per class',
+//   hAxis: {title: 'Land cover'},
+//   vAxis: {title: 'Area (ha)'},
+//   legend: {position: 'right'},
+//   isStacked: true,              
+//   colors: palette,       
+//   bar: {                    
+//     groupWidth: '100%' 
+//   }
+// });
+
+// print(barPlot);
