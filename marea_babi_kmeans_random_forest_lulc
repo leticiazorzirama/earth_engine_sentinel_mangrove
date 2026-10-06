@@ -320,8 +320,7 @@ var calculateWCSS = function(k) {
     
     // Parear valores dos centroides com seus respectivos clusters
     var centroidList = ee.List(centroids);
-    var matchingGroup = ee.Dictionary(centroidList.filter(ee.Filter.eq('cluster_id', clusterId)).get(0));
-    var centroidMeans = ee.List(matchingGroup.get('mean'));
+    var centroidMeans = ee.List(ee.Dictionary(centroids.get(clusterId)).get('mean'));
     
     // Funcao para computar o quadrado da distancia euclidiana: sum((Xi - Cj)^2)
     var distanceSq = ee.Number(bands.reduce(function(acc, bandName, index) {
