@@ -190,9 +190,9 @@ var babiDegr1 = ee.FeatureCollection("projects/leticiazr/assets/babiDegradada1")
               "system:index": "9"
             })]);
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
-// =============================
+// ============================================================
 // IMPORTAR E VISUALIZAR ASSETS
-// =============================
+// ============================================================
 
 // Carregar asset de tabela enviado
 var table = ee.FeatureCollection(babiDegr1);
@@ -210,9 +210,9 @@ var visParams = {
 Map.addLayer(mosaic, visParams, 'Cor natural', false);
 Map.centerObject(mosaic);
 
-// ==============================
+// ============================================================
 // DEFINIR VARIAVEIS DE ENTRADA
-// ==============================
+// ============================================================
 
 // O K-means utilizará os valores espectrais e dos índices
 // para agrupar os pixels de acordo com sua similaridade.
@@ -397,7 +397,6 @@ var clusterer = ee.Clusterer.wekaKMeans(
     randomSeed
 );
 
-
 // ============================================================
 // TREINAR O K-MEANS
 // ============================================================
@@ -407,7 +406,6 @@ var clusterer = ee.Clusterer.wekaKMeans(
 clusterer = clusterer.train(trainingData);
 
 print('Agrupador K-means:', clusterer);
-
 
 // ============================================================
 // TESTE INDEPENDENTE EM TODO O MOSAICO
@@ -446,7 +444,6 @@ Map.addLayer(
 
 print('Classificação K-means:', classification);
 
-
 // ============================================================
 // CALCULAR A AREA DE CADA AGRUPAMENTO
 // ============================================================
@@ -475,10 +472,9 @@ print(
     areaDict
 );
 
-
-// ===========================================================
+// ============================================================
 // CONVERTER O DICIONARIO DE AREAS PARA COLECAO DE ATRIBUTOS
-// ===========================================================
+// ============================================================
 
 var groups = ee.List(areaDict.get('groups'));
 
@@ -510,10 +506,9 @@ print(
     areaFc
 );
 
-
-// ============================================
+// ============================================================
 // PLOTAR OS AGRUPAMENTOS EM GRAFICO DE BARRAS
-// ============================================
+// ============================================================
 
 var clusterPlot = ui.Chart.feature.groups({
     features: areaFc,
@@ -550,18 +545,17 @@ var clusterPlot = ui.Chart.feature.groups({
 
 print(clusterPlot);
 
-// ============================================
-// COLETAR AMOSTRAS DOS CLUSTERS
-// ============================================
+// ============================================================
+// CONVERTER OS CLUSTERS DE RASTER PARA POLIGONO
+// ============================================================
 
-var cluster1 = 1;
-var cluster1Mask = classification.eq(cluster1);
+// Cluster 0
 
-// Converter raster para vetor
+var cluster0 = 0;
+var cluster0Mask = classification.eq(cluster0);
 
-// Cluster 1
-var vector1 = cluster1Mask.selfMask().reduceToVectors({
-  geometry: roi,              // Your region of interest (ee.Geometry)
+var vector0 = cluster0Mask.selfMask().reduceToVectors({
+  geometry: roi,              
   scale: 10,                 
   geometryType: 'polygon',
   eightConnected: false,
@@ -570,7 +564,41 @@ var vector1 = cluster1Mask.selfMask().reduceToVectors({
 });
 
 // Visualizar o poligono
-Map.addLayer(vector1, {color: '#A00000'}, 'Cluster 1 Polygons', false);
+Map.addLayer(vector0, {color: '#298C8C'}, 'Cluster 0 - Polígono', false);
+
+// Cluster 1
+
+var cluster1 = 1;
+var cluster1Mask = classification.eq(cluster1);
+
+var vector1 = cluster1Mask.selfMask().reduceToVectors({
+  geometry: roi,              
+  scale: 10,                 
+  geometryType: 'polygon',
+  eightConnected: false,
+  labelProperty: 'cluster',
+  maxPixels: 1e12
+});
+
+// Visualizar o poligono
+Map.addLayer(vector1, {color: '#A00000'}, 'Cluster 1 - Polígono', false);
+
+// Cluster 2
+
+var cluster2 = 2;
+var cluster2Mask = classification.eq(cluster2);
+
+var vector2 = cluster2Mask.selfMask().reduceToVectors({
+  geometry: roi,             
+  scale: 10,                 
+  geometryType: 'polygon',
+  eightConnected: false,
+  labelProperty: 'cluster',
+  maxPixels: 1e12
+});
+
+// Visualizar o poligono
+Map.addLayer(vector2, {color: '#B8B8B8'}, 'Cluster 2 - Polígono', false);
 
 // // // 2.2. Coletar amostras manuais
 // // // Coletar amostras manualmente para o processo de classificação. 
