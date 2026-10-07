@@ -699,12 +699,12 @@ print('Número de pixels por classe:', classPixelCount);
 // PARÂMETROS
 // ------------------------------------------------------------
 
-var numberOfTrainings = 10;
+var numberOfTrainings = 50;
 var sampleSizePerClass = 2500;
 var trainFraction = 0.8;
 var numberOfTrees = 100;
 
-var generateFinalPlot = true;
+var generateFinalPlot = falso;
 
 // ============================================================
 // CRIAR POOL DE PIXELS PARA CADA CLASSE
