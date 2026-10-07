@@ -210,6 +210,7 @@ var visParams = {
 Map.addLayer(mosaic, visParams, 'Cor natural', false);
 Map.centerObject(mosaic);
 
+
 // ============================================================
 // VARIÁVEIS PREDITORAS
 // ============================================================
@@ -236,6 +237,7 @@ var bands = [
   
 // Semente para reprodutibilidade
 var randomSeed = 42;
+
 
 // ============================================================
 //
@@ -279,6 +281,7 @@ trainingData = trainingData.filter(
 
 print('Amostras de treinamento do K-means:', trainingData);
 print('Número de amostras:', trainingData.size());
+
 
 // ============================================================
 // ENCONTRAR O K PELO METODO DO COTOVELO
@@ -371,6 +374,7 @@ print('Número de amostras:', trainingData.size());
 // // Imprimir o plot
 // print(wcssPlot);
 
+
 // ============================================================
 // INSTANCIAR O K-MEANS COM K = 4
 // ============================================================
@@ -394,6 +398,7 @@ var clusterer = ee.Clusterer.wekaKMeans(
     randomSeed
 );
 
+
 // ============================================================
 // TREINAR O K-MEANS
 // ============================================================
@@ -404,6 +409,7 @@ clusterer = clusterer.train(trainingData);
 
 print('Agrupador K-means:', clusterer);
 
+
 // ============================================================
 // TESTE INDEPENDENTE EM TODO O MOSAICO
 // ============================================================
@@ -411,6 +417,7 @@ print('Agrupador K-means:', clusterer);
 var classification = mosaic
     .select(bands)
     .cluster(clusterer);
+
 
 // ============================================================
 // VISUALIZAR OS AGRUPAMENTOS
@@ -437,6 +444,7 @@ Map.addLayer(
 );
 
 print('Classificação K-means:', classification);
+
 
 // ============================================================
 // CALCULAR A AREA DE CADA AGRUPAMENTO
@@ -465,6 +473,7 @@ print(
     'Tabela de áreas (ha) para cada cluster:',
     areaDict
 );
+
 
 // ============================================================
 // CONVERTER O DICIONARIO DE ÁREAS PARA COLEÇÃO DE ATRIBUTOS
@@ -499,6 +508,7 @@ print(
     'FeatureCollection de áreas (ha) para cada cluster:',
     areaFc
 );
+
 
 // ============================================================
 // PLOTAR OS AGRUPAMENTOS EM GRÁFICO DE BARRAS
@@ -539,11 +549,14 @@ var clusterPlot = ui.Chart.feature.groups({
 
 print(clusterPlot);
 
+
 // ============================================================
 // CONVERTER OS CLUSTERS DE RASTER PARA POLÍGONO
 // ============================================================
 
+// ------------------------------------------------------------
 // Cluster 0
+// ------------------------------------------------------------
 
 var cluster0 = 0;
 var cluster0Mask = classification.eq(cluster0);
@@ -560,7 +573,9 @@ var vector0 = cluster0Mask.selfMask().reduceToVectors({
 // Visualizar o polígono
 Map.addLayer(vector0, {color: '#4A2377'}, 'Cluster 0 - Polígono', false, 0.5);
 
+// ------------------------------------------------------------
 // Cluster 1
+// ------------------------------------------------------------
 
 var cluster1 = 1;
 var cluster1Mask = classification.eq(cluster1);
@@ -577,7 +592,9 @@ var vector1 = cluster1Mask.selfMask().reduceToVectors({
 // Visualizar o polígono
 Map.addLayer(vector1, {color: '#0D7D87'}, 'Cluster 1 - Polígono', false, 0.5);
 
+// ------------------------------------------------------------
 // Cluster 2
+// ------------------------------------------------------------
 
 var cluster2 = 2;
 var cluster2Mask = classification.eq(cluster2);
@@ -594,7 +611,9 @@ var vector2 = cluster2Mask.selfMask().reduceToVectors({
 // Visualizar o polígono
 Map.addLayer(vector2, {color: '#F55F74'}, 'Cluster 2 - Polígono', false, 0.5);
 
+// ------------------------------------------------------------
 // Cluster 3
+// ------------------------------------------------------------
 
 var cluster3 = 3;
 var cluster3Mask = classification.eq(cluster3);
@@ -611,18 +630,23 @@ var vector3 = cluster3Mask.selfMask().reduceToVectors({
 // Visualizar o polígono
 Map.addLayer(vector3, {color: '#8CC5E3'}, 'Cluster 3 - Polígono', false, 0.5);
 
+
 // ============================================================
 // MERGE DOS CLUSTERS EM DUAS CLASSES
 // ============================================================
 
-// Mangue = clusters 1 e 3
+// ------------------------------------------------------------
+// Mangue = Clusters 1 e 3
+// ------------------------------------------------------------
 var mangrovePolygons = vector1
     .merge(vector3)
     .map(function(feature) {
       return feature.set('class', 1);
     });
 
-// Nao-mangue = clusters 0 e 2
+// ------------------------------------------------------------
+// Não-mangue = Clusters 0 e 2
+// ------------------------------------------------------------
 var nonMangrovePolygons = vector0
     .merge(vector2)
     .map(function(feature) {
@@ -636,6 +660,7 @@ print('Polígonos de não-manguezal:', nonMangrovePolygons);
 var trainingPolygons = mangrovePolygons.merge(nonMangrovePolygons);
 
 print('Polígonos para amostragem:', trainingPolygons);
+
 
 // ============================================================
 // CONTAGEM DE PIXELS
@@ -657,11 +682,18 @@ var pixelCount = ee.Image.constant(1)
 
 print('Número de pixels por cluster:', pixelCount);
 
+// ------------------------------------------------------------
+// Mangue = classe 1
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+// Não-mangue = classe 0
+// ------------------------------------------------------------
+
 // Contagem por classe
 var binaryClassification = classification
     .remap(
       [0, 1, 2, 3],  // clusters
-      [0, 1, 0, 1]   // classes: 1 mangue / 0 nao-mangue
+      [0, 1, 0, 1]   // classes: 1 mangue / 0 não-mangue
     );
 
 var classPixelCount = ee.Image.constant(1)
@@ -678,6 +710,7 @@ var classPixelCount = ee.Image.constant(1)
     });
 
 print('Número de pixels por classe:', classPixelCount);
+
 
 // ============================================================
 //
@@ -701,6 +734,7 @@ var numberOfTrees = 100;
 var generateFinalLayer = true;
 var generateFinalPlot = false;
 
+
 // ============================================================
 // CRIAR POOL DE PIXELS PARA CADA CLASSE
 // ============================================================
@@ -712,7 +746,7 @@ var totalSamplesPerClass =
 
 
 // ------------------------------------------------------------
-// Manguezal = classe 1
+// Mangue = classe 1
 // ------------------------------------------------------------
 
 var mangrovePool = mosaic
@@ -735,7 +769,7 @@ var mangrovePool = mosaic
 
 
 // ------------------------------------------------------------
-// Não-manguezal = classe 0
+// Não-mangue = classe 0
 // ------------------------------------------------------------
 
 var nonMangrovePool = mosaic
@@ -775,6 +809,7 @@ print(
   'Pixels disponíveis - não-manguezal:',
   nonMangrovePool.size()
 );
+
 
 // ============================================================
 // HISTÓRICO DOS TREINAMENTOS
@@ -1042,11 +1077,7 @@ for (var i = 0; i < numberOfTrainings; i++) {
       'RF training ' + trainingNumber,
       false
     );
-
-  }
-
-}
-
+}}
 
 // ============================================================
 // HISTÓRICO DOS TREINAMENTOS
@@ -1076,7 +1107,7 @@ Export.table.toDrive({
 
 
 // ============================================================
-// GRÁFICO FINAL
+// SÉRIE DAS ÁREAS PREDITAS PELOS MODELOS
 // ============================================================
 
 if (generateFinalPlot) {
