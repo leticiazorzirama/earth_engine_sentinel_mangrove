@@ -693,11 +693,12 @@ print('Número de pixels por classe:', classPixelCount);
 // PARÂMETROS
 // ------------------------------------------------------------
 
-var numberOfTrainings = 10;
+var numberOfTrainings = 1;
 var sampleSizePerClass = 2500;
 var trainFraction = 0.8;
 var numberOfTrees = 100;
 
+var generateFinalLayer = true;
 var generateFinalPlot = false;
 
 // ============================================================
@@ -1023,10 +1024,10 @@ for (var i = 0; i < numberOfTrainings; i++) {
 
 
   // ==========================================================
-  // PLOT FINAL
+  // GERAR CAMADA NO MAPA
   // ==========================================================
 
-  if (generateFinalPlot) {
+  if (generateFinalLayer) {
 
     Map.addLayer(
       classification,
