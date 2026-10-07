@@ -982,27 +982,6 @@ for (var i = 0; i < numberOfTrainings; i++) {
   var nonMangroveArea = ee.Number(areaByClass.get('0', 0));
 
 
-  mangroveArea = ee.Number(
-    ee.Algorithms.If(
-      mangroveGroup.size().gt(0),
-      ee.Dictionary(
-        mangroveGroup.get(0)
-      ).get('sum'),
-      0
-    )
-  );
-
-  nonMangroveArea = ee.Number(
-    ee.Algorithms.If(
-      nonMangroveGroup.size().gt(0),
-      ee.Dictionary(
-        nonMangroveGroup.get(0)
-      ).get('sum'),
-      0
-    )
-  );
-
-
   // ==========================================================
   // HISTÓRICO
   // ==========================================================
