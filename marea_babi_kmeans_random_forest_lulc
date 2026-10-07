@@ -970,14 +970,14 @@ for (var i = 0; i < numberOfTrainings; i++) {
   // Obter as áreas usando filtros sobre os grupos.
   var mangroveGroup = groups.filter(
     ee.Filter.eq(
-      'classification',
+      'item.classification',
       1
     )
   );
 
   var nonMangroveGroup = groups.filter(
     ee.Filter.eq(
-      'classification',
+      'item.classification',
       0
     )
   );
