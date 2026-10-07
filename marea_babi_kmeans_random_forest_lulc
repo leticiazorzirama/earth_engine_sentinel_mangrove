@@ -967,18 +967,6 @@ for (var i = 0; i < numberOfTrainings; i++) {
   var nonMangroveArea = ee.Number(0);
 
 
-  groups.evaluate(function(groupList) {
-
-    // Esta função apenas permite visualizar os resultados
-    // no console quando necessário.
-    print(
-      'Training ' + trainingNumber + ' - áreas:',
-      groupList
-    );
-
-  }); 
-
-
   // Obter as áreas usando filtros sobre os grupos.
   var mangroveGroup = groups.filter(
     ee.Filter.eq(
