@@ -958,15 +958,6 @@ for (var i = 0; i < numberOfTrainings; i++) {
     areaDict.get('groups')
   );
 
-
-  // Área inicializada como zero.
-  // Isso permite tratar o caso em que uma classe
-  // eventualmente não apareça na classificação.
-
-  var mangroveArea = ee.Number(0);
-  var nonMangroveArea = ee.Number(0);
-
-
   // Obter a área de cada classe a partir dos grupos
   var areaByClass = ee.Dictionary(
     groups.map(function(item) {
