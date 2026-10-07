@@ -280,102 +280,102 @@ trainingData = trainingData.filter(
 print('Amostras de treinamento do K-means:', trainingData);
 print('Número de amostras:', trainingData.size());
 
-// // ============================================================
-// // ENCONTRAR O K PELO METODO DO COTOVELO
-// // ============================================================
+// ============================================================
+// ENCONTRAR O K PELO METODO DO COTOVELO
+// ============================================================
 
-// // Funcao para calcular WCSS para um determinado k
-// var calculateWCSS = function(k) {
-//   k = ee.Number(k);
+// Funcao para calcular WCSS para um determinado k
+var calculateWCSS = function(k) {
+  k = ee.Number(k);
   
-//   // Instanciar e treinar o Weka K-Means
-//   var clusterer = ee.Clusterer.wekaKMeans(
-//     k,        // nClusters
-//     1,        // init: k-means++
-//     false,    // canopies
-//     100,      // maxCandidates
-//     10000,    // periodicPruning
-//     2,        // minDensity
-//     -1.5,     // t1
-//     -1,       // t2
-//     'Euclidean',
-//     null,     // maxIterations
-//     false,    // preserveOrder
-//     false,    // fast
-//     randomSeed
-//     ).train(trainingData);
+  // Instanciar e treinar o Weka K-Means
+  var clusterer = ee.Clusterer.wekaKMeans(
+    k,        // nClusters
+    1,        // init: k-means++
+    false,    // canopies
+    100,      // maxCandidates
+    10000,    // periodicPruning
+    2,        // minDensity
+    -1.5,     // t1
+    -1,       // t2
+    'Euclidean',
+    null,     // maxIterations
+    false,    // preserveOrder
+    false,    // fast
+    randomSeed
+    ).train(trainingData);
   
-//   // K-means atribui cada pixel a um cluster
-//   var clusteredData = trainingData.cluster(clusterer, 'cluster_id');
+  // K-means atribui cada pixel a um cluster
+  var clusteredData = trainingData.cluster(clusterer, 'cluster_id');
   
-//   // Calcular a media de cada banda de cada cluster e assim definir os centroides
-//   var centroids = clusteredData.reduceColumns({
-//     reducer: ee.Reducer.mean().repeat(bands.length).group({
-//       groupField: bands.length, // Adicionar 'cluster_id' nas propriedades
-//       groupName: 'cluster_id'
-//     }),
-//     selectors: bands.concat(['cluster_id'])
-//   }).get('groups');
+  // Calcular a media de cada banda de cada cluster e assim definir os centroides
+  var centroids = clusteredData.reduceColumns({
+    reducer: ee.Reducer.mean().repeat(bands.length).group({
+      groupField: bands.length, // Adicionar 'cluster_id' nas propriedades
+      groupName: 'cluster_id'
+    }),
+    selectors: bands.concat(['cluster_id'])
+  }).get('groups');
   
-//   // Funcao para iterar sobre os pixels calculando o quadrado da distancia desses ao seu respectivo centroide
-//   var squaredErrors = clusteredData.map(function(feature) {
-//     var clusterId = feature.get('cluster_id');
+  // Funcao para iterar sobre os pixels calculando o quadrado da distancia desses ao seu respectivo centroide
+  var squaredErrors = clusteredData.map(function(feature) {
+    var clusterId = feature.get('cluster_id');
     
-//     // Parear valores dos centroides com seus respectivos clusters
-//     var centroidList = ee.List(centroids);
-//     var centroidMeans = ee.List(ee.Dictionary(centroidList.get(clusterId)).get('mean'));
+    // Parear valores dos centroides com seus respectivos clusters
+    var centroidList = ee.List(centroids);
+    var centroidMeans = ee.List(ee.Dictionary(centroidList.get(clusterId)).get('mean'));
     
-//     // Funcao para computar o quadrado da distancia euclidiana: sum((Xi - Cj)^2)
-//     var distanceSq = ee.Number(bands.reduce(function(acc, bandName, index) {
-//       var pixelVal = ee.Number(feature.get(bandName));
-//       var centroidVal = ee.Number(centroidMeans.get(index));
-//       var diff = pixelVal.subtract(centroidVal);
-//       return ee.Number(acc).add(diff.multiply(diff));
-//     }, 0));
+    // Funcao para computar o quadrado da distancia euclidiana: sum((Xi - Cj)^2)
+    var distanceSq = ee.Number(bands.reduce(function(acc, bandName, index) {
+      var pixelVal = ee.Number(feature.get(bandName));
+      var centroidVal = ee.Number(centroidMeans.get(index));
+      var diff = pixelVal.subtract(centroidVal);
+      return ee.Number(acc).add(diff.multiply(diff));
+    }, 0));
     
-//     return feature.set('error_sq', distanceSq);
-//   });
+    return feature.set('error_sq', distanceSq);
+  });
   
-//   // Total Within-Cluster Sum of Squares Error (WCSS)
-//   var totalWcss = squaredErrors.reduceColumns({
-//     reducer: ee.Reducer.sum(),
-//     selectors: ['error_sq']
-//   }).get('sum');
+  // Total Within-Cluster Sum of Squares Error (WCSS)
+  var totalWcss = squaredErrors.reduceColumns({
+    reducer: ee.Reducer.sum(),
+    selectors: ['error_sq']
+  }).get('sum');
   
-//   return ee.Feature(null, {
-//     'k': k,
-//     'wcss': totalWcss
-//   });
-// };
+  return ee.Feature(null, {
+    'k': k,
+    'wcss': totalWcss
+  });
+};
 
-// // Iterar em k valores
-// var kList = ee.List.sequence(1, 10);
-// var wcssFeatures = ee.FeatureCollection(kList.map(calculateWCSS));
+// Iterar em k valores
+var kList = ee.List.sequence(1, 10);
+var wcssFeatures = ee.FeatureCollection(kList.map(calculateWCSS));
 
-// // Plotar os resultados
-// var wcssPlot = ui.Chart.feature.byFeature({
-//   features: wcssFeatures,
-//   xProperty: 'k',
-//   yProperties: ['wcss']
-// })
-// .setChartType('LineChart')
-// .setOptions({
-//   title: 'K-Means método do cotovelo: WCSS vs. Número de Clusters (K)',
-//   hAxis: {title: 'Número de Clusters (K)', gridlines: {count: 9}},
-//   vAxis: {title: 'Within-Cluster Sum of Squared Errors (WCSS)'},
-//   lineWidth: 2,
-//   pointSize: 6,
-//   colors: ['#3F3F3F']
-// });
+// Plotar os resultados
+var wcssPlot = ui.Chart.feature.byFeature({
+  features: wcssFeatures,
+  xProperty: 'k',
+  yProperties: ['wcss']
+})
+.setChartType('LineChart')
+.setOptions({
+  title: 'K-Means método do cotovelo: WCSS vs. Número de Clusters (K)',
+  hAxis: {title: 'Número de Clusters (K)', gridlines: {count: 9}},
+  vAxis: {title: 'Within-Cluster Sum of Squared Errors (WCSS)'},
+  lineWidth: 2,
+  pointSize: 6,
+  colors: ['#3F3F3F']
+});
 
-// // Imprimir o plot
-// print(wcssPlot);
+// Imprimir o plot
+print(wcssPlot);
 
-// // Afericao do grafico indica o cotovelo em k = 3
-// // Ha 81% de reducao no WCSS de 1 para 3 agrupamentos
-// // Para 4 agrupamentos a reducao e de 84%
-// // Ou seja, de 3 para 4 k ha um ganho de 3% na reducao do WCSS
-// // k = 3 ja indica um bom balanco
+// Afericao do grafico indica o cotovelo em k = 3
+// Ha 81% de reducao no WCSS de 1 para 3 agrupamentos
+// Para 4 agrupamentos a reducao e de 84%
+// Ou seja, de 3 para 4 k ha um ganho de 3% na reducao do WCSS
+// k = 3 ja indica um bom balanco
 
 // ============================================================
 // INSTANCIAR O K-MEANS COM K = 4
