@@ -704,7 +704,7 @@ var sampleSizePerClass = 2500;
 var trainFraction = 0.8;
 var numberOfTrees = 100;
 
-var generateFinalPlot = falso;
+var generateFinalPlot = false;
 
 // ============================================================
 // CRIAR POOL DE PIXELS PARA CADA CLASSE
