@@ -699,7 +699,7 @@ print('Número de pixels por classe:', classPixelCount);
 // PARÂMETROS
 // ------------------------------------------------------------
 
-var numberOfTrainings = 20;
+var numberOfTrainings = 5;
 var sampleSizePerClass = 2500;
 var trainFraction = 0.8;
 var numberOfTrees = 100;
