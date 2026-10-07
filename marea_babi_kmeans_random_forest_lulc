@@ -1102,7 +1102,8 @@ if (generateFinalPlot) {
       title: 'Area (ha)'
     },
     lineWidth: 2,
-    pointSize: 4
+    pointSize: 4,
+    colors: ['#076132', '#2cc968']
   });
 
   print(areaPlot);
