@@ -685,22 +685,6 @@ var classPixelCount = ee.Image.constant(1)
 
 print('Número de pixels por classe:', classPixelCount);
 
-// COMO ESTAVA SENDO FEITO ANTES
-// 2.2. Coletar amostras manuais
-// Coletar amostras manualmente para o processo de classificação. 
-// Utilizando a ferramenta de edição de formas do editor de código, desenhe polígonos representando cada classe e importe-os como uma FeatureCollection
-
-// 2.2.1. Criar uma coleção de feições (FeatureCollection)
-// Classificar duas classes de cobertura do solo: manguezal (0) e não manguezal (1)
-
-// 2.3. Gerar pontos aleatórios
-// Gerar pontos aleatórios dentro destas regiões. 
-// A distribuição adequada dos polígonos de amostragem, combinada com o posicionamento aleatório dos pontos dentro deles, garante uma melhor representação da variabilidade das classes. 
-// Função para gerar pontos aleatórios dentro dos polígonos previamente definidos.
-
-// OBS.: Existem outras formas mais precisas de definir o número de pontos a serem coletados. 
-// Por exemplo, podemos determinar o tamanho do conjunto de pontos utilizando como referência a proporção da área conhecida da sua região de interesse (ROI).
-
 // ============================================================
 //
 //                      RANDOM FOREST
@@ -921,6 +905,22 @@ for (var i = 0; i < numberOfTrainings; i++) {
   var fp = matrixArray.get([0, 1]);
   var fn = matrixArray.get([1, 0]);
   var tp = matrixArray.get([1, 1]);
+  
+  // ----------------------------------------------------------
+  // Precisão, recall e F1 para manguezal (classe 1)
+  // ----------------------------------------------------------
+  var precision = ee.Number(tp).divide(ee.Number(tp).add(fp));
+  var recall    = ee.Number(tp).divide(ee.Number(tp).add(fn));
+  var f1 = precision.multiply(recall).multiply(2)
+      .divide(precision.add(recall));
+  
+  // ----------------------------------------------------------
+  // Precisão, recall e F1 para não-manguezal (classe 0)
+  // ----------------------------------------------------------
+  var precision0 = ee.Number(tn).divide(ee.Number(tn).add(fn));
+  var recall0    = ee.Number(tn).divide(ee.Number(tn).add(fp));
+  var f1_0 = precision0.multiply(recall0).multiply(2)
+      .divide(precision0.add(recall0));
 
 
   // ==========================================================
@@ -999,7 +999,16 @@ for (var i = 0; i < numberOfTrainings; i++) {
       tp: tp,
 
       mangrove_area_ha: mangroveArea,
-      non_mangrove_area_ha: nonMangroveArea
+      non_mangrove_area_ha: nonMangroveArea,
+      
+      precision_mangrove: precision,
+      recall_mangrove: recall,
+      f1_mangrove: f1,
+
+      precision_non_mangrove: precision0,
+      recall_non_mangrove: recall0,
+      f1_non_mangrove: f1_0,
+      
     }
   );
 
