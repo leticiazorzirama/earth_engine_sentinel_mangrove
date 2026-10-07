@@ -1071,10 +1071,12 @@ print(
 // EXPORTAR HISTÓRICO
 // ============================================================
 
-Export.table.toAsset({
+Export.table.toDrive({
   collection: trainingHistoryFc,
   description: 'RF_training_history',
-  assetId: 'RF_training_history'
+  folder: 'GEE_exports',          
+  fileNamePrefix: 'RF_training_history',
+  fileFormat: 'CSV'
 });
 
 
