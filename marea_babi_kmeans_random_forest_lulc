@@ -967,20 +967,19 @@ for (var i = 0; i < numberOfTrainings; i++) {
   var nonMangroveArea = ee.Number(0);
 
 
-  // Obter as áreas usando filtros sobre os grupos.
-  var mangroveGroup = groups.filter(
-    ee.Filter.eq(
-      'classification',
-      1
-    )
+  // Obter a área de cada classe a partir dos grupos
+  var areaByClass = ee.Dictionary(
+    groups.map(function(item) {
+      item = ee.Dictionary(item);
+      return ee.List([
+        ee.Number(item.get('classification')).int().format(),
+        item.get('sum')
+      ]);
+    }).flatten()
   );
-
-  var nonMangroveGroup = groups.filter(
-    ee.Filter.eq(
-      'classification',
-      0
-    )
-  );
+  
+  var mangroveArea = ee.Number(areaByClass.get('1', 0));
+  var nonMangroveArea = ee.Number(areaByClass.get('0', 0));
 
 
   mangroveArea = ee.Number(
