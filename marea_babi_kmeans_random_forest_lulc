@@ -981,8 +981,6 @@ for (var i = 0; i < numberOfTrainings; i++) {
       rightValue: classification
     }).get(0)
   );
-  
-  //     var centroidMeans = ee.List(ee.Dictionary(centroidList.get(clusterId)).get('mean'));
 
 
   mangroveArea = ee.Number(
