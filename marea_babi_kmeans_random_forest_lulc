@@ -716,11 +716,11 @@ print('Número de pixels por classe:', classPixelCount);
 // ------------------------------------------------------------
 
 var numberOfTrainings = 2;
-var sampleSizePerClass = 500;
+var sampleSizePerClass = 2500;
 var trainFraction = 0.8;
 var numberOfTrees = 100;
 
-var generateFinalPlot = false;
+var generateFinalPlot = true;
 
 // ============================================================
 // CRIAR POOL DE PIXELS PARA CADA CLASSE
