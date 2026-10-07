@@ -969,18 +969,20 @@ for (var i = 0; i < numberOfTrainings; i++) {
 
   // Obter as áreas usando filtros sobre os grupos.
   var mangroveGroup = groups.filter(
-    ee.Filter.eq(
-      'item.classification',
-      1
-    )
+    ee.Filter.equals({
+      leftField: 'classification',
+      rightValue: 1
+    }).get(0)
   );
 
   var nonMangroveGroup = groups.filter(
-    ee.Filter.eq(
-      'item.classification',
-      0
-    )
+    ee.Filter.equals({
+      leftField: 'classification',
+      rightValue: 0
+    }).get(0)
   );
+  
+  //     var centroidMeans = ee.List(ee.Dictionary(centroidList.get(clusterId)).get('mean'));
 
 
   mangroveArea = ee.Number(
