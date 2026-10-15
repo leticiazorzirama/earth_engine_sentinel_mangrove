@@ -488,7 +488,7 @@ print(AREA_ATUAL + ' - Blocos detectados:', blocos);
 //  COMPOR/EXPORTAR CADA BLOCO
 // ======================================================================
 
-// Destino possiveis: drive ou asset
+// Destino possiveis: 'drive' ou 'asset' 
 var DESTINO = 'asset';
 
 blocos.forEach(function(bloco, i) {
