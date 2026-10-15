@@ -722,10 +722,7 @@ print('Número de pixels por classe:', classPixelCount);
 // CLASSIFICAÇÃO COM RANDOM FOREST
 // ============================================================
 
-// ------------------------------------------------------------
-// PARÂMETROS
-// ------------------------------------------------------------
-
+// Parâmetros
 var numberOfTrainings = 1;
 var sampleSizePerClass = 2500;
 var trainFraction = 0.8;
@@ -881,7 +878,7 @@ for (var i = 0; i < numberOfTrainings; i++) {
 
 
   // ----------------------------------------------------------
-  // TREINAR RANDOM FOREST
+  // Treinar Random Forest
   // ----------------------------------------------------------
 
   var classifier = ee.Classifier.smileRandomForest({
